@@ -29,10 +29,11 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h7xx_hal.h"
+#include "stm32h7xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -62,6 +63,10 @@ void Error_Handler(void);
 #define LED_GPIO_Port GPIOE
 #define USB_SWITCH_Pin GPIO_PIN_15
 #define USB_SWITCH_GPIO_Port GPIOE
+#define DCMI_RST_Pin GPIO_PIN_10
+#define DCMI_RST_GPIO_Port GPIOA
+#define DCMI_PWDN_Pin GPIO_PIN_7
+#define DCMI_PWDN_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
