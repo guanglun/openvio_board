@@ -27,6 +27,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */     
 #include "cambus.h"
+#include "mt9v034.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -41,7 +42,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-    uint8_t send_buf[4096*2];
+uint8_t send_buf[4096 * 2];
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -52,7 +53,7 @@ osThreadId defaultTaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-   
+
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
@@ -69,27 +70,27 @@ void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, Stack
 /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
 static StaticTask_t xIdleTaskTCBBuffer;
 static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
-  
-void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
+
+void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize)
 {
   *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
   *ppxIdleTaskStackBuffer = &xIdleStack[0];
   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
   /* place for user code */
-}                   
+}
 /* USER CODE END GET_IDLE_TASK_MEMORY */
 
 /* USER CODE BEGIN GET_TIMER_TASK_MEMORY */
 static StaticTask_t xTimerTaskTCBBuffer;
 static StackType_t xTimerStack[configTIMER_TASK_STACK_DEPTH];
-  
-void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize )  
+
+void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize)
 {
   *ppxTimerTaskTCBBuffer = &xTimerTaskTCBBuffer;
   *ppxTimerTaskStackBuffer = &xTimerStack[0];
   *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
   /* place for user code */
-}                   
+}
 /* USER CODE END GET_TIMER_TASK_MEMORY */
 
 /**
@@ -99,7 +100,7 @@ void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, Stack
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-       
+
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -141,37 +142,38 @@ void StartDefaultTask(void const * argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN StartDefaultTask */
-    
+
   /* Infinite loop */
-	printf("SCAN START\r\n");
-	
-	HAL_GPIO_WritePin(DCMI_PWDN_GPIO_Port, DCMI_PWDN_Pin, GPIO_PIN_SET);
-	osDelay(10);
-	HAL_GPIO_WritePin(DCMI_PWDN_GPIO_Port, DCMI_PWDN_Pin, GPIO_PIN_RESET);
-	
-    HAL_GPIO_WritePin(DCMI_RST_GPIO_Port, DCMI_RST_Pin, GPIO_PIN_RESET);
-	osDelay(10);
-	HAL_GPIO_WritePin(DCMI_RST_GPIO_Port, DCMI_RST_Pin, GPIO_PIN_SET);
-	
-	
-	int ret = cambus_scan();
-    
-	printf("cambus_scan %02X\r\n",ret);
-	
-	printf("SCAN END\r\n");
-    
-    
-  for(;;)
+  //printf("SCAN START\r\n");
+
+  HAL_GPIO_WritePin(DCMI_PWDN_GPIO_Port, DCMI_PWDN_Pin, GPIO_PIN_SET);
+  osDelay(10);
+  HAL_GPIO_WritePin(DCMI_PWDN_GPIO_Port, DCMI_PWDN_Pin, GPIO_PIN_RESET);
+
+  HAL_GPIO_WritePin(DCMI_RST_GPIO_Port, DCMI_RST_Pin, GPIO_PIN_RESET);
+  osDelay(10);
+  HAL_GPIO_WritePin(DCMI_RST_GPIO_Port, DCMI_RST_Pin, GPIO_PIN_SET);
+    osDelay(100);
+  int ret = cambus_scan();
+
+  printf("cambus_scan %02X\r\n", ret);
+
+  mt9v034_start_stream();
+osDelay(100);
+  dcmi_dma_enable();
+  //printf("SCAN END\r\n");
+
+  for (;;)
   {
-        //osDelay(1);
-        CDC_Transmit_HS(send_buf,sizeof(send_buf));
+    osDelay(1000);
+    //CDC_Transmit_HS(send_buf,sizeof(send_buf));
   }
   /* USER CODE END StartDefaultTask */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-     
+
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

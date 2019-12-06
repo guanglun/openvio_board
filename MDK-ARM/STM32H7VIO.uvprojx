@@ -52,9 +52,9 @@
           <OutputName>STM32H7VIO</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>1</CreateHexFile>
+          <CreateHexFile>0</CreateHexFile>
           <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath></ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -209,7 +209,7 @@
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
             <Im1Chk>1</Im1Chk>
-            <Im2Chk>0</Im2Chk>
+            <Im2Chk>1</Im2Chk>
             <OnChipMemories>
               <Ocm1>
                 <Type>0</Type>
@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H743xx,USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc; ../Drivers/STM32H7xx_HAL_Driver/Inc; ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy; ../Drivers/CMSIS/Device/ST/STM32H7xx/Include; ../Drivers/CMSIS/Include; ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc; ../Middlewares/Third_Party/FreeRTOS/Source/include; ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS; ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F; ..\App; ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc; ..\MV</IncludePath>
+              <IncludePath>../Inc;               ../Drivers/STM32H7xx_HAL_Driver/Inc;               ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;               ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;               ../Drivers/CMSIS/Include;               ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;               ../Middlewares/Third_Party/FreeRTOS/Source/include;               ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;               ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;               ..\App;               ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;               ..\MV</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -359,7 +359,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -368,7 +368,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>..\output.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -390,6 +390,16 @@
               <FileName>cambus.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\MV\cambus.h</FilePath>
+            </File>
+            <File>
+              <FileName>mt9v034.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MV\mt9v034.c</FilePath>
+            </File>
+            <File>
+              <FileName>mt9v034.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\MV\mt9v034.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -435,6 +445,11 @@
               <FileName>debug.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/debug.c</FilePath>
+            </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Src/dma.c</FilePath>
             </File>
             <File>
               <FileName>freertos.c</FileName>

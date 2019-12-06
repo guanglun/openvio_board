@@ -21,10 +21,52 @@
 #include "dcmi.h"
 
 /* USER CODE BEGIN 0 */
+#include "mt9v034.h"
+#define DMA_BUFFER \
+  __attribute__((section(".RAM_D1")))
+/* USER CODE BEGIN 0 */
+DMA_BUFFER uint8_t dcmi_image_buffer_8bit_1[FULL_IMAGE_SIZE] = {0};
+int count = 0;
+void dcmi_dma_enable()
+{
+  for(int i = 0;i<FULL_IMAGE_SIZE;i++)
+    {
+    dcmi_image_buffer_8bit_1[i] = 0x00;
+    }
+    
+   // DCMI->IER=0x0;
+      __HAL_DCMI_ENABLE_IT(&hdcmi,DCMI_IT_FRAME);      
+      __HAL_DCMI_ENABLE_IT(&hdcmi,DCMI_IT_VSYNC);     
+      __HAL_DCMI_ENABLE(&hdcmi);                      
+  HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)&dcmi_image_buffer_8bit_1, FULL_IMAGE_SIZE);
+    
+    while(1)
+    {
+        printf("%02X\t%02X\t%02X\t%02X\r\n",hdcmi.State,hdcmi.ErrorCode,hdcmi.DMA_Handle->State,hdcmi.DMA_Handle->ErrorCode);
+        osDelay(200);
+    }
+}
+
+void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
+{
+  if (hdcmi->Instance == DCMI)
+  {
+    __HAL_DCMI_ENABLE_IT(hdcmi, DCMI_IT_FRAME);
+  }
+}
+
+void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi)
+{
+  if (hdcmi->Instance == DCMI)
+  {
+      count++;
+  }
+}
 
 /* USER CODE END 0 */
 
 DCMI_HandleTypeDef hdcmi;
+DMA_HandleTypeDef hdma_dcmi;
 
 /* DCMI init function */
 void MX_DCMI_Init(void)
@@ -107,6 +149,31 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* dcmiHandle)
     GPIO_InitStruct.Alternate = GPIO_AF13_DCMI;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+    /* DCMI DMA Init */
+    /* DCMI Init */
+    hdma_dcmi.Instance = DMA2_Stream1;
+    hdma_dcmi.Init.Request = DMA_REQUEST_DCMI;
+    hdma_dcmi.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_dcmi.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_dcmi.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_dcmi.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_dcmi.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_dcmi.Init.Mode = DMA_NORMAL;
+    hdma_dcmi.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_dcmi.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+    hdma_dcmi.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+    hdma_dcmi.Init.MemBurst = DMA_MBURST_SINGLE;
+    hdma_dcmi.Init.PeriphBurst = DMA_PBURST_SINGLE;
+    if (HAL_DMA_Init(&hdma_dcmi) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(dcmiHandle,DMA_Handle,hdma_dcmi);
+
+    /* DCMI interrupt Init */
+    HAL_NVIC_SetPriority(DCMI_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(DCMI_IRQn);
   /* USER CODE BEGIN DCMI_MspInit 1 */
 
   /* USER CODE END DCMI_MspInit 1 */
@@ -146,6 +213,11 @@ void HAL_DCMI_MspDeInit(DCMI_HandleTypeDef* dcmiHandle)
 
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6|GPIO_PIN_7);
 
+    /* DCMI DMA DeInit */
+    HAL_DMA_DeInit(dcmiHandle->DMA_Handle);
+
+    /* DCMI interrupt Deinit */
+    HAL_NVIC_DisableIRQ(DCMI_IRQn);
   /* USER CODE BEGIN DCMI_MspDeInit 1 */
 
   /* USER CODE END DCMI_MspDeInit 1 */
