@@ -32,7 +32,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+extern int frame_count;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -154,6 +154,7 @@ void StartDefaultTask(void const * argument)
   osDelay(10);
   HAL_GPIO_WritePin(DCMI_RST_GPIO_Port, DCMI_RST_Pin, GPIO_PIN_SET);
     osDelay(100);
+	
   int ret = cambus_scan();
 
   printf("cambus_scan %02X\r\n", ret);
@@ -165,6 +166,8 @@ osDelay(100);
 
   for (;;)
   {
+	printf("%d\r\n",frame_count);
+	frame_count = 0;
     osDelay(1000);
     //CDC_Transmit_HS(send_buf,sizeof(send_buf));
   }

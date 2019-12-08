@@ -209,7 +209,7 @@
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
             <Im1Chk>1</Im1Chk>
-            <Im2Chk>1</Im2Chk>
+            <Im2Chk>0</Im2Chk>
             <OnChipMemories>
               <Ocm1>
                 <Type>0</Type>
@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H743xx,USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;               ../Drivers/STM32H7xx_HAL_Driver/Inc;               ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;               ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;               ../Drivers/CMSIS/Include;               ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;               ../Middlewares/Third_Party/FreeRTOS/Source/include;               ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;               ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;               ..\App;               ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;               ..\MV</IncludePath>
+              <IncludePath>../Inc;                ../Drivers/STM32H7xx_HAL_Driver/Inc;                ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;                ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;                ../Drivers/CMSIS/Include;                ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                ../Middlewares/Third_Party/FreeRTOS/Source/include;                ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;                ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;                ..\App;                ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;                ..\MV</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
