@@ -160,7 +160,7 @@ void StartDefaultTask(void const * argument)
   printf("cambus_scan %02X\r\n", ret);
 
   mt9v034_start_stream();
-osDelay(100);
+  MX_DCMI_Init();
   dcmi_dma_enable();
   //printf("SCAN END\r\n");
 

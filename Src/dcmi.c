@@ -32,14 +32,14 @@ void dcmi_dma_enable()
 {
   for(int i = 0;i<FULL_IMAGE_SIZE;i++)
     {
-    dcmi_image_buffer_8bit_1[i] = 0x00;
+    dcmi_image_buffer_8bit_1[i] = i;
     }
     
    // DCMI->IER=0x0;
-      __HAL_DCMI_ENABLE_IT(&hdcmi,DCMI_IT_FRAME);      
+    //  __HAL_DCMI_ENABLE_IT(&hdcmi,DCMI_IT_FRAME);      
 //      __HAL_DCMI_ENABLE_IT(&hdcmi,DCMI_IT_VSYNC);     
 //      __HAL_DCMI_ENABLE(&hdcmi);                      
-  HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)&dcmi_image_buffer_8bit_1, FULL_IMAGE_SIZE);
+  HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)dcmi_image_buffer_8bit_1, FULL_IMAGE_SIZE/4);
     
 //    while(1)
 //    {
@@ -90,7 +90,11 @@ void MX_DCMI_Init(void)
   {
     Error_Handler();
   }
+  DCMI->IER=0x0;
 
+      __HAL_DCMI_ENABLE_IT(&hdcmi,DCMI_IT_FRAME);      //?????
+      __HAL_DCMI_ENABLE_IT(&hdcmi,DCMI_IT_VSYNC);      //?????
+      __HAL_DCMI_ENABLE(&hdcmi);                       //??DCMI
 }
 
 void HAL_DCMI_MspInit(DCMI_HandleTypeDef* dcmiHandle)
@@ -160,18 +164,22 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* dcmiHandle)
     hdma_dcmi.Init.MemInc = DMA_MINC_ENABLE;
     hdma_dcmi.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_dcmi.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
-    hdma_dcmi.Init.Mode = DMA_NORMAL;
-    hdma_dcmi.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_dcmi.Init.Mode = DMA_CIRCULAR;
+    hdma_dcmi.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     hdma_dcmi.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    hdma_dcmi.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
-    hdma_dcmi.Init.MemBurst = DMA_MBURST_SINGLE;
-    hdma_dcmi.Init.PeriphBurst = DMA_PBURST_SINGLE;
+//    hdma_dcmi.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+//    hdma_dcmi.Init.MemBurst = DMA_MBURST_SINGLE;
+//    hdma_dcmi.Init.PeriphBurst = DMA_PBURST_SINGLE;
+
+    __HAL_LINKDMA(dcmiHandle,DMA_Handle,hdma_dcmi);
+     __HAL_UNLOCK(&hdma_dcmi);
+    HAL_DMA_DeInit(&hdma_dcmi);                               //????????
+    
     if (HAL_DMA_Init(&hdma_dcmi) != HAL_OK)
     {
       Error_Handler();
     }
 
-    __HAL_LINKDMA(dcmiHandle,DMA_Handle,hdma_dcmi);
 
     /* DCMI interrupt Init */
     HAL_NVIC_SetPriority(DCMI_IRQn, 5, 0);
