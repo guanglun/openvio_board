@@ -11,8 +11,8 @@
 #ifndef __CAMBUS_H__
 #define __CAMBUS_H__
 #include <stdint.h>
-int cambus_init();
-int cambus_scan();
+//int cambus_init();
+int cambus_scan(void);
 int cambus_readb(uint8_t slv_addr, uint8_t reg_addr,  uint8_t *reg_data);
 int cambus_writeb(uint8_t slv_addr, uint8_t reg_addr, uint8_t reg_data);
 int cambus_readb2(uint8_t slv_addr, uint16_t reg_addr,  uint8_t *reg_data);

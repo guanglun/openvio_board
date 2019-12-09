@@ -33,6 +33,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 extern int frame_count;
+extern DCMI_HandleTypeDef hdcmi;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -42,7 +43,7 @@ extern int frame_count;
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-uint8_t send_buf[4096 * 2];
+//uint8_t send_buf[4096 * 2];
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -144,8 +145,7 @@ void StartDefaultTask(void const * argument)
   /* USER CODE BEGIN StartDefaultTask */
 
   /* Infinite loop */
-  //printf("SCAN START\r\n");
-
+    
   HAL_GPIO_WritePin(DCMI_PWDN_GPIO_Port, DCMI_PWDN_Pin, GPIO_PIN_SET);
   osDelay(10);
   HAL_GPIO_WritePin(DCMI_PWDN_GPIO_Port, DCMI_PWDN_Pin, GPIO_PIN_RESET);
@@ -153,23 +153,22 @@ void StartDefaultTask(void const * argument)
   HAL_GPIO_WritePin(DCMI_RST_GPIO_Port, DCMI_RST_Pin, GPIO_PIN_RESET);
   osDelay(10);
   HAL_GPIO_WritePin(DCMI_RST_GPIO_Port, DCMI_RST_Pin, GPIO_PIN_SET);
-    osDelay(100);
+  osDelay(100);
 	
-  int ret = cambus_scan();
+//  int ret = cambus_scan();
 
-  printf("cambus_scan %02X\r\n", ret);
+//  printf("cambus_scan %02X\r\n", ret);
 
-  mt9v034_start_stream();
-  MX_DCMI_Init();
-  dcmi_dma_enable();
-  //printf("SCAN END\r\n");
+//  mt9v034_init();
 
+//  dcmi_dma_start();
+    char* buf = "hello openvio\r\n";
   for (;;)
   {
 	printf("%d\r\n",frame_count);
 	frame_count = 0;
     osDelay(1000);
-    //CDC_Transmit_HS(send_buf,sizeof(send_buf));
+    CDC_Transmit_HS(buf,sizeof(buf));
   }
   /* USER CODE END StartDefaultTask */
 }

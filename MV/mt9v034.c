@@ -253,18 +253,18 @@ static struct mt9v034_reg mt9v034_mode_640x480[] = {
 //	{0xD8, 0x0000},
 //	{0xD9, 0x0000},
 
-	{MT9V034_WindowHeight,				320},
-	{MT9V034_WindowWidth,         160},
-	{MT9V034_HorizontalBlanking,  846 - 200},
-	{MT9V034_VerticalBlanking,    525 - 200},
-	{MT9V034_ColumnStart,         (752 - 200) / 2 + 1},
-	{MT9V034_RowStart,         		(480 - 200) / 2 + 1},
-	{0x07,         								(1 << 3) | (1 << 7) | (1 << 8)},
-	{MT9V034_ReadMode,            0x0300},
-	{MT9V034_AECorAGCEnable,			(1 << 0) | (1 << 1)},
-	{MT9V034_R0x20,								0x03C7},
-	{MT9V034_R0x2B,								0x0003},
-	{MT9V034_R0x2F,								0x0003},
+	{MT9V034_WindowHeight,          FULL_IMAGE_COLUMN_SIZE},
+	{MT9V034_WindowWidth,           FULL_IMAGE_ROW_SIZE},
+//	{MT9V034_HorizontalBlanking,    846 - 200},  //会导致帧率下降
+//	{MT9V034_VerticalBlanking,      525 - 200},
+	{MT9V034_ColumnStart,           1},
+	{MT9V034_RowStart,              4},
+	{0x07,         		            0x0088},
+	{MT9V034_ReadMode,              0x000C},
+	{MT9V034_AECorAGCEnable,	    0x0003},
+//	{MT9V034_R0x20,				    0x03C7},
+//	{MT9V034_R0x2B,				    0x0003},
+//	{MT9V034_R0x2F,			        0x0003},
 	
 	{MT9V034_TABLE_END, 0x0000}
 };
@@ -308,7 +308,7 @@ static int mt9v034_write_table(const struct mt9v034_reg table[])
 	return err;
 }
 
-int mt9v034_start_stream(void)
+int mt9v034_init(void)
 {
 	uint16_t chip_version = 0;
 	int retry_num = 1, err = 0;

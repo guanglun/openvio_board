@@ -125,8 +125,8 @@
  */
 
 #define FULL_IMAGE_SIZE (FULL_IMAGE_ROW_SIZE*FULL_IMAGE_COLUMN_SIZE)
-#define FULL_IMAGE_ROW_SIZE (320)
-#define FULL_IMAGE_COLUMN_SIZE (240)
+#define FULL_IMAGE_ROW_SIZE (752)
+#define FULL_IMAGE_COLUMN_SIZE (480)
 
 /* Functions */
 
@@ -145,5 +145,5 @@ int reset_mt9v034_by_hardware(void);
 uint8_t mt9v034_ReadReg(uint16_t Addr);
 uint8_t mt9v034_WriteReg(uint16_t Addr, uint8_t Data);
 */
-int mt9v034_start_stream(void);
+int mt9v034_init(void);
 #endif /* MT9V34_H_ */

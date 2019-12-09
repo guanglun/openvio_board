@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H743xx,USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                ../Drivers/STM32H7xx_HAL_Driver/Inc;                ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;                ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;                ../Drivers/CMSIS/Include;                ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                ../Middlewares/Third_Party/FreeRTOS/Source/include;                ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;                ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;                ..\App;                ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;                ..\MV</IncludePath>
+              <IncludePath>../Inc;                     ../Drivers/STM32H7xx_HAL_Driver/Inc;                     ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;                     ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;                     ../Drivers/CMSIS/Include;                     ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                     ../Middlewares/Third_Party/FreeRTOS/Source/include;                     ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;                     ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;                     ..\App;                     ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;                     ..\MV</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -440,11 +440,6 @@
               <FileName>dcmi.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/dcmi.c</FilePath>
-            </File>
-            <File>
-              <FileName>debug.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/debug.c</FilePath>
             </File>
             <File>
               <FileName>dma.c</FileName>

@@ -21,13 +21,7 @@
 
 extern I2C_HandleTypeDef hi2c1;
 
-int cambus_init()
-{
-
-    return 0;
-}
-
-int cambus_scan()
+int cambus_scan(void)
 {
     for (uint8_t addr=0x08; addr<=0x77; addr++) {
         __disable_irq();
