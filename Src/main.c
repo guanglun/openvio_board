@@ -78,13 +78,13 @@ int main(void)
   /* USER CODE END 1 */
   
   /* MPU Configuration--------------------------------------------------------*/
-//  MPU_Config();
+  MPU_Config();
 
-//  /* Enable I-Cache---------------------------------------------------------*/
-//  SCB_EnableICache();
+  /* Enable I-Cache---------------------------------------------------------*/
+  SCB_EnableICache();
 
-//  /* Enable D-Cache---------------------------------------------------------*/
-//  SCB_EnableDCache();
+  /* Enable D-Cache---------------------------------------------------------*/
+  SCB_EnableDCache();
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -99,7 +99,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-    __HAL_RCC_DMA2_CLK_ENABLE();//must enable dma2,for dcmi work well.
+  __HAL_RCC_DMA2_CLK_ENABLE();//must enable dma2,for dcmi work well.
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */

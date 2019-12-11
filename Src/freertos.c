@@ -28,11 +28,13 @@
 /* USER CODE BEGIN Includes */     
 #include "cambus.h"
 #include "mt9v034.h"
+#include "dcmi.h"
+#include "camera_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-extern int frame_count;
+
 extern DCMI_HandleTypeDef hdcmi;
 /* USER CODE END PTD */
 
@@ -44,6 +46,7 @@ extern DCMI_HandleTypeDef hdcmi;
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 //uint8_t send_buf[4096 * 2];
+extern DMA_BUFFER uint8_t dcmi_image_buffer_8bit_1[FULL_IMAGE_SIZE];
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -54,7 +57,7 @@ osThreadId defaultTaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
+osThreadId cameraTaskHandle;
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
@@ -122,11 +125,13 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 1024);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  osThreadDef(cameraTask, StartCameraTask, osPriorityNormal, 0, 1024);
+  cameraTaskHandle = osThreadCreate(osThread(cameraTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
 }
@@ -145,30 +150,11 @@ void StartDefaultTask(void const * argument)
   /* USER CODE BEGIN StartDefaultTask */
 
   /* Infinite loop */
-    
-  HAL_GPIO_WritePin(DCMI_PWDN_GPIO_Port, DCMI_PWDN_Pin, GPIO_PIN_SET);
-  osDelay(10);
-  HAL_GPIO_WritePin(DCMI_PWDN_GPIO_Port, DCMI_PWDN_Pin, GPIO_PIN_RESET);
-
-  HAL_GPIO_WritePin(DCMI_RST_GPIO_Port, DCMI_RST_Pin, GPIO_PIN_RESET);
-  osDelay(10);
-  HAL_GPIO_WritePin(DCMI_RST_GPIO_Port, DCMI_RST_Pin, GPIO_PIN_SET);
-  osDelay(100);
-	
-//  int ret = cambus_scan();
-
-//  printf("cambus_scan %02X\r\n", ret);
-
-//  mt9v034_init();
-
-//  dcmi_dma_start();
-    char* buf = "hello openvio\r\n";
+  
   for (;;)
   {
-	printf("%d\r\n",frame_count);
-	frame_count = 0;
-    osDelay(1000);
-    CDC_Transmit_HS(buf,sizeof(buf));
+	osDelay(1000);
+    //CDC_Transmit_HS(dcmi_image_buffer_8bit_1,FULL_IMAGE_SIZE);
   }
   /* USER CODE END StartDefaultTask */
 }

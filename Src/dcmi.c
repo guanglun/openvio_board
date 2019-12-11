@@ -23,9 +23,6 @@
 /* USER CODE BEGIN 0 */
 #include "mt9v034.h"
 
-#define DMA_BUFFER \
-  __attribute__((section(".RAM_D1")))
-
 DMA_BUFFER uint8_t dcmi_image_buffer_8bit_1[FULL_IMAGE_SIZE] = {0};
 int frame_count = 0;
 
@@ -35,7 +32,10 @@ void dcmi_dma_start(void)
   {
     dcmi_image_buffer_8bit_1[i] = 0x00;
   }
-
+  
+  HAL_DCMI_Stop(&hdcmi);
+  __HAL_DCMI_ENABLE(&hdcmi);                    
+  __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_FRAME);
   HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)dcmi_image_buffer_8bit_1, FULL_IMAGE_SIZE / 4);
 }
 
@@ -43,6 +43,8 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
   if (hdcmi->Instance == DCMI)
   {
+	frame_count++;
+	HAL_DCMI_Stop(hdcmi);
     __HAL_DCMI_ENABLE_IT(hdcmi, DCMI_IT_FRAME);
 
     if ((dcmi_image_buffer_8bit_1[0] != 0) || (dcmi_image_buffer_8bit_1[1] != 0))
@@ -60,7 +62,7 @@ void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
   if (hdcmi->Instance == DCMI)
   {
-    frame_count++;
+    
   }
 }
 

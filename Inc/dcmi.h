@@ -27,7 +27,8 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#define DMA_BUFFER \
+  __attribute__((section(".RAM_D1")))
 /* USER CODE END Includes */
 
 extern DCMI_HandleTypeDef hdcmi;
