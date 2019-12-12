@@ -28,33 +28,31 @@ int frame_count = 0;
 
 void dcmi_dma_start(void)
 {
-  for (int i = 0; i < FULL_IMAGE_SIZE; i++)
-  {
-    dcmi_image_buffer_8bit_1[i] = 0x00;
-  }
+//  for (int i = 0; i < FULL_IMAGE_SIZE; i++)
+//  {
+//    dcmi_image_buffer_8bit_1[i] = 0x00;
+//  }
   
-  HAL_DCMI_Stop(&hdcmi);
-  __HAL_DCMI_ENABLE(&hdcmi);                    
+  HAL_DCMI_Stop(&hdcmi);               
   __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_FRAME);
-  HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)dcmi_image_buffer_8bit_1, FULL_IMAGE_SIZE / 4);
+  HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)dcmi_image_buffer_8bit_1, FULL_IMAGE_SIZE);
 }
 
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
   if (hdcmi->Instance == DCMI)
   {
-	frame_count++;
-	HAL_DCMI_Stop(hdcmi);
+
     __HAL_DCMI_ENABLE_IT(hdcmi, DCMI_IT_FRAME);
 
-    if ((dcmi_image_buffer_8bit_1[0] != 0) || (dcmi_image_buffer_8bit_1[1] != 0))
-    {
-      dcmi_image_buffer_8bit_1[0] = 0;
-      dcmi_image_buffer_8bit_1[1] = 0;
-      
-    }else{
-		printf("frame error\r\n");
-	}
+//    if ((dcmi_image_buffer_8bit_1[0] != 0) || (dcmi_image_buffer_8bit_1[1] != 0))
+//    {
+//      dcmi_image_buffer_8bit_1[0] = 0;
+//      dcmi_image_buffer_8bit_1[1] = 0;
+//      
+//    }else{
+//		printf("frame error\r\n");
+//	}
   }
 }
 
@@ -62,7 +60,8 @@ void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
   if (hdcmi->Instance == DCMI)
   {
-    
+    	frame_count++;
+		HAL_DCMI_Stop(hdcmi);
   }
 }
 
@@ -160,10 +159,10 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* dcmiHandle)
     hdma_dcmi.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_dcmi.Init.MemInc = DMA_MINC_ENABLE;
     hdma_dcmi.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-    hdma_dcmi.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_dcmi.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
     hdma_dcmi.Init.Mode = DMA_CIRCULAR;
     hdma_dcmi.Init.Priority = DMA_PRIORITY_HIGH;
-    hdma_dcmi.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+    hdma_dcmi.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     hdma_dcmi.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
     hdma_dcmi.Init.MemBurst = DMA_MBURST_SINGLE;
     hdma_dcmi.Init.PeriphBurst = DMA_PBURST_SINGLE;

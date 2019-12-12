@@ -105,7 +105,7 @@ static struct mt9v034_reg mt9v034_mode_640x480[] = {
 //	#else
 //	{0x01, 0x0001},
 //	{0x02, 0x0004},
-//	{0x03, FULL_IMAGE_ROW_SIZE*4},
+//	{0x03, FULL_IMAGE_COLUMN_SIZE*4},
 //	{0x04, FULL_IMAGE_ROW_SIZE*4},
 //	{0x05, 425+91},
 //	{0x06, 10},
@@ -255,16 +255,16 @@ static struct mt9v034_reg mt9v034_mode_640x480[] = {
 
 	{MT9V034_WindowHeight,          FULL_IMAGE_COLUMN_SIZE},
 	{MT9V034_WindowWidth,           FULL_IMAGE_ROW_SIZE},
-//	{MT9V034_HorizontalBlanking,    846 - 200},  //会导致帧率下降
-//	{MT9V034_VerticalBlanking,      525 - 200},
+	{MT9V034_HorizontalBlanking,    846 - 100},  //会导致帧率下降
+	{MT9V034_VerticalBlanking,      525 - 100},
 	{MT9V034_ColumnStart,           1},
 	{MT9V034_RowStart,              4},
 	{0x07,         		            0x0088},
 	{MT9V034_ReadMode,              0x000C},
 	{MT9V034_AECorAGCEnable,	    0x0003},
-//	{MT9V034_R0x20,				    0x03C7},
-//	{MT9V034_R0x2B,				    0x0003},
-//	{MT9V034_R0x2F,			        0x0003},
+	{MT9V034_R0x20,				    0x0003},
+	{MT9V034_R0x2B,				    0x0003},
+	{MT9V034_R0x2F,			        0x0003},
 	
 	{MT9V034_TABLE_END, 0x0000}
 };
