@@ -37,6 +37,7 @@
 #include <string.h>
 #include "mt9v034.h"
 #include "main.h"
+#include "cambus.h"
 
 extern I2C_HandleTypeDef hi2c1;
 
@@ -253,8 +254,8 @@ static struct mt9v034_reg mt9v034_mode_640x480[] = {
 //	{0xD8, 0x0000},
 //	{0xD9, 0x0000},
 
-	{MT9V034_WindowHeight,          FULL_IMAGE_COLUMN_SIZE},
-	{MT9V034_WindowWidth,           FULL_IMAGE_ROW_SIZE},
+	{MT9V034_WindowHeight,          FULL_IMAGE_COLUMN_SIZE  *   4},
+	{MT9V034_WindowWidth,           FULL_IMAGE_ROW_SIZE     *   4},
 	{MT9V034_HorizontalBlanking,    846 - 100},  //会导致帧率下降
 	{MT9V034_VerticalBlanking,      525 - 100},
 	{MT9V034_ColumnStart,           1},
@@ -328,217 +329,150 @@ int mt9v034_init(void)
 	}
 	printf("[mt9v034]: ok\r\n");
 
-		err = mt9v034_write_table(mt9v034_mode_640x480);
+	//err = mt9v034_write_table(mt9v034_mode_640x480);
 	
+    set_framesize(FRAMESIZE_VGA);
+    set_colorbar(0);
+    set_vflip(0);
+    
+    uint16_t chip_control;
+    int enable = 0;
+                int ret  = cambus_readw(MT9V034_SLV_ADDR, MT9V034_CHIP_CONTROL, &chip_control);
+            ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_CHIP_CONTROL,
+                    (chip_control & (~MT9V034_CHIP_CONTROL_MODE_MASK))
+                    | ((enable != 0) ? MT9V034_CHIP_CONTROL_SNAP_MODE : MT9V034_CHIP_CONTROL_MASTER_MODE));
+    
 	/* Reset */
 		//mt9v034_WriteReg16(MTV_SOFT_RESET_REG, 0x01);
 	return err;
 }
-#if 0
-/**
-  * @brief  Configures the mt9v034 camera with two context (binning 4 and binning 2).
-  */
-void mt9v034_context_configuration(void)
+
+
+
+const int resolution[][2] = {
+    {0,    0   },
+    // C/SIF Resolutions
+    {88,   72  },    /* QQCIF     */
+    {176,  144 },    /* QCIF      */
+    {352,  288 },    /* CIF       */
+    {88,   60  },    /* QQSIF     */
+    {176,  120 },    /* QSIF      */
+    {352,  240 },    /* SIF       */
+    // VGA Resolutions
+    {40,   30  },    /* QQQQVGA   */
+    {80,   60  },    /* QQQVGA    */
+    {160,  120 },    /* QQVGA     */
+    {320,  240 },    /* QVGA      */
+    {640,  480 },    /* VGA       */
+    {60,   40  },    /* HQQQVGA   */
+    {120,  80  },    /* HQQVGA    */
+    {240,  160 },    /* HQVGA     */
+    // FFT Resolutions
+    {64,   32  },    /* 64x32     */
+    {64,   64  },    /* 64x64     */
+    {128,  64  },    /* 128x64    */
+    {128,  128 },    /* 128x64    */
+    // Other
+    {128,  160 },    /* LCD       */
+    {128,  160 },    /* QQVGA2    */
+    {720,  480 },    /* WVGA      */
+    {752,  480 },    /* WVGA2     */
+    {800,  600 },    /* SVGA      */
+    {1024, 768 },    /* XGA       */
+    {1280, 1024},    /* SXGA      */
+    {1600, 1200},    /* UXGA      */
+};
+
+int IM_MIN(int a,int b)
 {
-	/* Chip Control
-	 *
-	 * bits           | 15 | ... | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
-	 * -------------------------------------------------------------------
-	 * current values | 0  | ... | 0 | 1 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 |
-	 *
-	 * (0:2) Scan Mode (Progressive scan)
-	 * (3:4) Sensor Operation Mode (Master mode)
-	 * (5) Stereoscopy Mode (Disable)
-	 * (6) Stereoscopic Master/Slave mode (not used)
-	 * (7) Parallel Output Enable (Enable)
-	 * (8) Simultaneous/Sequential Mode (Simultaneous mode)
-	 * (9) Reserved
-	 *
-	 * (15)Context A (0) / Context B (1)
-	 *
-	 */
+    if(a>b)
+        return b;
+    else
+        return a;
+}    
 
-	uint16_t new_control;
+static int set_colorbar(int enable)
+{
+    uint16_t test;
+    int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_TEST_PATTERN, &test);
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_TEST_PATTERN,
+            (test & (~(MT9V034_TEST_PATTERN_ENABLE | MT9V034_TEST_PATTERN_GRAY_MASK)))
+          | ((enable != 0) ? (MT9V034_TEST_PATTERN_ENABLE | MT9V034_TEST_PATTERN_GRAY_VERTICAL) : 0));
 
-	if (FLOAT_AS_BOOL(global_data.param[PARAM_VIDEO_ONLY]))
-		new_control = 0x8188; // Context B
-	else
-		new_control = 0x0188; // Context A
-
-	/* image dimentions */
-	uint16_t new_width_context_a  = global_data.param[PARAM_IMAGE_WIDTH] * 4; // windowing off, row + col bin reduce size
-	uint16_t new_height_context_a = global_data.param[PARAM_IMAGE_HEIGHT] * 4;
-	uint16_t new_width_context_b  = FULL_IMAGE_ROW_SIZE * 4; // windowing off, row + col bin reduce size
-	uint16_t new_height_context_b = FULL_IMAGE_COLUMN_SIZE * 4;
-
-	/* blanking settings */
-	uint16_t new_hor_blanking_context_a = 425 + MINIMUM_HORIZONTAL_BLANKING;// 709 is minimum value without distortions
-	uint16_t new_ver_blanking_context_a = 10; // this value is the first without image errors (dark lines)
-	uint16_t new_hor_blanking_context_b = MAX_IMAGE_WIDTH - new_width_context_b + MINIMUM_HORIZONTAL_BLANKING;
-	if (new_hor_blanking_context_b < 800) {
-		new_hor_blanking_context_b = 800;
-	}
-	uint16_t new_ver_blanking_context_b = 10;
-
-
-	/* Read Mode
-	 *
-	 * bits           | ... | 10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
-	 * -------------------------------------------------------------------
-	 * current values | ... |  0 | 1 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 |
-	 *
-	 * (1:0) Row Bin
-	 * (3:2) Column Bin
-	 * (9:8) Reserved
-	 *
-	 */
-	uint16_t new_readmode_context_a = 0x30A ; // row + col bin 4 enable, (9:8) default
-	uint16_t new_readmode_context_b = 0x305 ; // row bin 2 col bin 4 enable, (9:8) default
-
-	/*
-	 * Settings for both context:
-	 *
-	 * Exposure time should not affect frame time
-	 * so we set max on 64 (lines) = 0x40
-	 */
-	uint16_t min_exposure = 0x0001; // default
-	uint16_t pixel_count = 4096; //64x64 take all pixels to estimate exposure time // VALID RANGE: 1-65535
-	uint16_t shutter_width_ctrl = 0x0164; // default from context A
-	uint16_t aec_update_freq = 0x02; // default Number of frames to skip between changes in AEC VALID RANGE: 0-15
-	uint16_t aec_low_pass = 0x01; // default VALID RANGE: 0-2
-	uint16_t agc_update_freq = 0x02; // default Number of frames to skip between changes in AGC VALID RANGE: 0-15
-	uint16_t agc_low_pass = 0x02; // default VALID RANGE: 0-2
-
-	uint16_t resolution_ctrl = 0x0303; // 12 bit adc for low light
-	uint16_t max_gain = global_data.param[PARAM_GAIN_MAX];
-	uint16_t max_exposure = global_data.param[PARAM_EXPOSURE_MAX];
-	uint16_t coarse_sw1 = global_data.param[PARAM_SHTR_W_1];
-	uint16_t coarse_sw2 = global_data.param[PARAM_SHTR_W_2];
-	uint16_t total_shutter_width = global_data.param[PARAM_SHTR_W_TOT];
-	uint16_t hdr_enabled = 0x0000;
-	bool hdr_enable_flag = global_data.param[PARAM_HDR] > 0;
-	if (hdr_enable_flag) {
-		hdr_enabled = 0x0100;
-	}
-
-	bool aec_enable_flag = global_data.param[PARAM_AEC] > 0;
-	uint16_t aec_agc_enabled = 0x0000;
-	if (aec_enable_flag) {
-		aec_agc_enabled |= (1 << 0);
-	}
-
-	bool agc_enable_flag = global_data.param[PARAM_AGC] > 0;
-	if (agc_enable_flag) {
-		aec_agc_enabled |= (1 << 1);
-	}
-
-	uint16_t desired_brightness = global_data.param[PARAM_BRIGHT];
-
-	uint16_t row_noise_correction = 0x0000; // default
-	uint16_t test_data = 0x0000; // default
-
-	if(FLOAT_AS_BOOL(global_data.param[PARAM_IMAGE_ROW_NOISE_CORR]) && !FLOAT_AS_BOOL(global_data.param[PARAM_IMAGE_TEST_PATTERN]))
-		row_noise_correction = 0x0101;
-	else
-		row_noise_correction = 0x0000;
-
-	if (FLOAT_AS_BOOL(global_data.param[PARAM_IMAGE_TEST_PATTERN]))
-		test_data = 0x3000; //enable vertical gray shade pattern
-	else
-		test_data = 0x0000;
-	//读取版本号,默认是0x1324
-	uint16_t version = mt9v034_ReadReg16(MTV_CHIP_VERSION_REG);
-	if (version == 0x1324)
-	{
-		mt9v034_WriteReg16(MTV_CHIP_CONTROL_REG, new_control);
-
-		// Initialize frame control reg
-		/*
-			该寄存器主要涉及到hsync vsync pclk的时钟极性 配置为hsync高有效 vsync高有效 pclk下降沿
-		*/
-		mt9v034_WriteReg(0x72, 0x0000);
-
-		// Write reserved registers per Rev G datasheet table 8 recommendations
-		mt9v034_WriteReg16(0x13, 0x2D2E);
-		mt9v034_WriteReg16(0x20, 0x03C7);
-		mt9v034_WriteReg16(0x24, 0x001B);
-		mt9v034_WriteReg16(0x2B, 0x0003);
-		mt9v034_WriteReg16(0x2F, 0x0003);
-
-		/* Context A */
-		#if 0
-		mt9v034_WriteReg16(MTV_WINDOW_WIDTH_REG_A, new_width_context_a);
-		mt9v034_WriteReg16(MTV_WINDOW_HEIGHT_REG_A, new_height_context_a);
-		mt9v034_WriteReg16(MTV_HOR_BLANKING_REG_A, new_hor_blanking_context_a);
-		mt9v034_WriteReg16(MTV_VER_BLANKING_REG_A, new_ver_blanking_context_a);
-		mt9v034_WriteReg16(MTV_READ_MODE_REG_A, new_readmode_context_a);
-		#if 1
-		mt9v034_WriteReg16(MTV_COLUMN_START_REG_A, (MAX_IMAGE_WIDTH - new_width_context_a) / 2 + MINIMUM_COLUMN_START); // Set column/row start point for lower resolutions (center window)
-		mt9v034_WriteReg16(MTV_ROW_START_REG_A, (MAX_IMAGE_HEIGHT - new_height_context_a) / 2 + MINIMUM_ROW_START);
-		#else
-		mt9v034_WriteReg16(MTV_COLUMN_START_REG_A, MINIMUM_COLUMN_START); // default
-		mt9v034_WriteReg16(MTV_ROW_START_REG_A, MINIMUM_ROW_START);
-		#endif
-		mt9v034_WriteReg16(MTV_COARSE_SW_1_REG_A, coarse_sw1);
-		mt9v034_WriteReg16(MTV_COARSE_SW_2_REG_A, coarse_sw2);
-		mt9v034_WriteReg16(MTV_COARSE_SW_CTRL_REG_A, shutter_width_ctrl);
-		mt9v034_WriteReg16(MTV_COARSE_SW_TOTAL_REG_A, total_shutter_width);
-		#else
-		mt9v034_WriteReg16(0x04, 64*4);
-		mt9v034_WriteReg16(0x03, 64*4);
-		mt9v034_WriteReg16(0x05, 425+91);
-		mt9v034_WriteReg16(0x06, 10);
-		mt9v034_WriteReg16(0x0d, 0x30a);
-		#if 0
-		mt9v034_WriteReg16(MTV_COLUMN_START_REG_A, (MAX_IMAGE_WIDTH - new_width_context_a) / 2 + MINIMUM_COLUMN_START); // Set column/row start point for lower resolutions (center window)
-		mt9v034_WriteReg16(MTV_ROW_START_REG_A, (MAX_IMAGE_HEIGHT - new_height_context_a) / 2 + MINIMUM_ROW_START);
-		#else
-		mt9v034_WriteReg16(0x01, 1); // default
-		mt9v034_WriteReg16(0x02, 4);
-		#endif
-		mt9v034_WriteReg16(0x08, 443);
-		mt9v034_WriteReg16(0x09, 473);
-		mt9v034_WriteReg16(0x0a, 0x0164);
-		mt9v034_WriteReg16(0x0b, 480);
-		#endif
-
-		/* Context B */
-		mt9v034_WriteReg16(MTV_WINDOW_WIDTH_REG_B, new_width_context_b);
-		mt9v034_WriteReg16(MTV_WINDOW_HEIGHT_REG_B, new_height_context_b);
-		mt9v034_WriteReg16(MTV_HOR_BLANKING_REG_B, new_hor_blanking_context_b);
-		mt9v034_WriteReg16(MTV_VER_BLANKING_REG_B, new_ver_blanking_context_b);
-		mt9v034_WriteReg16(MTV_READ_MODE_REG_B, new_readmode_context_b);
-		mt9v034_WriteReg16(MTV_COLUMN_START_REG_B, MINIMUM_COLUMN_START); // default
-		mt9v034_WriteReg16(MTV_ROW_START_REG_B, MINIMUM_ROW_START);
-		mt9v034_WriteReg16(MTV_COARSE_SW_1_REG_B, coarse_sw1);
-		mt9v034_WriteReg16(MTV_COARSE_SW_2_REG_B, coarse_sw2);
-		mt9v034_WriteReg16(MTV_COARSE_SW_CTRL_REG_B, shutter_width_ctrl);
-		mt9v034_WriteReg16(MTV_COARSE_SW_TOTAL_REG_B, total_shutter_width);
-
-		/* General Settings */
-		mt9v034_WriteReg16(MTV_ROW_NOISE_CORR_CTRL_REG, row_noise_correction);
-		mt9v034_WriteReg16(MTV_AEC_AGC_ENABLE_REG, aec_agc_enabled); // disable AEC/AGC for both contexts
-		mt9v034_WriteReg16(MTV_HDR_ENABLE_REG, hdr_enabled); // disable HDR on both contexts
-		mt9v034_WriteReg16(MTV_MIN_EXPOSURE_REG, min_exposure);
-		mt9v034_WriteReg16(MTV_MAX_EXPOSURE_REG, max_exposure);
-		mt9v034_WriteReg16(MTV_MAX_GAIN_REG, max_gain);
-		mt9v034_WriteReg16(MTV_AGC_AEC_PIXEL_COUNT_REG, pixel_count);
-		mt9v034_WriteReg16(MTV_AGC_AEC_DESIRED_BIN_REG, desired_brightness);
-		mt9v034_WriteReg16(MTV_ADC_RES_CTRL_REG, resolution_ctrl); // here is the way to regulate darkness :)
-
-		mt9v034_WriteReg16(MTV_DIGITAL_TEST_REG, test_data);//enable test pattern
-
-		mt9v034_WriteReg16(MTV_AEC_UPDATE_REG,aec_update_freq);
-		mt9v034_WriteReg16(MTV_AEC_LOWPASS_REG,aec_low_pass);
-		mt9v034_WriteReg16(MTV_AGC_UPDATE_REG,agc_update_freq);
-		mt9v034_WriteReg16(MTV_AGC_LOWPASS_REG,agc_low_pass);
-
-		/* Reset */
-		mt9v034_WriteReg16(MTV_SOFT_RESET_REG, 0x01);
-	}
-
+    return ret;
 }
-#endif
+static int set_hmirror(int enable)
+{
+    uint16_t read_mode;
+    int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_READ_MODE, &read_mode);
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_READ_MODE, // inverted behavior
+            (read_mode & (~MT9V034_READ_MODE_COL_FLIP)) | ((enable == 0) ? MT9V034_READ_MODE_COL_FLIP : 0));
+
+    return ret;
+}
+
+static int set_vflip(int enable)
+{
+    uint16_t read_mode;
+    int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_READ_MODE, &read_mode);
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_READ_MODE, // inverted behavior
+            (read_mode & (~MT9V034_READ_MODE_ROW_FLIP)) | ((enable == 0) ? MT9V034_READ_MODE_ROW_FLIP : 0));
+
+    return ret;
+}
+static int set_framesize(framesize_t framesize)
+{
+    uint16_t width = resolution[framesize][0];
+    uint16_t height = resolution[framesize][1];
+
+    if ((width > MT9V034_MAX_WIDTH) || (height > MT9V034_MAX_HEIGHT)) {
+        return -1;
+    }
+
+    uint16_t read_mode;
+
+    if (cambus_readw(MT9V034_SLV_ADDR, MT9V034_READ_MODE, &read_mode) != 0) {
+        return -1;
+    }
+
+    int read_mode_mul = 1;
+    read_mode &= 0xFFF0;
+
+    if ((width <= (MT9V034_MAX_WIDTH / 4)) && (height <= (MT9V034_MAX_HEIGHT / 4))) {
+        read_mode_mul = 4;
+        read_mode |= MT9V034_READ_MODE_COL_BIN_4 | MT9V034_READ_MODE_ROW_BIN_4;
+    } else if ((width <= (MT9V034_MAX_WIDTH / 2)) && (height <= (MT9V034_MAX_HEIGHT / 2))) {
+        read_mode_mul = 2;
+        read_mode |= MT9V034_READ_MODE_COL_BIN_2 | MT9V034_READ_MODE_ROW_BIN_2;
+    }
+
+    int ret = 0;
+
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_COL_START,
+            ((MT9V034_MAX_WIDTH - (width * read_mode_mul)) / 2) + MT9V034_COL_START_MIN);
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_ROW_START,
+            ((MT9V034_MAX_HEIGHT - (height * read_mode_mul)) / 2) + MT9V034_ROW_START_MIN);
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_WINDOW_WIDTH, width * read_mode_mul);
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_WINDOW_HEIGHT, height * read_mode_mul);
+
+    // Notes: 1. The MT9V034 uses column parallel analog-digital converters, thus short row timing is not possible.
+    // The minimum total row time is 690 columns (horizontal width + horizontal blanking). The minimum
+    // horizontal blanking is 61. When the window width is set below 627, horizontal blanking
+    // must be increased.
+    //
+    // The STM32H7 needs more than 94+(752-640) clocks between rows otherwise it can't keep up with the pixel rate.
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_HORIZONTAL_BLANKING,
+            MT9V034_HORIZONTAL_BLANKING_DEF + (MT9V034_MAX_WIDTH - IM_MIN(width * read_mode_mul, 640)));
+
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_READ_MODE, read_mode);
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_PIXEL_COUNT, (width * height) / 8);
+
+    // We need more setup time for the pixel_clk at the full data rate...
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_PIXEL_CLOCK, (read_mode_mul == 1) ? MT9V034_PIXEL_CLOCK_INV_PXL_CLK : 0);
+
+    return ret;
+}
+
 /**
   * @brief  Changes sensor context based on settings
   */

@@ -31,7 +31,7 @@ void StartCameraTask(void const * argument)
 		//printf("%d\r\n",frame_count);
 		//frame_count = 0;
 		//osDelay(1000);
-		if(frame_count > 0)
+		//if(frame_count > 0)
 		{
 			printf("send start\r\n");
 			frame_count = 0;

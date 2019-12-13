@@ -37,6 +37,26 @@
 #include <stdint.h>
 #include "main.h"
 
+#define OV7725_SLV_ADDR     (0x42)
+#define OV2640_SLV_ADDR     (0x60)
+#define MT9V034_SLV_ADDR    (0xB8)
+#define LEPTON_SLV_ADDR     (0x54)
+#define OV5640_SLV_ADDR     (0x78)
+
+#define OV_CHIP_ID          (0x0A)
+#define OV5640_CHIP_ID      (0x300A)
+#define ON_CHIP_ID          (0x00)
+
+#define OV9650_ID           (0x96)
+#define OV2640_ID           (0x26)
+#define OV7725_ID           (0x77)
+#define OV5640_ID           (0x56)
+#define MT9V034_ID          (0x13)
+#define LEPTON_ID           (0x54)
+
+
+
+    
 /* Constants */
 #define TIMEOUT_MAX      				10000
 
@@ -118,6 +138,138 @@
 #define MTV_AGC_LOWPASS_REG				0xAA
 #define MTV_DIGITAL_TEST_REG			0x7F
 
+
+
+
+
+#define MT9V034_MAX_HEIGHT                      (480)
+#define MT9V034_MAX_WIDTH                       (752)
+#define MT9V034_CHIP_VERSION                    (0x00)
+#define MT9V034_COL_START                       (0x01)
+#define MT9V034_COL_START_MIN                   (1)
+#define MT9V034_COL_START_MAX                   (752)
+#define MT9V034_ROW_START                       (0x02)
+#define MT9V034_ROW_START_MIN                   (4)
+#define MT9V034_ROW_START_MAX                   (482)
+#define MT9V034_WINDOW_HEIGHT                   (0x03)
+#define MT9V034_WINDOW_HEIGHT_MIN               (1)
+#define MT9V034_WINDOW_HEIGHT_MAX               (480)
+#define MT9V034_WINDOW_WIDTH                    (0x04)
+#define MT9V034_WINDOW_WIDTH_MIN                (1)
+#define MT9V034_WINDOW_WIDTH_MAX                (752)
+#define MT9V034_HORIZONTAL_BLANKING             (0x05)
+#define MT9V034_HORIZONTAL_BLANKING_MIN         (43)
+#define MT9V034_HORIZONTAL_BLANKING_MAX         (1023)
+#define MT9V034_HORIZONTAL_BLANKING_DEF         (94)
+#define MT9V034_VERTICAL_BLANKING               (0x06)
+#define MT9V034_VERTICAL_BLANKING_MIN           (4)
+#define MT9V034_VERTICAL_BLANKING_MAX           (3000)
+#define MT9V034_VERTICAL_BLANKING_DEF           (45)
+#define MT9V034_CHIP_CONTROL                    (0x07)
+#define MT9V034_CHIP_CONTROL_MASTER_MODE        (1 << 3)
+#define MT9V034_CHIP_CONTROL_SNAP_MODE          (3 << 3)
+#define MT9V034_CHIP_CONTROL_MODE_MASK          (3 << 3)
+#define MT9V034_CHIP_CONTROL_DOUT_ENABLE        (1 << 7)
+#define MT9V034_CHIP_CONTROL_SEQUENTIAL         (1 << 8)
+#define MT9V034_CHIP_CONTROL_RESERVED           (1 << 9)
+#define MT9V034_SHUTTER_WIDTH1                  (0x08)
+#define MT9V034_SHUTTER_WIDTH2                  (0x09)
+#define MT9V034_SHUTTER_WIDTH_CONTROL           (0x0A)
+#define MT9V034_TOTAL_SHUTTER_WIDTH             (0x0B)
+#define MT9V034_TOTAL_SHUTTER_WIDTH_MIN         (1)
+#define MT9V034_TOTAL_SHUTTER_WIDTH_MAX         (32767)
+#define MT9V034_RESET                           (0x0C)
+#define MT9V034_READ_MODE                       (0x0D)
+#define MT9V034_READ_MODE_ROW_BIN_2             (1 << 0)
+#define MT9V034_READ_MODE_ROW_BIN_4             (1 << 1)
+#define MT9V034_READ_MODE_COL_BIN_2             (1 << 2)
+#define MT9V034_READ_MODE_COL_BIN_4             (1 << 3)
+#define MT9V034_READ_MODE_ROW_FLIP              (1 << 4)
+#define MT9V034_READ_MODE_COL_FLIP              (1 << 5)
+#define MT9V034_READ_MODE_DARK_COLS             (1 << 6)
+#define MT9V034_READ_MODE_DARK_ROWS             (1 << 7)
+#define MT9V034_PIXEL_OPERATION_MODE            (0x0F)
+#define MT9V034_PIXEL_OPERATION_MODE_HDR        (1 << 0)
+#define MT9V034_PIXEL_OPERATION_MODE_COLOR      (1 << 1)
+#define MT9V034_ANALOG_GAIN                     (0x35)
+#define MT9V034_ANALOG_GAIN_MIN                 (16)
+#define MT9V034_ANALOG_GAIN_MAX                 (64)
+#define MT9V034_MAX_ANALOG_GAIN                 (0x36)
+#define MT9V034_MAX_ANALOG_GAIN_MAX             (127)
+#define MT9V034_FRAME_DARK_AVERAGE              (0x42)
+#define MT9V034_DARK_AVG_THRESH                 (0x46)
+#define MT9V034_DARK_AVG_LOW_THRESH_MASK        (255 << 0)
+#define MT9V034_DARK_AVG_LOW_THRESH_SHIFT       (0)
+#define MT9V034_DARK_AVG_HIGH_THRESH_MASK       (255 << 8)
+#define MT9V034_DARK_AVG_HIGH_THRESH_SHIFT      (8)
+#define MT9V034_ROW_NOISE_CORR_CONTROL          (0x70)
+#define MT9V034_ROW_NOISE_CORR_ENABLE           (1 << 5)
+#define MT9V034_ROW_NOISE_CORR_USE_BLK_AVG      (1 << 7)
+#define MT9V034_PIXEL_CLOCK                     (0x72)
+#define MT9V034_PIXEL_CLOCK_INV_LINE            (1 << 0)
+#define MT9V034_PIXEL_CLOCK_INV_FRAME           (1 << 1)
+#define MT9V034_PIXEL_CLOCK_XOR_LINE            (1 << 2)
+#define MT9V034_PIXEL_CLOCK_CONT_LINE           (1 << 3)
+#define MT9V034_PIXEL_CLOCK_INV_PXL_CLK         (1 << 4)
+#define MT9V034_TEST_PATTERN                    (0x7F)
+#define MT9V034_TEST_PATTERN_DATA_MASK          (1023 << 0)
+#define MT9V034_TEST_PATTERN_DATA_SHIFT         (0)
+#define MT9V034_TEST_PATTERN_USE_DATA           (1 << 10)
+#define MT9V034_TEST_PATTERN_GRAY_MASK          (3 << 11)
+#define MT9V034_TEST_PATTERN_GRAY_NONE          (0 << 11)
+#define MT9V034_TEST_PATTERN_GRAY_VERTICAL      (1 << 11)
+#define MT9V034_TEST_PATTERN_GRAY_HORIZONTAL    (2 << 11)
+#define MT9V034_TEST_PATTERN_GRAY_DIAGONAL      (3 << 11)
+#define MT9V034_TEST_PATTERN_ENABLE             (1 << 13)
+#define MT9V034_TEST_PATTERN_FLIP               (1 << 14)
+#define MT9V034_AEC_AGC_ENABLE                  (0xAF)
+#define MT9V034_AEC_ENABLE                      (1 << 0)
+#define MT9V034_AGC_ENABLE                      (1 << 1)
+#define MT9V034_THERMAL_INFO                    (0xC1)
+#define MT9V034_ID_REG                          (0x6B)
+#define MT9V034_MAX_GAIN                        (0xAB)
+#define MT9V034_MAX_EXPOSE                      (0xAD)
+#define MT9V034_PIXEL_COUNT                     (0xB0)
+#define MT9V034_FINE_SHUTTER_WIDTH_TOTAL        (0xD5)
+
+
+
+
+    
+typedef enum {
+    FRAMESIZE_INVALID = 0,
+    // C/SIF Resolutions
+    FRAMESIZE_QQCIF,    // 88x72
+    FRAMESIZE_QCIF,     // 176x144
+    FRAMESIZE_CIF,      // 352x288
+    FRAMESIZE_QQSIF,    // 88x60
+    FRAMESIZE_QSIF,     // 176x120
+    FRAMESIZE_SIF,      // 352x240
+    // VGA Resolutions
+    FRAMESIZE_QQQQVGA,  // 40x30
+    FRAMESIZE_QQQVGA,   // 80x60
+    FRAMESIZE_QQVGA,    // 160x120
+    FRAMESIZE_QVGA,     // 320x240
+    FRAMESIZE_VGA,      // 640x480
+    FRAMESIZE_HQQQVGA,  // 60x40
+    FRAMESIZE_HQQVGA,   // 120x80
+    FRAMESIZE_HQVGA,    // 240x160
+    // FFT Resolutions
+    FRAMESIZE_64X32,    // 64x32
+    FRAMESIZE_64X64,    // 64x64
+    FRAMESIZE_128X64,   // 128x64
+    FRAMESIZE_128X128,  // 128x128
+    // Other
+    FRAMESIZE_LCD,      // 128x160
+    FRAMESIZE_QQVGA2,   // 128x160
+    FRAMESIZE_WVGA,     // 720x480
+    FRAMESIZE_WVGA2,    // 752x480
+    FRAMESIZE_SVGA,     // 800x600
+    FRAMESIZE_XGA,      // 1024x768
+    FRAMESIZE_SXGA,     // 1280x1024
+    FRAMESIZE_UXGA,     // 1600x1200
+} framesize_t;
+
 /*
  * Resolution:
  * ROW_SIZE * BINNING_ROW <= MAX_IMAGE_WIDTH
@@ -125,12 +277,18 @@
  */
 
 #define FULL_IMAGE_SIZE (FULL_IMAGE_ROW_SIZE*FULL_IMAGE_COLUMN_SIZE)
-//#define FULL_IMAGE_ROW_SIZE 		(752)
-//#define FULL_IMAGE_COLUMN_SIZE 	(480)
-#define FULL_IMAGE_ROW_SIZE 		(240)
-#define FULL_IMAGE_COLUMN_SIZE (160)
-// #define FULL_IMAGE_ROW_SIZE 		  (320)
+
+//#define FULL_IMAGE_ROW_SIZE 		    (752)
+//#define FULL_IMAGE_COLUMN_SIZE 	    (480)
+
+//#define FULL_IMAGE_ROW_SIZE 		    (240)
+//#define FULL_IMAGE_COLUMN_SIZE          (160)
+
+// #define FULL_IMAGE_ROW_SIZE 		    (320)
 // #define FULL_IMAGE_COLUMN_SIZE 		(240)
+
+ #define FULL_IMAGE_ROW_SIZE 		    (640)
+ #define FULL_IMAGE_COLUMN_SIZE 		(480)
 
 /* Functions */
 
