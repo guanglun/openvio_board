@@ -5,7 +5,7 @@
 #include "usbd_def.h"
 #include "usbd_cdc_if.h"
 
-extern USBD_HandleTypeDef hUsbDeviceFS;
+extern USBD_HandleTypeDef hUsbDeviceHS;
 extern int frame_count;
 extern DMA_BUFFER uint8_t dcmi_image_buffer_8bit_1[FULL_IMAGE_SIZE];
 extern int line_cnt;
@@ -57,18 +57,18 @@ void StartCameraTask(void const * argument)
 				{
 					if( i + SNED_SIZE > FULL_IMAGE_SIZE)
 					{
-						while(CDC_Transmit_FS(&dcmi_image_buffer_8bit_1[i],FULL_IMAGE_SIZE - i) == USBD_BUSY);
+						while(CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i],FULL_IMAGE_SIZE - i) == USBD_BUSY);
 					}else{
-						while(CDC_Transmit_FS(&dcmi_image_buffer_8bit_1[i],SNED_SIZE) == USBD_BUSY);
+						while(CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i],SNED_SIZE) == USBD_BUSY);
 					}
 				}
 //			}
 
-			USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+			USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
 			while(hcdc->TxState != 0);
 			//printf("send end\r\n");
 			
-			HAL_Delay(10);
+			HAL_Delay(100);
 			dcmi_dma_start();
 		}
 		
