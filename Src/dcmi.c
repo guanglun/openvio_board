@@ -25,7 +25,7 @@
 
 DMA_BUFFER uint8_t dcmi_image_buffer_8bit_1[FULL_IMAGE_SIZE] = {0};
 int frame_count = 0;
-
+int line_cnt = 0,count = 0,start=0;
 void dcmi_dma_start(void)
 {
 //  for (int i = 0; i < FULL_IMAGE_SIZE; i++)
@@ -33,41 +33,82 @@ void dcmi_dma_start(void)
 //    dcmi_image_buffer_8bit_1[i] = 0x00;
 //  }
   
-  HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);         
+      
   __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_FRAME);
+  //__HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_FRAME);
+  __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_LINE);
+  
+  //HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);    
+
+  HAL_DCMI_Stop(&hdcmi); 
+  //__HAL_DCMI_DISABLE_IT(&hdcmi, DCMI_IT_LINE);
+  line_cnt = 0;
   //HAL_DCMI_Start_DMA_MB(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer_8bit_1, FULL_IMAGE_SIZE/4,FULL_IMAGE_COLUMN_SIZE);
   HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer_8bit_1, FULL_IMAGE_SIZE/4);
+  line_cnt = 0;
+  __HAL_DCMI_ENABLE(&hdcmi);
+  //start = 1;
+  //while(start==1);
   while ((DCMI->CR & DCMI_CR_CAPTURE) != 0);
+  //HAL_DCMI_Stop(&hdcmi);
+  // HAL_NVIC_DisableIRQ(DMA2_Stream1_IRQn);
+  // HAL_DMA_Abort(hdcmi.DMA_Handle);
+  
+
+  printf("catch %d\r\n",line_cnt);
+}
+
+void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi)
+{
+	HAL_GPIO_WritePin(GPIOE, LED_Pin, GPIO_PIN_SET);
+	
+	//if((DCMI->SR & 0x03) == 0x01)
+	if(start == 2)
+		line_cnt++;
+    // if(line_cnt == 1)
+    // {
+         count++;
+    // }
+    //printf("%d\r\n",line_cnt);
+	
+	HAL_GPIO_WritePin(GPIOE, LED_Pin, GPIO_PIN_RESET);
 }
 
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
-  if (hdcmi->Instance == DCMI)
-  {
+//  if (hdcmi->Instance == DCMI)
+//  {
+//	  
+//	  count++;
+//    // HAL_NVIC_DisableIRQ(DMA2_Stream1_IRQn);
+//    // HAL_DMA_Abort(hdcmi->DMA_Handle);
 
-    __HAL_DCMI_ENABLE_IT(hdcmi, DCMI_IT_FRAME);
-
-//    if ((dcmi_image_buffer_8bit_1[0] != 0) || (dcmi_image_buffer_8bit_1[1] != 0))
-//    {
-//      dcmi_image_buffer_8bit_1[0] = 0;
-//      dcmi_image_buffer_8bit_1[1] = 0;
-//      
-//    }else{
-//		printf("frame error\r\n");
-//	}
-  }
+////    if ((dcmi_image_buffer_8bit_1[0] != 0) || (dcmi_image_buffer_8bit_1[1] != 0))
+////    {
+////      dcmi_image_buffer_8bit_1[0] = 0;
+////      dcmi_image_buffer_8bit_1[1] = 0;
+////      
+////    }else{
+////		printf("frame error\r\n");
+////	}
+//  }
 }
 
 void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
-  if (hdcmi->Instance == DCMI)
-  {
-    	frame_count++;
-		HAL_DMA_Abort(hdcmi->DMA_Handle);
-
-        // Disable DMA IRQ
-        HAL_NVIC_DisableIRQ(DMA2_Stream1_IRQn);
-  }
+	if(start == 1)
+	{
+		start = 2;
+	
+	//hdcmi->Instance->CR |= DCMI_CR_CAPTURE;
+		
+	}
+//  if (hdcmi->Instance == DCMI)
+//  {
+//     frame_count++;
+//		// HAL_DMA_Abort(hdcmi->DMA_Handle);
+//    // HAL_NVIC_DisableIRQ(DMA2_Stream1_IRQn);
+//  }
 }
 
 /* USER CODE END 0 */
@@ -167,9 +208,9 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* dcmiHandle)
     hdma_dcmi.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_dcmi.Init.Mode = DMA_NORMAL;
     hdma_dcmi.Init.Priority = DMA_PRIORITY_HIGH;
-    hdma_dcmi.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+    hdma_dcmi.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     hdma_dcmi.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
-    hdma_dcmi.Init.MemBurst = DMA_MBURST_INC4;
+    hdma_dcmi.Init.MemBurst = DMA_MBURST_SINGLE;
     hdma_dcmi.Init.PeriphBurst = DMA_PBURST_SINGLE;
     if (HAL_DMA_Init(&hdma_dcmi) != HAL_OK)
     {
@@ -179,7 +220,7 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* dcmiHandle)
     __HAL_LINKDMA(dcmiHandle,DMA_Handle,hdma_dcmi);
 
     /* DCMI interrupt Init */
-    HAL_NVIC_SetPriority(DCMI_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(DCMI_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DCMI_IRQn);
   /* USER CODE BEGIN DCMI_MspInit 1 */
 

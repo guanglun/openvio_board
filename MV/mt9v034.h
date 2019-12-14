@@ -236,6 +236,16 @@
 
 
     
+
+
+/*
+ * Resolution:
+ * ROW_SIZE * BINNING_ROW <= MAX_IMAGE_WIDTH
+ * COLUMN_SIZE * BINNING_COLUMN <= MAX_IMAGE_HEIGHT
+ */
+
+#define FULL_IMAGE_SIZE (FULL_IMAGE_ROW_SIZE*FULL_IMAGE_COLUMN_SIZE)
+
 typedef enum {
     FRAMESIZE_INVALID = 0,
     // C/SIF Resolutions
@@ -270,25 +280,26 @@ typedef enum {
     FRAMESIZE_UXGA,     // 1600x1200
 } framesize_t;
 
-/*
- * Resolution:
- * ROW_SIZE * BINNING_ROW <= MAX_IMAGE_WIDTH
- * COLUMN_SIZE * BINNING_COLUMN <= MAX_IMAGE_HEIGHT
- */
 
-#define FULL_IMAGE_SIZE (FULL_IMAGE_ROW_SIZE*FULL_IMAGE_COLUMN_SIZE)
+// #define FULL_IMAGE_ROW_SIZE 		        (160)
+// #define FULL_IMAGE_COLUMN_SIZE         (120)
+
+// #define FULL_IMAGE_ROW_SIZE 		      	(240)
+// #define FULL_IMAGE_COLUMN_SIZE       		(160)
+
+// #define FRAMESIZE_USE 						FRAMESIZE_QVGA
+// #define FULL_IMAGE_ROW_SIZE 		      (320)
+// #define FULL_IMAGE_COLUMN_SIZE 		  (240)
+
+// #define FULL_IMAGE_ROW_SIZE 		      (352)
+// #define FULL_IMAGE_COLUMN_SIZE 		  (288)
+
+ #define FRAMESIZE_USE FRAMESIZE_VGA
+ #define FULL_IMAGE_ROW_SIZE 		      (640)
+ #define FULL_IMAGE_COLUMN_SIZE 		  (480)
 
 //#define FULL_IMAGE_ROW_SIZE 		    (752)
 //#define FULL_IMAGE_COLUMN_SIZE 	    (480)
-
-//#define FULL_IMAGE_ROW_SIZE 		    (240)
-//#define FULL_IMAGE_COLUMN_SIZE          (160)
-
-// #define FULL_IMAGE_ROW_SIZE 		    (320)
-// #define FULL_IMAGE_COLUMN_SIZE 		(240)
-
- #define FULL_IMAGE_ROW_SIZE 		    (640)
- #define FULL_IMAGE_COLUMN_SIZE 		(480)
 
 /* Functions */
 

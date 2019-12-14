@@ -12,10 +12,10 @@
 #include <stddef.h>
 #include "cambus.h"
 
-#include "FreeRTOS.h"
-#include "task.h"
+//#include "FreeRTOS.h"
+//#include "task.h"
 #include "main.h"
-#include "cmsis_os.h"
+//#include "cmsis_os.h"
 
 #define I2C_TIMEOUT     (1000)
 
