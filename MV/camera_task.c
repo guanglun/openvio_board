@@ -5,6 +5,11 @@
 #include "usbd_def.h"
 #include "usbd_cdc_if.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "main.h"
+#include "cmsis_os.h"
+
 extern USBD_HandleTypeDef hUsbDeviceHS;
 extern int frame_count;
 extern DMA_BUFFER uint8_t dcmi_image_buffer_8bit_1[FULL_IMAGE_SIZE];
@@ -26,16 +31,13 @@ void StartCameraTask(void const * argument)
 	printf("cambus_scan %02X\r\n", ret);
 
 	mt9v034_init();
-	HAL_Delay(10);
-	//MX_DCMI_Init();
-//	HAL_NVIC_DisableIRQ(DMA2_Stream1_IRQn);
-//  	HAL_DMA_Abort(hdcmi.DMA_Handle);
+	osDelay(10);
 	
 	int count = 5;
 
 	while(count--)
 	{
-		HAL_Delay(1000);
+		osDelay(1000);
 		printf("count %d\r\n",count);
 	}
 
@@ -68,7 +70,7 @@ void StartCameraTask(void const * argument)
 			while(hcdc->TxState != 0);
 			//printf("send end\r\n");
 			
-			HAL_Delay(100);
+			osDelay(100);
 			dcmi_dma_start();
 		}
 		

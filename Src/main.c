@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 #include "dcmi.h"
 #include "dma.h"
 #include "i2c.h"
@@ -56,6 +57,7 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MPU_Config(void);
+void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -106,16 +108,17 @@ int main(void)
   MX_I2C1_Init();
   MX_UART4_Init();
   MX_DMA_Init();
-  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
   printf("hello openvio\r\n");
-  
-//  while(1)
-//  {
-//	HAL_Delay(10);
-//  }
-  StartCameraTask(NULL);
   /* USER CODE END 2 */
+
+  /* Call init function for freertos objects (in freertos.c) */
+  MX_FREERTOS_Init(); 
+
+  /* Start scheduler */
+  osKernelStart();
+  
+  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
