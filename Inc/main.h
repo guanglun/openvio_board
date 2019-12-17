@@ -65,6 +65,8 @@ void Error_Handler(void);
 #define USB_SWITCH_GPIO_Port GPIOE
 #define DCMI_RST_Pin GPIO_PIN_10
 #define DCMI_RST_GPIO_Port GPIOA
+#define SD_CD_Pin GPIO_PIN_0
+#define SD_CD_GPIO_Port GPIOD
 #define DCMI_PWDN_Pin GPIO_PIN_7
 #define DCMI_PWDN_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
