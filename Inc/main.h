@@ -67,6 +67,8 @@ void Error_Handler(void);
 #define DCMI_RST_GPIO_Port GPIOA
 #define SD_CD_Pin GPIO_PIN_0
 #define SD_CD_GPIO_Port GPIOD
+#define IMU_SPI_CS_Pin GPIO_PIN_6
+#define IMU_SPI_CS_GPIO_Port GPIOD
 #define DCMI_PWDN_Pin GPIO_PIN_7
 #define DCMI_PWDN_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */

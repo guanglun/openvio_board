@@ -24,6 +24,7 @@
 #include "dcmi.h"
 #include "dma.h"
 #include "i2c.h"
+#include "spi.h"
 #include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
@@ -108,6 +109,7 @@ int main(void)
   MX_I2C1_Init();
   MX_UART4_Init();
   MX_DMA_Init();
+  MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
   printf("hello openvio\r\n");
   /* USER CODE END 2 */
@@ -186,7 +188,9 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_UART4|RCC_PERIPHCLK_I2C1;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_UART4|RCC_PERIPHCLK_SPI3
+                              |RCC_PERIPHCLK_I2C1;
+  PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
   PeriphClkInitStruct.Usart234578ClockSelection = RCC_USART234578CLKSOURCE_D2PCLK1;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)

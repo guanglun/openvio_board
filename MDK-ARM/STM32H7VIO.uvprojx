@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H743xx,USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                                                             ../Drivers/STM32H7xx_HAL_Driver/Inc;                                                             ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;                                                             ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;                                                             ../Drivers/CMSIS/Include;                                                             ..\App;                                                             ..\MV;                ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;         ../Middlewares/Third_Party/FreeRTOS/Source/include;         ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;         ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F</IncludePath>
+              <IncludePath>../Inc;                                                                  ../Drivers/STM32H7xx_HAL_Driver/Inc;                                                                  ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;                                                                  ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;                                                                  ../Drivers/CMSIS/Include;                                                                  ..\App;                                                                  ..\MV;                     ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                     ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;              ../Middlewares/Third_Party/FreeRTOS/Source/include;              ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;              ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -406,6 +406,21 @@
               <FileType>1</FileType>
               <FilePath>..\MV\camera_task.c</FilePath>
             </File>
+            <File>
+              <FileName>camera_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\MV\camera_task.h</FilePath>
+            </File>
+            <File>
+              <FileName>mpu6000.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MV\mpu6000.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpu6000.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\MV\mpu6000.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -460,6 +475,11 @@
               <FileName>i2c.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Src/spi.c</FilePath>
             </File>
             <File>
               <FileName>sys.c</FileName>
@@ -620,6 +640,16 @@
               <FileName>stm32h7xx_hal_dcmi.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dcmi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32h7xx_hal_tim.c</FileName>

@@ -10,6 +10,8 @@
 #include "main.h"
 #include "cmsis_os.h"
 
+#include "mpu6000.h"
+
 //#include "ff.h"
 
 //FATFS   fs;         
@@ -26,7 +28,7 @@ extern int line_cnt;
 void StartCameraTask(void const * argument)
 {
 	
-	
+	mpu6000_init();
 //	char filename[] = "test.txt";
 //	uint8_t write_dat[] = "Hello,FATFS!\n";
 //	uint16_t write_num = 0;
