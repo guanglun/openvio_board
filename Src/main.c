@@ -23,7 +23,9 @@
 #include "cmsis_os.h"
 #include "dcmi.h"
 #include "dma.h"
+#include "fatfs.h"
 #include "i2c.h"
+#include "sdmmc.h"
 #include "spi.h"
 #include "usart.h"
 #include "usb_device.h"
@@ -79,13 +81,13 @@ int main(void)
   /* USER CODE END 1 */
   
   /* MPU Configuration--------------------------------------------------------*/
-  MPU_Config();
+//  MPU_Config();
 
-  /* Enable I-Cache---------------------------------------------------------*/
-  SCB_EnableICache();
+//  /* Enable I-Cache---------------------------------------------------------*/
+//  SCB_EnableICache();
 
-  /* Enable D-Cache---------------------------------------------------------*/
-  SCB_EnableDCache();
+//  /* Enable D-Cache---------------------------------------------------------*/
+//  SCB_EnableDCache();
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -109,6 +111,7 @@ int main(void)
   MX_I2C1_Init();
   MX_UART4_Init();
   MX_DMA_Init();
+  MX_SDMMC1_SD_Init();
   MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
   printf("hello openvio\r\n");
@@ -152,6 +155,9 @@ void SystemClock_Config(void)
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
+  /** Macro to configure the PLL clock source 
+  */
+  __HAL_RCC_PLL_PLLSOURCE_CONFIG(RCC_PLLSOURCE_HSE);
   /** Initializes the CPU, AHB and APB busses clocks 
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSE;
@@ -189,7 +195,16 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_UART4|RCC_PERIPHCLK_SPI3
-                              |RCC_PERIPHCLK_I2C1;
+                              |RCC_PERIPHCLK_SDMMC|RCC_PERIPHCLK_I2C1;
+  PeriphClkInitStruct.PLL2.PLL2M = 6;
+  PeriphClkInitStruct.PLL2.PLL2N = 400;
+  PeriphClkInitStruct.PLL2.PLL2P = 2;
+  PeriphClkInitStruct.PLL2.PLL2Q = 2;
+  PeriphClkInitStruct.PLL2.PLL2R = 17;
+  PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_1;
+  PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
+  PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
+  PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL2;
   PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
   PeriphClkInitStruct.Usart234578ClockSelection = RCC_USART234578CLKSOURCE_D2PCLK1;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;

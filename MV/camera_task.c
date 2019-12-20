@@ -12,11 +12,11 @@
 
 #include "mpu6000.h"
 
-//#include "ff.h"
+#include "ff.h"
 
-//FATFS   fs;         
-//FRESULT fr;       
-//FIL     fd;   
+FATFS   fs;         
+FRESULT fr;       
+FIL     fd;   
 
 extern USBD_HandleTypeDef hUsbDeviceHS;
 extern int frame_count;
@@ -28,7 +28,9 @@ extern int line_cnt;
 void StartCameraTask(void const * argument)
 {
 	
-	mpu6000_init();
+	//mpu6000_init();
+	
+	
 //	char filename[] = "test.txt";
 //	uint8_t write_dat[] = "Hello,FATFS!\n";
 //	uint16_t write_num = 0;
