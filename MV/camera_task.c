@@ -28,6 +28,14 @@ extern int line_cnt;
 void StartCameraTask(void const * argument)
 {
 	
+	char hello[] = "hello";
+	
+	while(1)
+	{
+		while(CDC_Transmit_HS(hello,sizeof(hello)) == USBD_BUSY);
+		
+		osDelay(1000);
+	}
 	//mpu6000_init();
 	
 	
