@@ -103,7 +103,7 @@ extern "C" {
 #define  USB_REQ_SET_INTERFACE                          0x0BU
 #define  USB_REQ_SYNCH_FRAME                            0x0CU
 
-#define  USB_REQ_MS_VENDOR_CODE                         0xA0U
+#define  USB_REQ_MS_VENDOR_CODE                         0x32U
 
 #define  USB_DESC_TYPE_DEVICE                           0x01U
 #define  USB_DESC_TYPE_CONFIGURATION                    0x02U

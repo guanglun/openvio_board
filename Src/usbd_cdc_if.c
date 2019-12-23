@@ -294,7 +294,19 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-
+uint8_t MPU_Transmit_HS(uint8_t* Buf, uint16_t Len)
+{
+  uint8_t result = USBD_OK;
+  /* USER CODE BEGIN 12 */
+  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
+  if (hcdc->TxState != 0){
+    return USBD_BUSY;
+  }
+  USBD_CDC_SetTxBuffer(&hUsbDeviceHS, Buf, Len);
+  result = USBD_MPU_TransmitPacket(&hUsbDeviceHS);
+  /* USER CODE END 12 */
+  return result;
+}
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
