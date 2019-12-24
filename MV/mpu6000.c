@@ -67,18 +67,22 @@ int mpu6000_init(void)
 
 	if (id == 0x68)
 	{
-		mpu6000_write_reg(MPU6000_RA_PWR_MGMT_1, 0x80);
+		mpu6000_write_reg(MPU6000_RA_PWR_MGMT_1, 0x80);		
 		osDelay(100);
 		mpu6000_write_reg(MPU6000_RA_SIGNAL_PATH_RESET, 0x07);
 		osDelay(100);
 
-		mpu6000_write_reg(MPU6000_RA_PWR_MGMT_1, 0x01);
+		mpu6000_write_reg(MPU6000_RA_PWR_MGMT_1, 0x00);
 		mpu6000_write_reg(MPU6000_RA_PWR_MGMT_2, 0x00);
-		mpu6000_write_reg(MPU6000_RA_SMPLRT_DIV, 0x00);
-		mpu6000_write_reg(MPU6000_RA_USER_CTRL, 0x10);
-		mpu6000_write_reg(MPU6000_RA_CONFIG, 0x02);
+		//mpu6000_write_reg(MPU6000_RA_SMPLRT_DIV, 0x00);
+		//mpu6000_write_reg(MPU6000_RA_USER_CTRL, 0x10);
+		//mpu6000_write_reg(MPU6000_RA_CONFIG, 0x02);
 		mpu6000_write_reg(MPU6000_RA_GYRO_CONFIG, 0x18);
 		mpu6000_write_reg(MPU6000_RA_ACCEL_CONFIG, 0x10);
+		
+		mpu6000_write_reg(MPU6000_RA_CONFIG,0x06);
+		mpu6000_write_reg(MPU6000_RA_INT_PIN_CFG,0X9C);
+		mpu6000_write_reg(MPU6000_RA_INT_ENABLE, 0x01); //enable int
 	}
 	else
 	{
@@ -99,6 +103,14 @@ void mpu6000_transmit(void)
 	static uint8_t mpu6000_data[14];
 	static short acc[3],gyro[3],temp;
 		
+	
+	mpu6000_read_reg((MPU6000_RA_INT_STATUS | 0x80), mpu6000_data, 1);
+	if((mpu6000_data[0] & 0x01) != 0x01)
+	{
+		printf("mpu6000 not ready\r\n");
+		return;
+	}
+	
 	mpu6000_read(mpu6000_data);
 	MPU_Transmit_HS(mpu6000_data, 14);
 
@@ -108,18 +120,19 @@ void mpu6000_transmit(void)
 	//		}
 	//		printf("\r\n");
 	
-//	acc[0] = (short)((mpu6000_data[0]<<8)|mpu6000_data[1]);
-//	acc[1] = (short)((mpu6000_data[2]<<8)|mpu6000_data[3]);
-//	acc[2] = (short)((mpu6000_data[4]<<8)|mpu6000_data[5]);
-//	
-//	temp = (short)((mpu6000_data[6]<<8)|mpu6000_data[7]);
-//	
-//	gyro[0] = (short)((mpu6000_data[8]<<8)|mpu6000_data[9]);
-//	gyro[1] = (short)((mpu6000_data[10]<<8)|mpu6000_data[11]);
-//	gyro[2] = (short)((mpu6000_data[12]<<8)|mpu6000_data[13]);
-//	
-//	printf("%d %d %d %d %d %d %d\r\n", 	acc[0],acc[1],acc[2],
-//										temp,
-//										gyro[0],gyro[1],gyro[2]);
+	
+	acc[0] = (short)((mpu6000_data[0]<<8)|mpu6000_data[1]);
+	acc[1] = (short)((mpu6000_data[2]<<8)|mpu6000_data[3]);
+	acc[2] = (short)((mpu6000_data[4]<<8)|mpu6000_data[5]);
+	
+	temp = (short)((mpu6000_data[6]<<8)|mpu6000_data[7]);
+	
+	gyro[0] = (short)((mpu6000_data[8]<<8)|mpu6000_data[9]);
+	gyro[1] = (short)((mpu6000_data[10]<<8)|mpu6000_data[11]);
+	gyro[2] = (short)((mpu6000_data[12]<<8)|mpu6000_data[13]);
+	
+	printf("%d %d %d %d %d %d %d\r\n", 	acc[0],acc[1],acc[2],
+										temp,
+										gyro[0],gyro[1],gyro[2]);
 
 }

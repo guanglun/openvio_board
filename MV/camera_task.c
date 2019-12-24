@@ -131,7 +131,11 @@ void StartCameraTask(void const *argument)
 	//		printf("count %d\r\n", count);
 	//	}
 	
-	
+	while(1)
+	{
+		mpu6000_transmit();
+		osDelay(1000);
+	}
 	
 	while (1)
 	{
