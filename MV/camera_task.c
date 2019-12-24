@@ -1,4 +1,7 @@
 #include "camera_task.h"
+#include "openvio_def.h"
+#include "openvio.h"
+
 #include "cambus.h"
 #include "mt9v034.h"
 #include "dcmi.h"
@@ -24,7 +27,10 @@ extern DMA_BUFFER uint8_t dcmi_image_buffer_8bit_1[FULL_IMAGE_SIZE];
 extern int line_cnt;
 
 DMA_BUFFER uint8_t mpu6000_data[14];
-char is_cam_start = 0,is_imu_start = 0;
+
+
+
+struct OPENVIO_STATUS vio_status;
 
 static void camera_img_send(void);
 
@@ -40,19 +46,19 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req)
 	switch (req->bRequest)
 	{
 	case REQUEST_CAMERA_START:
-		is_cam_start = 1;
+		vio_status.is_cam_start = 1;
 		result = 'S';
 		break;
 	case REQUEST_CAMERA_STOP:
-		is_cam_start = 0;
+		vio_status.is_cam_start = 0;
 		result = 'S';
 		break;
 	case REQUEST_IMU_START:
-		is_imu_start = 1;
+		vio_status.is_imu_start = 1;
 		result = 'S';
 		break;
 	case REQUEST_IMU_STOP:
-		is_imu_start = 0;
+		vio_status.is_imu_start = 0;
 		result = 'S';
 		break;	
 	default:
@@ -120,7 +126,11 @@ void StartCameraTask(void const *argument)
 	//	}
 
 
-
+	openvio_status_init(&vio_status);
+	
+	vio_status.is_cam_start = 1;
+	vio_status.is_imu_start = 1;
+	
 	mt9v034_init();
 	mpu6000_init();
 	
@@ -131,44 +141,53 @@ void StartCameraTask(void const *argument)
 	//		printf("count %d\r\n", count);
 	//	}
 	
-	while(1)
-	{
-		mpu6000_transmit();
-		osDelay(1000);
-	}
+//	while(1)
+//	{
+//		mpu6000_transmit();
+//		osDelay(1000);
+//	}
 	
 	while (1)
 	{
-		while (!is_cam_start)
+		while (!vio_status.is_cam_start)
 		{
 			osDelay(10);
 		}
 
+		printf("dcmi_dma_start\r\n");
+		
 		dcmi_dma_start();
 		camera_img_send();
+		//mpu6000_transmit();
 		frame_count++;
+		
+		//osDelay(4000);
 	}
 }
 
-void camera_img_send(void)
-{
 #define SNED_SIZE (63 * 1024)
 
+void camera_img_send(void)
+{
+	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
 	for (uint32_t i = 0; i < FULL_IMAGE_SIZE; i += SNED_SIZE)
 	{
 		if (i + SNED_SIZE > FULL_IMAGE_SIZE)
 		{
-			while (CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i], FULL_IMAGE_SIZE - i) == USBD_BUSY)
-				;
+			while (hcdc->TxState != 0);
+			//CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i], FULL_IMAGE_SIZE - i);
+			while(CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i], FULL_IMAGE_SIZE - i) == USBD_BUSY);
 		}
 		else
 		{
-			while (CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i], SNED_SIZE) == USBD_BUSY)
-				;
+			while (hcdc->TxState != 0);
+			//CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i], SNED_SIZE);
+			while(CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i], SNED_SIZE) == USBD_BUSY);
 		}
+		
+		mpu6000_transmit();
+		
 	}
-
-	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
-	while (hcdc->TxState != 0)
-		;
+	
+	
 }

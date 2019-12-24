@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H743xx,USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                                                                     ../Drivers/STM32H7xx_HAL_Driver/Inc;                                                                     ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;                                                                     ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;                                                                     ../Drivers/CMSIS/Include;                                                                     ..\App;                                                                     ..\MV;                        ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                        ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;                 ../Middlewares/Third_Party/FreeRTOS/Source/include;                 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;                 ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;  ../Middlewares/Third_Party/FatFs/src</IncludePath>
+              <IncludePath>../Inc;                                                                        ../Drivers/STM32H7xx_HAL_Driver/Inc;                                                                        ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;                                                                        ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;                                                                        ../Drivers/CMSIS/Include;                                                                        ..\App;                                                                        ..\MV;                           ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                           ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;                    ../Middlewares/Third_Party/FreeRTOS/Source/include;                    ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;                    ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;     ../Middlewares/Third_Party/FatFs/src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -420,6 +420,21 @@
               <FileName>mpu6000.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\MV\mpu6000.h</FilePath>
+            </File>
+            <File>
+              <FileName>openvio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MV\openvio.c</FilePath>
+            </File>
+            <File>
+              <FileName>openvio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\MV\openvio.h</FilePath>
+            </File>
+            <File>
+              <FileName>openvio_def.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\MV\openvio_def.h</FilePath>
             </File>
           </Files>
         </Group>

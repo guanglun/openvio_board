@@ -49,13 +49,17 @@ void dcmi_dma_start(void)
   __HAL_DCMI_ENABLE(&hdcmi);
   //start = 1;
   //while(start==1);
-  while ((DCMI->CR & DCMI_CR_CAPTURE) != 0);
+  while ((DCMI->CR & DCMI_CR_CAPTURE) != 0)
+  {
+	  mpu6000_transmit();
+  }
+  
   //HAL_DCMI_Stop(&hdcmi);
   // HAL_NVIC_DisableIRQ(DMA2_Stream1_IRQn);
   // HAL_DMA_Abort(hdcmi.DMA_Handle);
   
 
-  printf("catch %d\r\n",line_cnt);
+  //printf("catch %d\r\n",line_cnt);
 }
 
 void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi)
