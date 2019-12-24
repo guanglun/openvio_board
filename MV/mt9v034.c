@@ -314,17 +314,26 @@ int mt9v034_init(void)
 	uint16_t chip_version = 0;
 	int retry_num = 1, err = 0;
 
-	/* MT9V034 Soft Reset */
-	/* Reset */
-	//mt9v034_WriteReg16(MTV_SOFT_RESET_REG, 0x01);
-	//msleep(1);
+	////////////////////////////////////////////////////////////////////////////////
+	HAL_GPIO_WritePin(DCMI_PWDN_GPIO_Port, DCMI_PWDN_Pin, GPIO_PIN_SET);
+	HAL_Delay(10);
+	HAL_GPIO_WritePin(DCMI_PWDN_GPIO_Port, DCMI_PWDN_Pin, GPIO_PIN_RESET);
 
+	HAL_GPIO_WritePin(DCMI_RST_GPIO_Port, DCMI_RST_Pin, GPIO_PIN_RESET);
+	HAL_Delay(10);
+	HAL_GPIO_WritePin(DCMI_RST_GPIO_Port, DCMI_RST_Pin, GPIO_PIN_SET);
+	HAL_Delay(10);
+
+	int id = cambus_scan();
+
+	printf("cambus_scan %02X\r\n", id);
+	////////////////////////////////////////////////////////////////////////////////
+	
 	while (!chip_version && retry_num-- > 0)
 		chip_version = mt9v034_ReadReg16(MTV_CHIP_VERSION_REG);
 
 	if (chip_version != 0x1324) {
 		printf("read err\r\n");
-		//while(1);
 		return -1;
 	}
 	printf("[mt9v034]: ok\r\n");

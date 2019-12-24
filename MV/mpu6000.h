@@ -116,6 +116,7 @@
 
 int mpu6000_init(void);
 void mpu6000_read(uint8_t *buf);
-	
+void mpu6000_transmit(void);
+
 #endif
 
