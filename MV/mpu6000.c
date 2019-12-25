@@ -96,11 +96,11 @@ int mpu6000_init(void)
 		//mpu6000_write_reg(MPU6000_RA_SMPLRT_DIV, 0x00);
 		//mpu6000_write_reg(MPU6000_RA_USER_CTRL, 0x10);
 		//mpu6000_write_reg(MPU6000_RA_CONFIG, 0x02);
-		mpu6000_write_reg(MPU6000_RA_GYRO_CONFIG, 0x18);
-		mpu6000_write_reg(MPU6000_RA_ACCEL_CONFIG, 0x10);
+		mpu6000_write_reg(MPU6000_RA_GYRO_CONFIG, (MPU6050_GYRO_FS_2000<<3));
+		mpu6000_write_reg(MPU6000_RA_ACCEL_CONFIG, (MPU6050_ACCEL_FS_4<<3));
 		
 		/*enable int*/
-		mpu6000_write_reg(MPU6000_RA_CONFIG,0x06);
+		mpu6000_write_reg(MPU6000_RA_CONFIG,0x11);
 		mpu6000_write_reg(MPU6000_RA_INT_PIN_CFG,0X9C);
 		mpu6000_write_reg(MPU6000_RA_INT_ENABLE, 0x01); 
 	}
@@ -139,6 +139,7 @@ void mpu6000_transmit(void)
 		//MPU_Transmit_HS(mpu6000_data, 14);
 		while(MPU_Transmit_HS(mpu6000_data, 14) == USBD_BUSY);
 	}
+
 	//		for(int i=0;i<14;i++)
 	//		{
 	//			printf("%02X ",mpu6000_data[i]);
@@ -165,7 +166,7 @@ void mpu6000_transmit(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	static BaseType_t xHigherPriorityTaskWoken;
-	if(vio_status.is_imu_start == 1)
+	if(vio_status.is_imu_start)
 	{
 		vio_status.is_imu_send = 1;
 //		xSemaphoreGiveFromISR( xIMUSemaphore, &xHigherPriorityTaskWoken );

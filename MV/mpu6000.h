@@ -114,6 +114,16 @@
 #define MPU6000_RA_FIFO_R_W         0x74
 #define MPU6000_RA_WHO_AM_I         0x75
 
+#define MPU6050_GYRO_FS_250         0x00
+#define MPU6050_GYRO_FS_500         0x01
+#define MPU6050_GYRO_FS_1000        0x02
+#define MPU6050_GYRO_FS_2000        0x03
+
+#define MPU6050_ACCEL_FS_2          0x00
+#define MPU6050_ACCEL_FS_4          0x01
+#define MPU6050_ACCEL_FS_8          0x02
+#define MPU6050_ACCEL_FS_16         0x03
+
 int mpu6000_init(void);
 void mpu6000_read(uint8_t *buf);
 void mpu6000_transmit(void);

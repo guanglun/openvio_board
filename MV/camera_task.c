@@ -64,7 +64,6 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req)
 	default:
 		break;
 	}
-
 	return result;
 }
 
@@ -128,8 +127,8 @@ void StartCameraTask(void const *argument)
 
 	openvio_status_init(&vio_status);
 	
-	vio_status.is_cam_start = 1;
-	vio_status.is_imu_start = 1;
+//	vio_status.is_cam_start = 1;
+//	vio_status.is_imu_start = 1;
 	
 	mt9v034_init();
 	mpu6000_init();
@@ -146,19 +145,18 @@ void StartCameraTask(void const *argument)
 //		mpu6000_transmit();
 //		osDelay(1000);
 //	}
+
+	//printf("dcmi_dma_start\r\n");
 	
 	while (1)
 	{
-		while (!vio_status.is_cam_start)
-		{
-			osDelay(10);
-		}
 
-		printf("dcmi_dma_start\r\n");
-		
-		dcmi_dma_start();
-		camera_img_send();
-		//mpu6000_transmit();
+		if(vio_status.is_cam_start)
+		{
+			dcmi_dma_start();
+			camera_img_send();
+		}
+		mpu6000_transmit();
 		frame_count++;
 		
 		//osDelay(4000);
@@ -186,8 +184,5 @@ void camera_img_send(void)
 		}
 		
 		mpu6000_transmit();
-		
 	}
-	
-	
 }
