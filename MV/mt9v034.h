@@ -294,12 +294,13 @@ typedef enum {
 // #define FULL_IMAGE_ROW_SIZE 		      (352)
 // #define FULL_IMAGE_COLUMN_SIZE 		  (288)
 
- #define FRAMESIZE_USE FRAMESIZE_VGA
- #define FULL_IMAGE_ROW_SIZE 		      (640)
- #define FULL_IMAGE_COLUMN_SIZE 		  (480)
+// #define FRAMESIZE_USE FRAMESIZE_VGA
+// #define FULL_IMAGE_ROW_SIZE 		      (640)
+// #define FULL_IMAGE_COLUMN_SIZE 		  (480)
 
-//#define FULL_IMAGE_ROW_SIZE 		    (752)
-//#define FULL_IMAGE_COLUMN_SIZE 	    (480)
+#define FRAMESIZE_USE FRAMESIZE_WVGA2
+#define FULL_IMAGE_ROW_SIZE 		    (752)
+#define FULL_IMAGE_COLUMN_SIZE 	    	(480)
 
 /* Functions */
 

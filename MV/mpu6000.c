@@ -9,6 +9,7 @@
 
 #include "usbd_def.h"
 #include "usbd_cdc_if.h"
+#include "openvio.h"
 
 extern struct OPENVIO_STATUS vio_status;
 
@@ -135,9 +136,8 @@ void mpu6000_transmit(void)
 		mpu6000_read(mpu6000_data);
 		//MPU_Transmit_HS(mpu6000_data, 14);
 		
-		while (hcdc->TxState != 0);
-		//MPU_Transmit_HS(mpu6000_data, 14);
-		while(MPU_Transmit_HS(mpu6000_data, 14) == USBD_BUSY);
+		openvio_usb_send(SENSOR_USB_IMU,mpu6000_data, 14);
+
 	}
 
 	//		for(int i=0;i<14;i++)
@@ -166,7 +166,7 @@ void mpu6000_transmit(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	static BaseType_t xHigherPriorityTaskWoken;
-	if(vio_status.is_imu_start)
+	if(vio_status.imu_status == SENSOR_STATUS_START)
 	{
 		vio_status.is_imu_send = 1;
 //		xSemaphoreGiveFromISR( xIMUSemaphore, &xHigherPriorityTaskWoken );

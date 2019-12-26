@@ -33,6 +33,7 @@ DMA_BUFFER uint8_t mpu6000_data[14];
 struct OPENVIO_STATUS vio_status;
 
 static void camera_img_send(void);
+static void camera_start_send(void);
 
 #define REQUEST_CAMERA_START    0xA0
 #define REQUEST_CAMERA_STOP     0xA1
@@ -46,20 +47,42 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req)
 	switch (req->bRequest)
 	{
 	case REQUEST_CAMERA_START:
-		vio_status.is_cam_start = 1;
-		result = 'S';
+		if(vio_status.cam_status == SENSOR_STATUS_WAIT)
+		{
+			result = 'S';
+			vio_status.cam_status = SENSOR_STATUS_START;
+		}else{
+			result = 'F';
+		}
+
 		break;
 	case REQUEST_CAMERA_STOP:
-		vio_status.is_cam_start = 0;
-		result = 'S';
+		if(vio_status.cam_status != SENSOR_STATUS_WAIT)
+		{		
+			result = 'S';
+			vio_status.cam_status = SENSOR_STATUS_WAIT;
+		}else{
+			result = 'F';
+		}
+		
 		break;
 	case REQUEST_IMU_START:
-		vio_status.is_imu_start = 1;
-		result = 'S';
+		if(vio_status.imu_status == SENSOR_STATUS_WAIT)
+		{			
+			vio_status.imu_status = SENSOR_STATUS_START;
+			result = 'S';
+		}else{
+			result = 'F';
+		}
 		break;
 	case REQUEST_IMU_STOP:
-		vio_status.is_imu_start = 0;
-		result = 'S';
+		if(vio_status.imu_status != SENSOR_STATUS_WAIT)
+		{		
+			vio_status.imu_status = SENSOR_STATUS_WAIT;
+			result = 'S';
+		}else{
+			result = 'F';
+		}
 		break;	
 	default:
 		break;
@@ -69,7 +92,7 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req)
 
 void StartCameraTask(void const *argument)
 {
-
+	int ret;
 	//
 	//mpu6000_init();
 
@@ -127,9 +150,6 @@ void StartCameraTask(void const *argument)
 
 	openvio_status_init(&vio_status);
 	
-//	vio_status.is_cam_start = 1;
-//	vio_status.is_imu_start = 1;
-	
 	mt9v034_init();
 	mpu6000_init();
 	
@@ -151,11 +171,16 @@ void StartCameraTask(void const *argument)
 	while (1)
 	{
 
-		if(vio_status.is_cam_start)
+		if(vio_status.cam_status == SENSOR_STATUS_START)
+		{
+			camera_start_send();
+			
+		}else if(vio_status.cam_status == SENSOR_STATUS_RUNNING)
 		{
 			dcmi_dma_start();
 			camera_img_send();
 		}
+
 		mpu6000_transmit();
 		frame_count++;
 		
@@ -165,6 +190,22 @@ void StartCameraTask(void const *argument)
 
 #define SNED_SIZE (63 * 1024)
 
+void camera_start_send(void)
+{
+//	int ret;
+//	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
+//			uint8_t start_byte[4] = {0x12,0x34,0x56,0x78};
+//			while (hcdc->TxState != 0);
+
+//			do{
+//				ret = CDC_Transmit_HS(start_byte, 4);
+//			}while(ret == USBD_BUSY);
+//			if(ret == USBD_OK)
+			{
+				vio_status.cam_status = SENSOR_STATUS_RUNNING;
+			}	
+}
+
 void camera_img_send(void)
 {
 	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
@@ -172,15 +213,11 @@ void camera_img_send(void)
 	{
 		if (i + SNED_SIZE > FULL_IMAGE_SIZE)
 		{
-			while (hcdc->TxState != 0);
-			//CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i], FULL_IMAGE_SIZE - i);
-			while(CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i], FULL_IMAGE_SIZE - i) == USBD_BUSY);
+			openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer_8bit_1[i], FULL_IMAGE_SIZE - i);
 		}
 		else
 		{
-			while (hcdc->TxState != 0);
-			//CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i], SNED_SIZE);
-			while(CDC_Transmit_HS(&dcmi_image_buffer_8bit_1[i], SNED_SIZE) == USBD_BUSY);
+			openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer_8bit_1[i], SNED_SIZE);
 		}
 		
 		mpu6000_transmit();
