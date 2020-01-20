@@ -112,7 +112,7 @@ int main(void)
   MX_UART4_Init();
   MX_DMA_Init();
   MX_SDMMC1_SD_Init();
-  MX_SPI3_Init();
+  MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
   printf("hello openvio\r\n");
   /* USER CODE END 2 */
@@ -194,7 +194,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_UART4|RCC_PERIPHCLK_SPI3
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_UART4|RCC_PERIPHCLK_SPI2
                               |RCC_PERIPHCLK_SDMMC|RCC_PERIPHCLK_I2C1;
   PeriphClkInitStruct.PLL2.PLL2M = 6;
   PeriphClkInitStruct.PLL2.PLL2N = 400;

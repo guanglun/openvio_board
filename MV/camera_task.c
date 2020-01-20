@@ -13,7 +13,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 
-#include "mpu6000.h"
+#include "icm20948.h"
 
 #include "ff.h"
 
@@ -151,7 +151,7 @@ void StartCameraTask(void const *argument)
 	openvio_status_init(&vio_status);
 	
 	mt9v034_init();
-	//mpu6000_init();
+	icm20948_init();
 	
 	//int count = 5;
 	//	while (count--)
@@ -220,6 +220,6 @@ void camera_img_send(void)
 			openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer_8bit_1[i], SNED_SIZE);
 		}
 		
-		mpu6000_transmit();
+		icm20948_transmit();
 	}
 }
