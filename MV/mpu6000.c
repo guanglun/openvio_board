@@ -94,11 +94,13 @@ int mpu6000_init(void)
 
 		mpu6000_write_reg(MPU6000_RA_PWR_MGMT_1, 0x00);
 		mpu6000_write_reg(MPU6000_RA_PWR_MGMT_2, 0x00);
+		
 		//mpu6000_write_reg(MPU6000_RA_SMPLRT_DIV, 0x00);
 		//mpu6000_write_reg(MPU6000_RA_USER_CTRL, 0x10);
 		//mpu6000_write_reg(MPU6000_RA_CONFIG, 0x02);
-		mpu6000_write_reg(MPU6000_RA_GYRO_CONFIG, (MPU6050_GYRO_FS_2000<<3));
-		mpu6000_write_reg(MPU6000_RA_ACCEL_CONFIG, (MPU6050_ACCEL_FS_4<<3));
+		
+		mpu6000_write_reg(MPU6000_RA_GYRO_CONFIG, (MPU6050_GYRO_FS_2000 << 3));
+		mpu6000_write_reg(MPU6000_RA_ACCEL_CONFIG, (MPU6050_ACCEL_FS_4 << 3));
 		
 		/*enable int*/
 		mpu6000_write_reg(MPU6000_RA_CONFIG,0x11);

@@ -151,7 +151,7 @@ void StartCameraTask(void const *argument)
 	openvio_status_init(&vio_status);
 	
 	mt9v034_init();
-	mpu6000_init();
+	//mpu6000_init();
 	
 	//int count = 5;
 	//	while (count--)
@@ -181,7 +181,7 @@ void StartCameraTask(void const *argument)
 			camera_img_send();
 		}
 
-		mpu6000_transmit();
+		//mpu6000_transmit();
 		frame_count++;
 		
 		//osDelay(4000);
