@@ -264,20 +264,20 @@ int icm20948_init(void)
 	//    osThreadDef(IMUTask, StartIMUTask, osPriorityNormal, 0, 512);
 	//    IMUTaskHandle = osThreadCreate(osThread(IMUTask), NULL);
 
-	while (1)
-	{
-		static uint8_t icm20948_data[14];
-		static short acc[3], gyro[3], mag[2],temp;
-		ICM_SelectBank(USER_BANK_0);
-		ICM_ReadAccelGyroData(acc, gyro);
-		
+//	while (1)
+//	{
+//		static uint8_t icm20948_data[14];
+//		static short acc[3], gyro[3], mag[2],temp;
+//		ICM_SelectBank(USER_BANK_0);
+//		ICM_ReadAccelGyroData(acc, gyro);
+//		
 
-		//ICM_SelectBank(USER_BANK_2);
-		icm20948_read_mag(mag);
+//		//ICM_SelectBank(USER_BANK_2);
+//		icm20948_read_mag(mag);
 
-		printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2], mag[0], mag[1], mag[2]);
-		osDelay(10);
-	}
+//		printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2], mag[0], mag[1], mag[2]);
+//		osDelay(10);
+//	}
 
 	return 0;
 }

@@ -93,59 +93,51 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req)
 void StartCameraTask(void const *argument)
 {
 	int ret;
-	//
-	//mpu6000_init();
 
-	//	char filename[] = "test.txt";
-	//	uint8_t write_dat[] = "	char hello[] = "hello";
-	//
-	//	while(1)
-	//	{
-	//		while(CDC_Transmit_HS(hello,sizeof(hello)) == USBD_BUSY);
-	//
-	//		osDelay(1000);
-	//	}Hello,FATFS!\n";
-	//	uint16_t write_num = 0;
-	//
-	//	fr = f_mount(&fs, "", 0);
-	//	if(fr == FR_OK)
-	//	{
-	//		printf("SD card mount ok!\r\n");
-	//	}
-	//	else
-	//	{
-	//		printf("SD card mount error, error code:%d.\r\n",fr);
-	//	}
-	//
-	//	fr = f_open(&fd, filename, FA_CREATE_ALWAYS | FA_WRITE);
-	//	if(fr == FR_OK)
-	//	{
-	//		printf("open file \"%s\" ok! \r\n", filename);
-	//	}
-	//	else
-	//	{
-	//	printf("open file \"%s\" error : %d\r\n", filename, fr);
-	//	}
+		char filename[] = "test.txt";
+		uint8_t write_dat[] = "hello";
+	
+		uint16_t write_num = 0;
+	
+		fr = f_mount(&fs, "", 0);
+		if(fr == FR_OK)
+		{
+			printf("SD card mount ok!\r\n");
+		}
+		else
+		{
+			printf("SD card mount error, error code:%d.\r\n",fr);
+		}
+	
+		fr = f_open(&fd, filename, FA_CREATE_ALWAYS | FA_WRITE);
+		if(fr == FR_OK)
+		{
+			printf("open file \"%s\" ok! \r\n", filename);
+		}
+		else
+		{
+		printf("open file \"%s\" error : %d\r\n", filename, fr);
+		}
 
-	//	fr = f_write(&fd, write_dat, sizeof(write_dat), (void *)&write_num);
-	//	if(fr == FR_OK)
-	//	{
-	//		printf("write %d dat to file \"%s\" ok,dat is \"%s\".\r\n", write_num, filename, write_dat);
-	//	}
-	//	else
-	//	{
-	//		printf("write dat to file \"%s\" error,error code is:%d\r\n", filename, fr);
-	//	}
+		fr = f_write(&fd, write_dat, sizeof(write_dat), (void *)&write_num);
+		if(fr == FR_OK)
+		{
+			printf("write %d dat to file \"%s\" ok,dat is \"%s\".\r\n", write_num, filename, write_dat);
+		}
+		else
+		{
+			printf("write dat to file \"%s\" error,error code is:%d\r\n", filename, fr);
+		}
 
-	//	fr = f_close(&fd);
-	//	if(fr == FR_OK)
-	//	{
-	//		printf("close file \"%s\" ok!\r\n", filename);
-	//	}
-	//	else
-	//	{
-	//		printf("close file \"%s\" error, error code is:%d.\r\n", filename, fr);
-	//	}
+		fr = f_close(&fd);
+		if(fr == FR_OK)
+		{
+			printf("close file \"%s\" ok!\r\n", filename);
+		}
+		else
+		{
+			printf("close file \"%s\" error, error code is:%d.\r\n", filename, fr);
+		}
 
 
 	openvio_status_init(&vio_status);
