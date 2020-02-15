@@ -154,9 +154,9 @@ void ICM_ReadAccelGyroData(int16_t *accel_data, int16_t *gyro_data)
 	uint8_t raw_data[12];
 	icm20948_read_reg(0x2D, raw_data, 12);
 
-	accel_data[0] = (raw_data[0] << 8) | raw_data[1];
-	accel_data[1] = (raw_data[2] << 8) | raw_data[3];
-	accel_data[2] = (raw_data[4] << 8) | raw_data[5];
+	accel_data[0] = (short)((raw_data[0] << 8) | raw_data[1]);
+	accel_data[1] = (short)((raw_data[2] << 8) | raw_data[3]);
+	accel_data[2] = (short)((raw_data[4] << 8) | raw_data[5]);
 
 	gyro_data[0] = (raw_data[6] << 8) | raw_data[7];
 	gyro_data[1] = (raw_data[8] << 8) | raw_data[9];
@@ -264,20 +264,65 @@ int icm20948_init(void)
 	//    osThreadDef(IMUTask, StartIMUTask, osPriorityNormal, 0, 512);
 	//    IMUTaskHandle = osThreadCreate(osThread(IMUTask), NULL);
 
-//	while (1)
-//	{
-//		static uint8_t icm20948_data[14];
-//		static short acc[3], gyro[3], mag[2],temp;
-//		ICM_SelectBank(USER_BANK_0);
-//		ICM_ReadAccelGyroData(acc, gyro);
-//		
+	#define COUNT 2
+	while (1)
+	{
+		static int count = 0;
+		static int acc_tmp[3] = {0,0,0};
+		static uint8_t icm20948_data[14];
+		static short acc[3], gyro[3], mag[2],temp;
+		
+		static float accf[6];
+		
+		ICM_SelectBank(USER_BANK_0);
+		ICM_ReadAccelGyroData(acc, gyro);
+		
 
-//		//ICM_SelectBank(USER_BANK_2);
-//		icm20948_read_mag(mag);
+		//ICM_SelectBank(USER_BANK_2);
+		//icm20948_read_mag(mag);
 
-//		printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2], mag[0], mag[1], mag[2]);
-//		osDelay(10);
-//	}
+		//printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2], mag[0], mag[1], mag[2]);
+		//printf("%d\t%d\t%d\r\n", acc[0], acc[1], acc[2]);
+		
+		float acc_cal = 9.8f*8.0f/65535*2;
+		
+		acc_tmp[0]+=acc[0];
+		acc_tmp[1]+=acc[1];
+		acc_tmp[2]+=acc[2];
+		count++;
+		
+		#define OX -0.0273
+		#define OY -0.2073
+		#define OZ 0.1292
+		#define RX 1.0002
+		#define RY 1.0017
+		#define RZ 1.0133
+		
+		
+		if(count>=COUNT)
+		{
+			
+			
+			accf[0] = acc_tmp[0]/COUNT*acc_cal;
+			accf[1] = acc_tmp[1]/COUNT*acc_cal;
+			accf[2] = acc_tmp[2]/COUNT*acc_cal;
+			accf[3] = (accf[0]-OX)/RX;
+			accf[4] = (accf[1]-OY)/RY;
+			accf[5] = (accf[2]-OZ)/RZ;
+			
+			printf("\t%f\t%f\t%f\t%f\t%f\t%f;\r\n", 
+			accf[0],accf[1],accf[2],accf[3],accf[4],accf[5]);
+			
+			
+			
+			count = 0;
+			acc_tmp[0]=0;
+			acc_tmp[1]=0;
+			acc_tmp[2]=0;
+		}
+		
+		osDelay(2);
+	}
 
 	return 0;
 }
