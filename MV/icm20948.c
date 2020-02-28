@@ -328,12 +328,13 @@ int icm20948_init(void)
 //		osDelay(2);
 //	}
 
+	ICM_SelectBank(USER_BANK_0);
 	return 0;
 }
 
 void icm20948_read(uint8_t *buf)
 {
-		ICM_SelectBank(USER_BANK_0);
+		//ICM_SelectBank(USER_BANK_0);
 		icm20948_read_reg(0x2D, buf, 14);
 
 }
@@ -347,9 +348,13 @@ void icm20948_transmit(void)
 	// if(vio_status.is_imu_send)
 	// {
 	// 	vio_status.is_imu_send = 0;
-	icm20948_read(icm20948_data);
+	
 	// 	//MPU_Transmit_HS(mpu6000_data, 14);
-
+	
+	
+	
+	icm20948_read(icm20948_data);
+	
 	openvio_usb_send(SENSOR_USB_IMU,icm20948_data, 14);
 
 	// }

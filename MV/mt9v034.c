@@ -343,7 +343,9 @@ int mt9v034_init(void)
     set_framesize(FRAMESIZE_USE);
     set_colorbar(0);
     set_vflip(0);
-    
+    set_hmirror(0);
+		//set_auto_exposure(0,0);
+	
     uint16_t chip_control;
     int enable = 0;
                 int ret  = cambus_readw(MT9V034_SLV_ADDR, MT9V034_CHIP_CONTROL, &chip_control);
@@ -400,7 +402,43 @@ int IM_MIN(int a,int b)
         return a;
 }    
 
-static int set_colorbar(int enable)
+#define MICROSECOND_CLKS                        (1000000)
+#define MT9V034_XCLK_FREQ 27000000
+
+static int set_auto_exposure(int enable, int exposure_us)
+{
+    uint16_t reg, row_time_0, row_time_1;
+    int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_AEC_AGC_ENABLE, &reg);
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_AEC_AGC_ENABLE,
+            (reg & (~MT9V034_AEC_ENABLE)) | ((enable != 0) ? MT9V034_AEC_ENABLE : 0));
+    //ret |= sensor->snapshot(sensor, NULL, NULL); // Force shadow mode register to update...
+
+    if ((enable == 0) && (exposure_us >= 0)) {
+        ret |= cambus_readw(MT9V034_SLV_ADDR, MT9V034_WINDOW_WIDTH, &row_time_0);
+        ret |= cambus_readw(MT9V034_SLV_ADDR, MT9V034_HORIZONTAL_BLANKING, &row_time_1);
+
+        int exposure = IM_MIN(exposure_us, MICROSECOND_CLKS / 2) * (MT9V034_XCLK_FREQ / MICROSECOND_CLKS);
+        int row_time = row_time_0 + row_time_1;
+        int coarse_time = exposure / row_time;
+        int fine_time = exposure % row_time;
+
+        ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_TOTAL_SHUTTER_WIDTH, coarse_time);
+        ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_FINE_SHUTTER_WIDTH_TOTAL, fine_time);
+    } else if ((enable != 0) && (exposure_us >= 0)) {
+        ret |= cambus_readw(MT9V034_SLV_ADDR, MT9V034_WINDOW_WIDTH, &row_time_0);
+        ret |= cambus_readw(MT9V034_SLV_ADDR, MT9V034_HORIZONTAL_BLANKING, &row_time_1);
+
+        int exposure = IM_MIN(exposure_us, MICROSECOND_CLKS / 2) * (MT9V034_XCLK_FREQ / MICROSECOND_CLKS);
+        int row_time = row_time_0 + row_time_1;
+        int coarse_time = exposure / row_time;
+
+        ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_MAX_EXPOSE, coarse_time);
+    }
+
+    return ret;
+}
+
+static int set_colorbar(int enable)//是否使能测试条码
 {
     uint16_t test;
     int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_TEST_PATTERN, &test);
@@ -410,7 +448,7 @@ static int set_colorbar(int enable)
 
     return ret;
 }
-static int set_hmirror(int enable)
+static int set_hmirror(int enable)//设置水平对称
 {
     uint16_t read_mode;
     int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_READ_MODE, &read_mode);
@@ -420,7 +458,7 @@ static int set_hmirror(int enable)
     return ret;
 }
 
-static int set_vflip(int enable)
+static int set_vflip(int enable)//设置竖直对称
 {
     uint16_t read_mode;
     int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_READ_MODE, &read_mode);
