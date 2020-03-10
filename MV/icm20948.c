@@ -264,69 +264,69 @@ int icm20948_init(void)
 	//    osThreadDef(IMUTask, StartIMUTask, osPriorityNormal, 0, 512);
 	//    IMUTaskHandle = osThreadCreate(osThread(IMUTask), NULL);
 
-//	#define COUNT 2
-//	while (1)
-//	{
-//		static int count = 0;
-//		static int acc_tmp[3] = {0,0,0};
-//		static uint8_t icm20948_data[14];
-//		static short acc[3], gyro[3], mag[2],temp;
-//		
-//		static float accf[6];
-//		
-//		ICM_SelectBank(USER_BANK_0);
-//		ICM_ReadAccelGyroData(acc, gyro);
-//		
+	//	#define COUNT 2
+	//	while (1)
+	//	{
+	//		static int count = 0;
+	//		static int acc_tmp[3] = {0,0,0};
+	//		static uint8_t icm20948_data[14];
+	//		static short acc[3], gyro[3], mag[2],temp;
+	//
+	//		static float accf[6];
+	//
+	//		ICM_SelectBank(USER_BANK_0);
+	//		ICM_ReadAccelGyroData(acc, gyro);
+	//
 
-//		//ICM_SelectBank(USER_BANK_2);
-//		//icm20948_read_mag(mag);
+	//		//ICM_SelectBank(USER_BANK_2);
+	//		//icm20948_read_mag(mag);
 
-//		//printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2], mag[0], mag[1], mag[2]);
-//		//printf("%d\t%d\t%d\r\n", acc[0], acc[1], acc[2]);
-//		
-//		float acc_cal = 9.8f*8.0f/65535*2;
-//		
-//		acc_tmp[0]+=acc[0];
-//		acc_tmp[1]+=acc[1];
-//		acc_tmp[2]+=acc[2];
-//		count++;
-//		
-//		#define OX -0.0273
-//		#define OY -0.2073
-//		#define OZ 0.1292
-//		#define RX 1.0002
-//		#define RY 1.0017
-//		#define RZ 1.0133
-//		
-//		
-//		if(count>=COUNT)
-//		{
-//			
-//			
-//			accf[0] = acc_tmp[0]/COUNT*acc_cal;
-//			accf[1] = acc_tmp[1]/COUNT*acc_cal;
-//			accf[2] = acc_tmp[2]/COUNT*acc_cal;
-////			accf[3] = (accf[0]-OX)/RX;
-////			accf[4] = (accf[1]-OY)/RY;
-////			accf[5] = (accf[2]-OZ)/RZ;
+	//		//printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2], mag[0], mag[1], mag[2]);
+	//		//printf("%d\t%d\t%d\r\n", acc[0], acc[1], acc[2]);
+	//
+	//		float acc_cal = 9.8f*8.0f/65535*2;
+	//
+	//		acc_tmp[0]+=acc[0];
+	//		acc_tmp[1]+=acc[1];
+	//		acc_tmp[2]+=acc[2];
+	//		count++;
+	//
+	//		#define OX -0.0273
+	//		#define OY -0.2073
+	//		#define OZ 0.1292
+	//		#define RX 1.0002
+	//		#define RY 1.0017
+	//		#define RZ 1.0133
+	//
+	//
+	//		if(count>=COUNT)
+	//		{
+	//
+	//
+	//			accf[0] = acc_tmp[0]/COUNT*acc_cal;
+	//			accf[1] = acc_tmp[1]/COUNT*acc_cal;
+	//			accf[2] = acc_tmp[2]/COUNT*acc_cal;
+	////			accf[3] = (accf[0]-OX)/RX;
+	////			accf[4] = (accf[1]-OY)/RY;
+	////			accf[5] = (accf[2]-OZ)/RZ;
 
-//			accf[3] =  1.0019*accf[0]-0.0134*accf[1]+0.0212*accf[2];
-//			accf[4] =  0.0569*accf[0]+1.0190*accf[1]+0.0180*accf[2];
-//			accf[5] = -0.0263*accf[0]-0.0086*accf[1]+0.9741*accf[2];
-//			
-//			printf("\t%f\t%f\t%f\t%f\t%f\t%f;\r\n", 
-//			accf[0],accf[1],accf[2],accf[3],accf[4],accf[5]);
-//			
-//			
-//			
-//			count = 0;
-//			acc_tmp[0]=0;
-//			acc_tmp[1]=0;
-//			acc_tmp[2]=0;
-//		}
-//		
-//		osDelay(2);
-//	}
+	//			accf[3] =  1.0019*accf[0]-0.0134*accf[1]+0.0212*accf[2];
+	//			accf[4] =  0.0569*accf[0]+1.0190*accf[1]+0.0180*accf[2];
+	//			accf[5] = -0.0263*accf[0]-0.0086*accf[1]+0.9741*accf[2];
+	//
+	//			printf("\t%f\t%f\t%f\t%f\t%f\t%f;\r\n",
+	//			accf[0],accf[1],accf[2],accf[3],accf[4],accf[5]);
+	//
+	//
+	//
+	//			count = 0;
+	//			acc_tmp[0]=0;
+	//			acc_tmp[1]=0;
+	//			acc_tmp[2]=0;
+	//		}
+	//
+	//		osDelay(2);
+	//	}
 
 	ICM_SelectBank(USER_BANK_0);
 	return 0;
@@ -334,29 +334,45 @@ int icm20948_init(void)
 
 void icm20948_read(uint8_t *buf)
 {
-		//ICM_SelectBank(USER_BANK_0);
-		icm20948_read_reg(0x2D, buf, 14);
-
+	//ICM_SelectBank(USER_BANK_0);
+	icm20948_read_reg(0x2D, buf, 14);
 }
+
+uint8_t isIMUReady = 0;
+TickType_t xIMUTimeNow = 0,xIMUTimeLast = 0;
 
 void icm20948_transmit(void)
 {
-	static uint8_t icm20948_data[14];
-	// static short acc[3], gyro[3], temp;
-	// USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
+	if (vio_status.imu_status == SENSOR_STATUS_START)
+	{
 
-	// if(vio_status.is_imu_send)
-	// {
-	// 	vio_status.is_imu_send = 0;
-	
-	// 	//MPU_Transmit_HS(mpu6000_data, 14);
-	
-	
-	
-	icm20948_read(icm20948_data);
-	
-	openvio_usb_send(SENSOR_USB_IMU,icm20948_data, 14);
+		static uint8_t icm20948_data[14];
+		// static short acc[3], gyro[3], temp;
+		// USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
 
+		// if(vio_status.is_imu_send)
+		// {
+		// 	vio_status.is_imu_send = 0;
+
+		// 	//MPU_Transmit_HS(mpu6000_data, 14);
+
+		
+		if(isIMUReady == 0)
+		{
+			icm20948_read(icm20948_data);
+			isIMUReady = 1;
+		}
+		
+		xIMUTimeNow = xTaskGetTickCount();
+		if((xIMUTimeNow-xIMUTimeLast) >= 5 && isIMUReady == 1)
+		{
+				
+			openvio_usb_send(SENSOR_USB_IMU, icm20948_data, 14);
+			
+			xIMUTimeLast = xIMUTimeNow;
+			
+		}
+	}
 	// }
 
 	// ICM_ReadAccelGyroData(acc, gyro);

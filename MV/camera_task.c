@@ -159,7 +159,8 @@ void StartCameraTask(void const *argument)
 //	}
 
 	//printf("dcmi_dma_start\r\n");
-	
+	uint8_t isCamReady = 0;
+	TickType_t xTimeNow = 0,xTimeLast = 0;
 	while (1)
 	{
 
@@ -169,14 +170,27 @@ void StartCameraTask(void const *argument)
 			
 		}else if(vio_status.cam_status == SENSOR_STATUS_RUNNING)
 		{
-			dcmi_dma_start();
-			camera_img_send();
+			if(isCamReady == 0)
+			{
+				dcmi_dma_start();
+				isCamReady = 1;
+			}
+			
+			xTimeNow = xTaskGetTickCount();
+			if((xTimeNow-xTimeLast) >= 50 && isCamReady == 1)
+			{
+				xTimeLast = xTimeNow;
+				//printf("time:%d\r\n",xTimeNow);
+				
+				camera_img_send();
+				isCamReady = 0;
+			}			
+			
 		}
 
-		//mpu6000_transmit();
+		icm20948_transmit();
+
 		frame_count++;
-		
-		//osDelay(4000);
 	}
 }
 
@@ -213,5 +227,6 @@ void camera_img_send(void)
 		}
 		
 		icm20948_transmit();
+		
 	}
 }
