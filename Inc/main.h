@@ -59,6 +59,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define LED_G_Pin GPIO_PIN_1
+#define LED_G_GPIO_Port GPIOC
 #define USB_ENABLE_Pin GPIO_PIN_7
 #define USB_ENABLE_GPIO_Port GPIOA
 #define IMU_INT_Pin GPIO_PIN_4
@@ -66,8 +68,10 @@ void Error_Handler(void);
 #define IMU_INT_EXTI_IRQn EXTI4_IRQn
 #define IMU_FSYNC_Pin GPIO_PIN_5
 #define IMU_FSYNC_GPIO_Port GPIOC
-#define LED_Pin GPIO_PIN_14
-#define LED_GPIO_Port GPIOE
+#define LED_R_Pin GPIO_PIN_13
+#define LED_R_GPIO_Port GPIOE
+#define LED_B_Pin GPIO_PIN_14
+#define LED_B_GPIO_Port GPIOE
 #define USB_SWITCH_Pin GPIO_PIN_15
 #define USB_SWITCH_GPIO_Port GPIOE
 #define DCMI_RST_Pin GPIO_PIN_10

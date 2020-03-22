@@ -64,18 +64,18 @@ void dcmi_dma_start(void)
 
 void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
-	HAL_GPIO_WritePin(GPIOE, LED_Pin, GPIO_PIN_SET);
+	// HAL_GPIO_WritePin(GPIOE, LED_Pin, GPIO_PIN_SET);
 	
-	//if((DCMI->SR & 0x03) == 0x01)
-	if(start == 2)
-		line_cnt++;
-    // if(line_cnt == 1)
-    // {
-         count++;
-    // }
-    //printf("%d\r\n",line_cnt);
+	// //if((DCMI->SR & 0x03) == 0x01)
+	// if(start == 2)
+	// 	line_cnt++;
+  //   // if(line_cnt == 1)
+  //   // {
+  //        count++;
+  //   // }
+  //   //printf("%d\r\n",line_cnt);
 	
-	HAL_GPIO_WritePin(GPIOE, LED_Pin, GPIO_PIN_RESET);
+	// HAL_GPIO_WritePin(GPIOE, LED_Pin, GPIO_PIN_RESET);
 }
 
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)

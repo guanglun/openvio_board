@@ -73,14 +73,14 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
 /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
 static StaticTask_t xIdleTaskTCBBuffer;
 static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
-  
-void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
+
+void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize)
 {
   *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
   *ppxIdleTaskStackBuffer = &xIdleStack[0];
   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
   /* place for user code */
-}                   
+}
 /* USER CODE END GET_IDLE_TASK_MEMORY */
 
 /**
@@ -90,7 +90,7 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-       
+
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -116,8 +116,8 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-  osThreadDef(cameraTask, StartCameraTask, osPriorityNormal, 0, 1024*2);
-  cameraTaskHandle = osThreadCreate(osThread(cameraTask), NULL);  
+  osThreadDef(cameraTask, StartCameraTask, osPriorityNormal, 0, 1024 * 2);
+  cameraTaskHandle = osThreadCreate(osThread(cameraTask), NULL);
 
   /* USER CODE END RTOS_THREADS */
 
@@ -139,62 +139,73 @@ void StartDefaultTask(void const * argument)
   MX_FATFS_Init();
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-	
-		char filename[] = "test222.txt";
-		uint8_t write_dat[] = "hello2222";
-	
-		uint16_t write_num = 0;
-	
-		fr = f_mount(&fs, "0:/", 1);
-		if(fr == FR_OK)
-		{
-			printf("SD card mount ok!\r\n");
-		}
-		else
-		{
-			printf("SD card mount error, error code:%d.\r\n",fr);
-		}
-	
-		fr = f_open(&fd, filename, FA_CREATE_ALWAYS | FA_WRITE);
-		if(fr == FR_OK)
-		{
-			printf("open file \"%s\" ok! \r\n", filename);
-		}
-		else
-		{
-		printf("open file \"%s\" error : %d\r\n", filename, fr);
-		}
 
-		fr = f_write(&fd, write_dat, sizeof(write_dat), (void *)&write_num);
-		if(fr == FR_OK)
-		{
-			printf("write %d dat to file \"%s\" ok,dat is \"%s\".\r\n", write_num, filename, write_dat);
-		}
-		else
-		{
-			printf("write dat to file \"%s\" error,error code is:%d\r\n", filename, fr);
-		}
+  char filename[] = "test222.txt";
+  uint8_t write_dat[] = "hello2222";
 
-		fr = f_close(&fd);
-		if(fr == FR_OK)
-		{
-			printf("close file \"%s\" ok!\r\n", filename);
-		}
-		else
-		{
-			printf("close file \"%s\" error, error code is:%d.\r\n", filename, fr);
-		}
-		
-  for(;;)
+  uint16_t write_num = 0;
+
+  fr = f_mount(&fs, "0:/", 1);
+  if (fr == FR_OK)
   {
+    printf("SD card mount ok!\r\n");
+  }
+  else
+  {
+    printf("SD card mount error, error code:%d.\r\n", fr);
+  }
+
+  fr = f_open(&fd, filename, FA_CREATE_ALWAYS | FA_WRITE);
+  if (fr == FR_OK)
+  {
+    printf("open file \"%s\" ok! \r\n", filename);
+  }
+  else
+  {
+    printf("open file \"%s\" error : %d\r\n", filename, fr);
+  }
+
+  fr = f_write(&fd, write_dat, sizeof(write_dat), (void *)&write_num);
+  if (fr == FR_OK)
+  {
+    printf("write %d dat to file \"%s\" ok,dat is \"%s\".\r\n", write_num, filename, write_dat);
+  }
+  else
+  {
+    printf("write dat to file \"%s\" error,error code is:%d\r\n", filename, fr);
+  }
+
+  fr = f_close(&fd);
+  if (fr == FR_OK)
+  {
+    printf("close file \"%s\" ok!\r\n", filename);
+  }
+  else
+  {
+    printf("close file \"%s\" error, error code is:%d.\r\n", filename, fr);
+  }
+
+  for (;;)
+  {
+    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
     osDelay(1000);
+    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
+    osDelay(1000);    
   }
   /* USER CODE END StartDefaultTask */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-     
+
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
