@@ -20,9 +20,15 @@ enum USB_LOCK_STATUS{
     USB_LOCK_IMU
 };
 
+enum USB_CONNECT_STATUS{
+    USB_DISCONNECT,
+    USB_CONNECT
+};
+
 struct OPENVIO_STATUS{
 	enum SENSOR_STATUS cam_status;
 	enum SENSOR_STATUS imu_status;
+    enum USB_CONNECT_STATUS usb_status;
     uint8_t usb_lock_status;
 	uint8_t is_imu_send;
 };

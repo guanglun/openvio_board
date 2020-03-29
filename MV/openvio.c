@@ -3,6 +3,7 @@
 #include "usbd_cdc_if.h"
 
 extern USBD_HandleTypeDef hUsbDeviceHS;
+extern struct OPENVIO_STATUS vio_status;
 
 void openvio_status_init(struct OPENVIO_STATUS *status)
 {
@@ -10,6 +11,7 @@ void openvio_status_init(struct OPENVIO_STATUS *status)
     status->imu_status = 0;
     status->usb_lock_status = 0;
 	status->is_imu_send = 0;
+	status->usb_status = USB_DISCONNECT;
 }
 
 #define USB_TRY_NUM 65500

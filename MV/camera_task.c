@@ -111,12 +111,19 @@ void StartCameraTask(void const *argument)
 	//printf("dcmi_dma_start\r\n");
 	uint8_t isCamReady = 0;
 	TickType_t xTimeNow = 0,xTimeLast = 0;
+	
+	
 	while (1)
 	{
-
 		if(vio_status.cam_status == SENSOR_STATUS_START)
 		{
+			//osDelay(100);
+			openvio_usb_send(SENSOR_USB_CAM,"START", 5);
 			camera_start_send();
+
+			//osDelay(1000);
+			isCamReady = 0;
+			xTimeLast = xTimeNow;
 			
 		}else if(vio_status.cam_status == SENSOR_STATUS_RUNNING)
 		{
@@ -164,6 +171,7 @@ void camera_start_send(void)
 
 void camera_img_send(void)
 {
+	openvio_usb_send(SENSOR_USB_CAM,"CAM", 3);
 	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
 	for (uint32_t i = 0; i < FULL_IMAGE_SIZE; i += SNED_SIZE)
 	{

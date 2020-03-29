@@ -68,6 +68,14 @@ void Error_Handler(void);
 #define IMU_INT_EXTI_IRQn EXTI4_IRQn
 #define IMU_FSYNC_Pin GPIO_PIN_5
 #define IMU_FSYNC_GPIO_Port GPIOC
+#define INPUT_E7_Pin GPIO_PIN_7
+#define INPUT_E7_GPIO_Port GPIOE
+#define INPUT_E8_Pin GPIO_PIN_8
+#define INPUT_E8_GPIO_Port GPIOE
+#define LED_E9_Pin GPIO_PIN_9
+#define LED_E9_GPIO_Port GPIOE
+#define LED_E10_Pin GPIO_PIN_10
+#define LED_E10_GPIO_Port GPIOE
 #define LED_R_Pin GPIO_PIN_13
 #define LED_R_GPIO_Port GPIOE
 #define LED_B_Pin GPIO_PIN_14

@@ -117,9 +117,11 @@ int main(void)
   MX_SPI2_Init();
   MX_TIM2_Init();
   MX_MDMA_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);//USB2.0 CLK
   printf("hello openvio\r\n");
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -199,8 +201,9 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_UART4|RCC_PERIPHCLK_SPI2
-                              |RCC_PERIPHCLK_SDMMC|RCC_PERIPHCLK_I2C1;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_UART4
+                              |RCC_PERIPHCLK_SPI2|RCC_PERIPHCLK_SDMMC
+                              |RCC_PERIPHCLK_I2C1;
   PeriphClkInitStruct.PLL2.PLL2M = 6;
   PeriphClkInitStruct.PLL2.PLL2N = 400;
   PeriphClkInitStruct.PLL2.PLL2P = 2;

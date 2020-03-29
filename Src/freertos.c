@@ -30,9 +30,14 @@
 #include "ff.h"
 #include "dcmi.h"
 
+#include "openvio.h"
+
 FRESULT fr;
 DMA_BUFFER FATFS fs;
 DMA_BUFFER FIL fd;
+
+extern USBD_HandleTypeDef hUsbDeviceHS;
+extern struct OPENVIO_STATUS vio_status;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -140,8 +145,8 @@ void StartDefaultTask(void const * argument)
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
 
-  char filename[] = "test222.txt";
-  uint8_t write_dat[] = "hello2222";
+  char filename[] = "test.txt";
+  uint8_t write_dat[] = "hello";
 
   uint16_t write_num = 0;
 
@@ -184,21 +189,58 @@ void StartDefaultTask(void const * argument)
   {
     printf("close file \"%s\" error, error code is:%d.\r\n", filename, fr);
   }
-
+  
+  uint32_t connect_delay = 0;
+  
   for (;;)
   {
-    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
-    osDelay(1000);
-    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
-    osDelay(1000);
-    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
-    osDelay(1000);
-    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
-    osDelay(1000);
-    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
-    osDelay(1000);
-    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
-    osDelay(1000);    
+
+	  	if(hUsbDeviceHS.dev_state != HAL_PCD_STATE_BUSY && vio_status.usb_status == USB_CONNECT)
+		{
+			connect_delay++;
+			if(connect_delay >= 100)
+			{
+				connect_delay = 0;
+				printf("[USB DISCONNECT]\r\n");
+				vio_status.usb_status = USB_DISCONNECT;
+        MX_USB_DEVICE_Init();
+			}
+
+		}else if(hUsbDeviceHS.dev_state == HAL_PCD_STATE_BUSY && vio_status.usb_status == USB_DISCONNECT)
+		{
+			connect_delay++;
+			if(connect_delay >= 100)
+			{			
+				connect_delay = 0;
+				printf("[USB CONNECT]\r\n");
+				vio_status.usb_status = USB_CONNECT;
+			}
+		}
+		
+	osDelay(10);
+    // printf("status:%d\r\n",hUsbDeviceHS.dev_state);
+    // osDelay(10);
+
+//    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
+//    osDelay(1000);
+//    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
+//    osDelay(1000);
+//    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
+//    osDelay(1000);
+//    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+//    osDelay(1000);
+//    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
+//    osDelay(1000);
+//    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
+//    osDelay(1000);    
+//    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_RESET);
+//    osDelay(1000);
+//    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_SET);
+//    osDelay(1000);     
+//    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_RESET);
+//    osDelay(1000);
+//    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_SET);
+//    osDelay(1000);            
   }
   /* USER CODE END StartDefaultTask */
 }
