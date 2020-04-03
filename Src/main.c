@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "adc.h"
 #include "dcmi.h"
 #include "dma.h"
 #include "fatfs.h"
@@ -111,12 +112,12 @@ int main(void)
   MX_GPIO_Init();
   MX_DCMI_Init();
   MX_I2C1_Init();
-  MX_UART4_Init();
   MX_DMA_Init();
   MX_SDMMC1_SD_Init();
   MX_SPI2_Init();
   MX_TIM2_Init();
   MX_MDMA_Init();
+  MX_ADC1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);//USB2.0 CLK
@@ -201,8 +202,8 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_UART4
-                              |RCC_PERIPHCLK_SPI2|RCC_PERIPHCLK_SDMMC
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_SPI2
+                              |RCC_PERIPHCLK_SDMMC|RCC_PERIPHCLK_ADC
                               |RCC_PERIPHCLK_I2C1;
   PeriphClkInitStruct.PLL2.PLL2M = 6;
   PeriphClkInitStruct.PLL2.PLL2N = 400;
@@ -216,6 +217,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL2;
   PeriphClkInitStruct.Usart234578ClockSelection = RCC_USART234578CLKSOURCE_D2PCLK1;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
+  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();

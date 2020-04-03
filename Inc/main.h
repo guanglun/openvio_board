@@ -76,6 +76,8 @@ void Error_Handler(void);
 #define LED_E9_GPIO_Port GPIOE
 #define LED_E10_Pin GPIO_PIN_10
 #define LED_E10_GPIO_Port GPIOE
+#define KEY_Pin GPIO_PIN_12
+#define KEY_GPIO_Port GPIOE
 #define LED_R_Pin GPIO_PIN_13
 #define LED_R_GPIO_Port GPIOE
 #define LED_B_Pin GPIO_PIN_14
