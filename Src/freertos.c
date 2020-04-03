@@ -221,26 +221,26 @@ void StartDefaultTask(void const * argument)
     // printf("status:%d\r\n",hUsbDeviceHS.dev_state);
     // osDelay(10);
 
-//    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
-//    osDelay(1000);    
-//    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_RESET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_SET);
-//    osDelay(1000);     
-//    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_RESET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_SET);
-//    osDelay(1000);            
+    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
+    osDelay(1000);    
+    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_RESET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_SET);
+    osDelay(1000);     
+    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_RESET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_SET);
+    osDelay(1000);            
   }
   /* USER CODE END StartDefaultTask */
 }
