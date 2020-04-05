@@ -14,7 +14,7 @@
 #include "cmsis_os.h"
 
 #include "icm20948.h"
-
+#include "camera.h"
 
 
 extern USBD_HandleTypeDef hUsbDeviceHS;
@@ -134,7 +134,7 @@ void StartCameraTask(void const *argument)
 			}
 			
 			xTimeNow = xTaskGetTickCount();
-			if((xTimeNow-xTimeLast) >= 50 && isCamReady == 1)
+			if((xTimeNow-xTimeLast) >= 33 && isCamReady == 1)
 			{
 				xTimeLast = xTimeNow;
 				//printf("time:%d\r\n",xTimeNow);

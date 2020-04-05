@@ -37,9 +37,11 @@ void openvio_usb_send(enum SENSOR_USB usb,uint8_t* Buf, uint16_t Len)
 	{
 		if(usb == SENSOR_USB_CAM)
 		{
+			vio_status.cam_status = SENSOR_STATUS_WAIT;
 			printf("cam error\r\n");
 		}else if(usb == SENSOR_USB_IMU)
 		{
+			vio_status.imu_status = SENSOR_STATUS_WAIT;
 			printf("imu error\r\n");
 		}
 	}
@@ -51,9 +53,11 @@ void openvio_usb_send(enum SENSOR_USB usb,uint8_t* Buf, uint16_t Len)
 		
 		if(usb == SENSOR_USB_CAM)
 		{
+			vio_status.cam_status = SENSOR_STATUS_WAIT;
 			printf("cam timeout\r\n");
 		}else if(usb == SENSOR_USB_IMU)
 		{
+			vio_status.imu_status = SENSOR_STATUS_WAIT;
 			printf("imu  timeout\r\n");
 		}
 	

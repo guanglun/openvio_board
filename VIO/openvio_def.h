@@ -3,6 +3,9 @@
 
 #include "main.h"
 
+#define DMA_BUFFER \
+  __attribute__((section(".RAM_D1")))
+  
 enum SENSOR_USB{
 	SENSOR_USB_CAM,
 	SENSOR_USB_IMU

@@ -25,7 +25,7 @@
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */     
+/* USER CODE BEGIN Includes */
 #include "camera_task.h"
 #include "ff.h"
 #include "dcmi.h"
@@ -67,14 +67,14 @@ osThreadId defaultTaskHandle;
 osThreadId cameraTaskHandle;
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void const * argument);
+void StartDefaultTask(void const *argument);
 
 extern void MX_USB_DEVICE_Init(void);
 extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* GetIdleTaskMemory prototype (linked to static allocation support) */
-void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
+void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize);
 
 /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
 static StaticTask_t xIdleTaskTCBBuffer;
@@ -94,7 +94,8 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackTyp
   * @param  None
   * @retval None
   */
-void MX_FREERTOS_Init(void) {
+void MX_FREERTOS_Init(void)
+{
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -126,7 +127,6 @@ void MX_FREERTOS_Init(void) {
   cameraTaskHandle = osThreadCreate(osThread(cameraTask), NULL);
 
   /* USER CODE END RTOS_THREADS */
-
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -136,7 +136,7 @@ void MX_FREERTOS_Init(void) {
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const * argument)
+void StartDefaultTask(void const *argument)
 {
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
@@ -190,73 +190,71 @@ void StartDefaultTask(void const * argument)
   {
     printf("close file \"%s\" error, error code is:%d.\r\n", filename, fr);
   }
-  
+
   uint32_t connect_delay = 0;
 
   for (;;)
   {
 
-//	  	if(hUsbDeviceHS.dev_state != HAL_PCD_STATE_BUSY && vio_status.usb_status == USB_CONNECT)
-//		{
-//			connect_delay++;
-//			if(connect_delay >= 100)
-//			{
-//				connect_delay = 0;
-//				printf("[USB DISCONNECT]\r\n");
-//				vio_status.usb_status = USB_DISCONNECT;
-//        MX_USB_DEVICE_Init();
-//			}
+    //	  	if(hUsbDeviceHS.dev_state != HAL_PCD_STATE_BUSY && vio_status.usb_status == USB_CONNECT)
+    //		{
+    //			connect_delay++;
+    //			if(connect_delay >= 100)
+    //			{
+    //				connect_delay = 0;
+    //				printf("[USB DISCONNECT]\r\n");
+    //				vio_status.usb_status = USB_DISCONNECT;
+    //        MX_USB_DEVICE_Init();
+    //			}
 
-//		}else if(hUsbDeviceHS.dev_state == HAL_PCD_STATE_BUSY && vio_status.usb_status == USB_DISCONNECT)
-//		{
-//			connect_delay++;
-//			if(connect_delay >= 100)
-//			{			
-//				connect_delay = 0;
-//				printf("[USB CONNECT]\r\n");
-//				vio_status.usb_status = USB_CONNECT;
-//			}
-//		}
-	
-		
-HAL_ADC_Start(&hadc1);
-HAL_ADC_PollForConversion(&hadc1, 50);
-if(HAL_IS_BIT_SET(HAL_ADC_GetState(&hadc1), HAL_ADC_STATE_REG_EOC))
-{
-int AD_Value = HAL_ADC_GetValue(&hadc1);
-printf(" %d\r\n",AD_Value);
-}
-HAL_Delay(1000);
-		
-    GPIO_PinState state = HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin);
+    //		}else if(hUsbDeviceHS.dev_state == HAL_PCD_STATE_BUSY && vio_status.usb_status == USB_DISCONNECT)
+    //		{
+    //			connect_delay++;
+    //			if(connect_delay >= 100)
+    //			{
+    //				connect_delay = 0;
+    //				printf("[USB CONNECT]\r\n");
+    //				vio_status.usb_status = USB_CONNECT;
+    //			}
+    //		}
 
-printf(" %d\r\n",state);
+//    HAL_ADC_Start(&hadc1);
+//    HAL_ADC_PollForConversion(&hadc1, 50);
+//    if (HAL_IS_BIT_SET(HAL_ADC_GetState(&hadc1), HAL_ADC_STATE_REG_EOC))
+//    {
+//      int AD_Value = HAL_ADC_GetValue(&hadc1);
+//      printf(" %d\r\n", AD_Value);
+//    }
+//    HAL_Delay(1000);
+
+//    GPIO_PinState state = HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin);
+
+//    printf(" %d\r\n", state);
+
+//    osDelay(100);
 
 
-	osDelay(100);
-    // printf("status:%d\r\n",hUsbDeviceHS.dev_state);
-    // osDelay(10);
+    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
+    osDelay(1000);
+    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
+    osDelay(1000);
 
-//    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
-//    osDelay(1000);    
-//    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_RESET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_SET);
-//    osDelay(1000);     
-//    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_RESET);
-//    osDelay(1000);
-//    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_SET);
-//    osDelay(1000);            
+    //    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_RESET);
+    //    osDelay(1000);
+    //    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_SET);
+    //    osDelay(1000);
+    //    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_RESET);
+    //    osDelay(1000);
+    //    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_SET);
+    //    osDelay(1000);
   }
   /* USER CODE END StartDefaultTask */
 }
