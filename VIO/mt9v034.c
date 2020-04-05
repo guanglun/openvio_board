@@ -38,6 +38,7 @@
 #include "mt9v034.h"
 #include "main.h"
 #include "cambus.h"
+#include "openvio.h"
 
 extern I2C_HandleTypeDef hi2c1;
 
@@ -126,8 +127,8 @@ int mt9v034_init(void)
 	}
 	printf("[mt9v034]: ok\r\n");
 
-	//set_framesize(FRAMESIZE_USE);
-	set_framesize(FRAMESIZE_QQVGA2);
+	mt9v034_config(vio_status.cam_frame_size_num);
+
 	set_colorbar(0);
 	set_vflip(0);
 	set_hmirror(0);
@@ -176,6 +177,15 @@ const int resolution[][2] = {
 	{1280, 1024}, /* SXGA      */
 	{1600, 1200}, /* UXGA      */
 };
+
+void mt9v034_config(int frame_size_num)
+{
+	vio_status.cam_frame_size_num = frame_size_num;
+	vio_status.cam_frame_size = resolution[frame_size_num][0]*resolution[frame_size_num][1];
+	set_framesize(frame_size_num);
+}
+
+
 
 int IM_MIN(int a, int b)
 {

@@ -19,7 +19,7 @@
 
 extern USBD_HandleTypeDef hUsbDeviceHS;
 extern int frame_count;
-extern DMA_BUFFER uint8_t dcmi_image_buffer_8bit_1[FULL_IMAGE_SIZE];
+extern DMA_BUFFER uint8_t dcmi_image_buffer[FULL_IMAGE_SIZE];
 extern int line_cnt;
 
 DMA_BUFFER uint8_t mpu6000_data[14];
@@ -173,15 +173,15 @@ void camera_img_send(void)
 {
 	openvio_usb_send(SENSOR_USB_CAM,"CAM", 3);
 	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
-	for (uint32_t i = 0; i < FULL_IMAGE_SIZE; i += SNED_SIZE)
+	for (uint32_t i = 0; i < vio_status.cam_frame_size; i += SNED_SIZE)
 	{
-		if (i + SNED_SIZE > FULL_IMAGE_SIZE)
+		if (i + SNED_SIZE > vio_status.cam_frame_size)
 		{
-			openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer_8bit_1[i], FULL_IMAGE_SIZE - i);
+			openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer[i], vio_status.cam_frame_size - i);
 		}
 		else
 		{
-			openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer_8bit_1[i], SNED_SIZE);
+			openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer[i], SNED_SIZE);
 		}
 		
 		icm20948_transmit();

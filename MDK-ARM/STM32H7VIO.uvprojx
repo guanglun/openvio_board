@@ -387,9 +387,19 @@
               <FilePath>..\VIO\cambus.c</FilePath>
             </File>
             <File>
+              <FileName>cambus.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\cambus.h</FilePath>
+            </File>
+            <File>
               <FileName>camera.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\VIO\camera.c</FilePath>
+            </File>
+            <File>
+              <FileName>camera.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\camera.h</FilePath>
             </File>
             <File>
               <FileName>camera_task.c</FileName>
@@ -397,14 +407,19 @@
               <FilePath>..\VIO\camera_task.c</FilePath>
             </File>
             <File>
+              <FileName>camera_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\camera_task.h</FilePath>
+            </File>
+            <File>
               <FileName>icm20948.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\VIO\icm20948.c</FilePath>
             </File>
             <File>
-              <FileName>mpu6000.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\VIO\mpu6000.c</FilePath>
+              <FileName>icm20948.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\icm20948.h</FilePath>
             </File>
             <File>
               <FileName>mt9v034.c</FileName>
@@ -412,9 +427,24 @@
               <FilePath>..\VIO\mt9v034.c</FilePath>
             </File>
             <File>
+              <FileName>mt9v034.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\mt9v034.h</FilePath>
+            </File>
+            <File>
               <FileName>openvio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\VIO\openvio.c</FilePath>
+            </File>
+            <File>
+              <FileName>openvio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\openvio.h</FilePath>
+            </File>
+            <File>
+              <FileName>openvio_def.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\openvio_def.h</FilePath>
             </File>
           </Files>
         </Group>

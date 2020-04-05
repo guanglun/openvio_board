@@ -28,12 +28,21 @@ enum USB_CONNECT_STATUS{
     USB_CONNECT
 };
 
+enum CAMERA_NAME{
+    MT9V034,
+    OV7725
+};
+
 struct OPENVIO_STATUS{
 	enum SENSOR_STATUS cam_status;
 	enum SENSOR_STATUS imu_status;
     enum USB_CONNECT_STATUS usb_status;
     uint8_t usb_lock_status;
 	uint8_t is_imu_send;
+
+    uint8_t cam_frame_size_num;
+    uint16_t cam_frame_size;
+    uint8_t cam_name;
 };
 
 

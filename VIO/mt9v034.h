@@ -1,36 +1,3 @@
-/****************************************************************************
- *
- *   Copyright (C) 2013 PX4 Development Team. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- * 3. Neither the name PX4 nor the names of its contributors may be
- *    used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- ****************************************************************************/
-
 #ifndef MT9V34_H_
 #define MT9V34_H_
 
@@ -138,10 +105,6 @@
 #define MTV_AGC_LOWPASS_REG				0xAA
 #define MTV_DIGITAL_TEST_REG			0x7F
 
-
-
-
-
 #define MT9V034_MAX_HEIGHT                      (480)
 #define MT9V034_MAX_WIDTH                       (752)
 #define MT9V034_CHIP_VERSION                    (0x00)
@@ -232,12 +195,6 @@
 #define MT9V034_PIXEL_COUNT                     (0xB0)
 #define MT9V034_FINE_SHUTTER_WIDTH_TOTAL        (0xD5)
 
-
-
-
-    
-
-
 /*
  * Resolution:
  * ROW_SIZE * BINNING_ROW <= MAX_IMAGE_WIDTH
@@ -280,26 +237,7 @@ typedef enum {
     FRAMESIZE_UXGA,     // 1600x1200
 } framesize_t;
 
-
-// #define FULL_IMAGE_ROW_SIZE 		        (160)
-// #define FULL_IMAGE_COLUMN_SIZE         (120)
-
-// #define FULL_IMAGE_ROW_SIZE 		      	(240)
-// #define FULL_IMAGE_COLUMN_SIZE       		(160)
-
-// #define FRAMESIZE_USE 						FRAMESIZE_QVGA
-// #define FULL_IMAGE_ROW_SIZE 		      (320)
-// #define FULL_IMAGE_COLUMN_SIZE 		  (240)
-
-// #define FULL_IMAGE_ROW_SIZE 		      (352)
-// #define FULL_IMAGE_COLUMN_SIZE 		  (288)
-
-// #define FRAMESIZE_USE FRAMESIZE_VGA
-// #define FULL_IMAGE_ROW_SIZE 		      (640)
-// #define FULL_IMAGE_COLUMN_SIZE 		  (480)
-
-#define FRAMESIZE_USE FRAMESIZE_WVGA2
-#define FULL_IMAGE_ROW_SIZE 		    (752)
+#define FULL_IMAGE_ROW_SIZE 		      (752)
 #define FULL_IMAGE_COLUMN_SIZE 	    	(480)
 
 /* Functions */
@@ -320,4 +258,6 @@ uint8_t mt9v034_ReadReg(uint16_t Addr);
 uint8_t mt9v034_WriteReg(uint16_t Addr, uint8_t Data);
 */
 int mt9v034_init(void);
+void mt9v034_config(int frame_size_num);
+
 #endif /* MT9V34_H_ */
