@@ -49,7 +49,7 @@ void openvio_status_init(struct OPENVIO_STATUS *status)
 	status->usb_status = USB_DISCONNECT;
 
 	status->cam_name = MT9V034;
-	status->cam_frame_size_num = FRAMESIZE_WVGA2;
+	status->cam_frame_size_num = FRAMESIZE_VGA;
 
 }
 

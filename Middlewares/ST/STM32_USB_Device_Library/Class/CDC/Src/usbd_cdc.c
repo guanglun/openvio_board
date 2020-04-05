@@ -483,8 +483,9 @@ static uint8_t  USBD_CDC_Setup(USBD_HandleTypeDef *pdev,
 	  
 	//zsp device config
     case USB_REQ_TYPE_VENDOR:
-      ifalt = camera_ctrl(req);
-      USBD_CtlSendData(pdev, &ifalt, 1U);
+      uint8_t s_data[128],s_len;
+      s_len = camera_ctrl(req,s_data);
+      USBD_CtlSendData(pdev, s_data, s_len);
     break;
 
     default:

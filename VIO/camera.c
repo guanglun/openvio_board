@@ -17,9 +17,7 @@ void dcmi_dma_start(void)
   __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_LINE);
 
   HAL_DCMI_Stop(&hdcmi); 
-  line_cnt = 0;
   HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size/4);
-  line_cnt = 0;
   __HAL_DCMI_ENABLE(&hdcmi);
 
   while ((DCMI->CR & DCMI_CR_CAPTURE) != 0)
