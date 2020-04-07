@@ -76,3 +76,5 @@ JLinkLog.txt
 *.bak
 *.scvd
 *.ipch
+
+.vscode
