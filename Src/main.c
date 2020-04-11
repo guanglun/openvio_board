@@ -168,15 +168,14 @@ void SystemClock_Config(void)
   __HAL_RCC_PLL_PLLSOURCE_CONFIG(RCC_PLLSOURCE_HSE);
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 6;
   RCC_OscInitStruct.PLL.PLLN = 384;
   RCC_OscInitStruct.PLL.PLLP = 2;
-  RCC_OscInitStruct.PLL.PLLQ = 16;
+  RCC_OscInitStruct.PLL.PLLQ = 4;
   RCC_OscInitStruct.PLL.PLLR = 2;
   RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_1;
   RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
@@ -206,14 +205,14 @@ void SystemClock_Config(void)
                               |RCC_PERIPHCLK_SDMMC|RCC_PERIPHCLK_ADC
                               |RCC_PERIPHCLK_I2C1;
   PeriphClkInitStruct.PLL2.PLL2M = 6;
-  PeriphClkInitStruct.PLL2.PLL2N = 400;
+  PeriphClkInitStruct.PLL2.PLL2N = 384;
   PeriphClkInitStruct.PLL2.PLL2P = 2;
   PeriphClkInitStruct.PLL2.PLL2Q = 2;
-  PeriphClkInitStruct.PLL2.PLL2R = 17;
+  PeriphClkInitStruct.PLL2.PLL2R = 16;
   PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_1;
   PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
-  PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL;
+  PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL2;
   PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL2;
   PeriphClkInitStruct.Usart234578ClockSelection = RCC_USART234578CLKSOURCE_D2PCLK1;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
@@ -222,7 +221,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSI48, RCC_MCODIV_2);
+  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_7);
 }
 
 /* USER CODE BEGIN 4 */

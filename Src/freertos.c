@@ -25,7 +25,7 @@
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+/* USER CODE BEGIN Includes */     
 #include "openvio_task.h"
 #include "dcmi.h"
 #include "sd_card.h"
@@ -64,14 +64,14 @@ osThreadId defaultTaskHandle;
 osThreadId openvioTaskHandle;
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void const *argument);
+void StartDefaultTask(void const * argument);
 
 extern void MX_USB_DEVICE_Init(void);
 extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* GetIdleTaskMemory prototype (linked to static allocation support) */
-void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize);
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
 
 /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
 static StaticTask_t xIdleTaskTCBBuffer;
@@ -91,8 +91,7 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackTyp
   * @param  None
   * @retval None
   */
-void MX_FREERTOS_Init(void)
-{
+void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -124,6 +123,7 @@ void MX_FREERTOS_Init(void)
   openvioTaskHandle = osThreadCreate(osThread(openvioTask), NULL);
 
   /* USER CODE END RTOS_THREADS */
+
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -133,7 +133,7 @@ void MX_FREERTOS_Init(void)
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const *argument)
+void StartDefaultTask(void const * argument)
 {
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
