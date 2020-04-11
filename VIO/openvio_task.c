@@ -48,8 +48,10 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req,uint8_t *s_data)
 		if(vio_status.cam_status == SENSOR_STATUS_WAIT)
 		{
 			s_data[0] = 'S';
-			s_data[1] = vio_status.cam_frame_size_num;
-			s_len = 2;
+            s_data[1] = vio_status.cam_id;
+			s_data[2] = vio_status.cam_frame_size_num;
+			s_data[3] = vio_status.gs_bpp;
+			s_len = 4;
 			vio_status.cam_status = SENSOR_STATUS_START;
 		}else{
 			s_data[0] = 'F';

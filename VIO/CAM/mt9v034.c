@@ -4,6 +4,10 @@
 #include "cambus.h"
 #include "openvio.h"
 
+#include "dcmi.h"
+
+extern DCMI_HandleTypeDef hdcmi;
+
 extern I2C_HandleTypeDef hi2c1;
 
 struct mt9v034_reg
@@ -61,6 +65,28 @@ static int set_colorbar(int enable); //是否使能测试条码
 static int set_hmirror(int enable); //设置水平对称
 static int set_vflip(int enable); //设置竖直对称
 
+void mt9v034_dcmi_init(void)
+{
+
+  hdcmi.Instance = DCMI;
+  hdcmi.Init.SynchroMode = DCMI_SYNCHRO_HARDWARE;
+  hdcmi.Init.PCKPolarity = DCMI_PCKPOLARITY_FALLING;
+  hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_LOW;
+  hdcmi.Init.HSPolarity = DCMI_HSPOLARITY_LOW;
+  hdcmi.Init.CaptureRate = DCMI_CR_ALL_FRAME;
+  hdcmi.Init.ExtendedDataMode = DCMI_EXTEND_DATA_8B;
+  hdcmi.Init.JPEGMode = DCMI_JPEG_DISABLE;
+  hdcmi.Init.ByteSelectMode = DCMI_BSM_ALL;
+  hdcmi.Init.ByteSelectStart = DCMI_OEBS_ODD;
+  hdcmi.Init.LineSelectMode = DCMI_LSM_ALL;
+  hdcmi.Init.LineSelectStart = DCMI_OELS_ODD;
+  if (HAL_DCMI_Init(&hdcmi) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
+
 int mt9v034_init(void)
 {
 	uint16_t chip_version = 0;
@@ -78,56 +104,24 @@ int mt9v034_init(void)
 	}
 	printf("[mt9v034 chip version][ok]\r\n");
 
+    mt9v034_dcmi_init();
+    
 	mt9v034_config(vio_status.cam_frame_size_num);
 
-	set_colorbar(0);
+	// set_colorbar(0);
 	set_vflip(0);
 	set_hmirror(0);
 	//set_auto_exposure(0,0);
 
-	uint16_t chip_control;
-	int enable = 0;
-	int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_CHIP_CONTROL, &chip_control);
-	ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_CHIP_CONTROL,
-						 (chip_control & (~MT9V034_CHIP_CONTROL_MODE_MASK)) | ((enable != 0) ? MT9V034_CHIP_CONTROL_SNAP_MODE : MT9V034_CHIP_CONTROL_MASTER_MODE));
+	// uint16_t chip_control;
+	// int enable = 0;
+	// int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_CHIP_CONTROL, &chip_control);
+	// ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_CHIP_CONTROL,
+	// 					 (chip_control & (~MT9V034_CHIP_CONTROL_MODE_MASK)) | ((enable != 0) ? MT9V034_CHIP_CONTROL_SNAP_MODE : MT9V034_CHIP_CONTROL_MASTER_MODE));
 
 
 	return err;
 }
-
-const int resolution[][2] = {
-	{0, 0},
-	// C/SIF Resolutions
-	{88, 72},	/* QQCIF     */
-	{176, 144}, /* QCIF      */
-	{352, 288}, /* CIF       */
-	{88, 60},	/* QQSIF     */
-	{176, 120}, /* QSIF      */
-	{352, 240}, /* SIF       */
-	// VGA Resolutions
-	{40, 30},	/* QQQQVGA   */
-	{80, 60},	/* QQQVGA    */
-	{160, 120}, /* QQVGA     */
-	{320, 240}, /* QVGA      */
-	{640, 480}, /* VGA       */
-	{60, 40},	/* HQQQVGA   */
-	{120, 80},	/* HQQVGA    */
-	{240, 160}, /* HQVGA     */
-	// FFT Resolutions
-	{64, 32},	/* 64x32     */
-	{64, 64},	/* 64x64     */
-	{128, 64},	/* 128x64    */
-	{128, 128}, /* 128x64    */
-	// Other
-	{128, 160},	  /* LCD       */
-	{128, 160},	  /* QQVGA2    */
-	{720, 480},	  /* WVGA      */
-	{752, 480},	  /* WVGA2     */
-	{800, 600},	  /* SVGA      */
-	{1024, 768},  /* XGA       */
-	{1280, 1024}, /* SXGA      */
-	{1600, 1200}, /* UXGA      */
-};
 
 void mt9v034_config(int frame_size_num)
 {

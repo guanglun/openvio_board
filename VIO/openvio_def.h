@@ -40,6 +40,8 @@ struct OPENVIO_STATUS{
     uint8_t usb_lock_status;
 	uint8_t is_imu_send;
 
+    uint8_t cam_id;
+    uint8_t gs_bpp;
     uint8_t cam_frame_size_num;
     uint32_t cam_frame_size;
     uint8_t cam_name;

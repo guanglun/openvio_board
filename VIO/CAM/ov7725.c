@@ -4,6 +4,11 @@
 #include "cambus.h"
 #include "openvio.h"
 #include "FreeRTOS.h"
+
+#include "dcmi.h"
+
+extern DCMI_HandleTypeDef hdcmi;
+
 static const uint8_t default_regs[][2] = {
 
 // From App Note.
@@ -113,7 +118,119 @@ static int ov7725_reset(void)
    return ret;
 }
 
+static int ov7725_set_framesize(framesize_t framesize)
+{
+    int ret=0;
+    uint16_t w = resolution[framesize][0];
+    uint16_t h = resolution[framesize][1];
+
+    // Write MSBs
+    ret |= cambus_writeb(OV7725_SLV_ADDR, HOUTSIZE, w>>2);
+    ret |= cambus_writeb(OV7725_SLV_ADDR, VOUTSIZE, h>>1);
+
+    // Write LSBs
+    ret |= cambus_writeb(OV7725_SLV_ADDR, EXHCH, ((w&0x3) | ((h&0x1) << 2)));
+
+    if ((w <= 320) && (h <= 240)) {
+        // Set QVGA Resolution
+        uint8_t reg;
+        int ret = cambus_readb(OV7725_SLV_ADDR, COM7, &reg);
+        reg = COM7_SET_RES(reg, COM7_RES_QVGA);
+        ret |= cambus_writeb(OV7725_SLV_ADDR, COM7, reg);
+
+        // Set QVGA Window Size
+        ret |= cambus_writeb(OV7725_SLV_ADDR, HSTART, 0x3F);
+        ret |= cambus_writeb(OV7725_SLV_ADDR, HSIZE,  0x50);
+        ret |= cambus_writeb(OV7725_SLV_ADDR, VSTART, 0x03);
+        ret |= cambus_writeb(OV7725_SLV_ADDR, VSIZE,  0x78);
+
+        // Enable auto-scaling/zooming factors
+        ret |= cambus_writeb(OV7725_SLV_ADDR, DSPAUTO, 0xFF);
+    } else {
+        // Set VGA Resolution
+        uint8_t reg;
+        int ret = cambus_readb(OV7725_SLV_ADDR, COM7, &reg);
+        reg = COM7_SET_RES(reg, COM7_RES_VGA);
+        ret |= cambus_writeb(OV7725_SLV_ADDR, COM7, reg);
+
+        // Set VGA Window Size
+        ret |= cambus_writeb(OV7725_SLV_ADDR, HSTART, 0x23);
+        ret |= cambus_writeb(OV7725_SLV_ADDR, HSIZE,  0xA0);
+        ret |= cambus_writeb(OV7725_SLV_ADDR, VSTART, 0x07);
+        ret |= cambus_writeb(OV7725_SLV_ADDR, VSIZE,  0xF0);
+
+        // Disable auto-scaling/zooming factors
+        ret |= cambus_writeb(OV7725_SLV_ADDR, DSPAUTO, 0xF3);
+
+        // Clear auto-scaling/zooming factors
+        ret |= cambus_writeb(OV7725_SLV_ADDR, SCAL0, 0x00);
+        ret |= cambus_writeb(OV7725_SLV_ADDR, SCAL1, 0x40);
+        ret |= cambus_writeb(OV7725_SLV_ADDR, SCAL2, 0x40);
+    }
+
+    return ret;
+}
+
+static int set_pixformat(pixformat_t pixformat)
+{
+    uint8_t reg;
+    int ret = cambus_readb(OV7725_SLV_ADDR, COM7, &reg);
+
+    switch (pixformat) {
+        case PIXFORMAT_RGB565:
+            reg = COM7_SET_FMT(reg, COM7_FMT_RGB);
+            ret |= cambus_writeb(OV7725_SLV_ADDR, DSP_CTRL4, DSP_CTRL4_YUV_RGB);
+            break;
+        case PIXFORMAT_YUV422:
+        case PIXFORMAT_GRAYSCALE:
+            reg = COM7_SET_FMT(reg, COM7_FMT_YUV);
+            ret |= cambus_writeb(OV7725_SLV_ADDR, DSP_CTRL4, DSP_CTRL4_YUV_RGB);
+            break;
+        case PIXFORMAT_BAYER:
+            reg = COM7_SET_FMT(reg, COM7_FMT_P_BAYER);
+            ret |= cambus_writeb(OV7725_SLV_ADDR, DSP_CTRL4, DSP_CTRL4_RAW8);
+            break;
+        default:
+            return -1;
+    }
+
+    // Write back register
+    return cambus_writeb(OV7725_SLV_ADDR, COM7, reg) | ret;
+}
+
+void ov7725_config(int frame_size_num)
+{
+	vio_status.cam_frame_size_num = frame_size_num;
+	vio_status.cam_frame_size = resolution[frame_size_num][0]*resolution[frame_size_num][1];
+	ov7725_set_framesize(frame_size_num);
+}
+
+void ov7725_dcmi_init(void)
+{
+
+  hdcmi.Instance = DCMI;
+  hdcmi.Init.SynchroMode = DCMI_SYNCHRO_HARDWARE;
+  hdcmi.Init.PCKPolarity = DCMI_PCKPOLARITY_RISING;
+  hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_HIGH;
+  hdcmi.Init.HSPolarity = DCMI_HSPOLARITY_LOW;
+  hdcmi.Init.CaptureRate = DCMI_CR_ALL_FRAME;
+  hdcmi.Init.ExtendedDataMode = DCMI_EXTEND_DATA_8B;
+  hdcmi.Init.JPEGMode = DCMI_JPEG_DISABLE;
+  hdcmi.Init.ByteSelectMode = DCMI_BSM_ALL;
+  hdcmi.Init.ByteSelectStart = DCMI_OEBS_ODD;
+  hdcmi.Init.LineSelectMode = DCMI_LSM_ALL;
+  hdcmi.Init.LineSelectStart = DCMI_OELS_ODD;
+  if (HAL_DCMI_Init(&hdcmi) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
+
 void ov7725_init(void)
 {
+    ov7725_dcmi_init();
     ov7725_reset();
+    ov7725_config(vio_status.cam_frame_size_num);
+    set_pixformat(PIXFORMAT_GRAYSCALE);
 }
