@@ -1,4 +1,4 @@
-#include "camera_task.h"
+#include "openvio_task.h"
 #include "openvio_def.h"
 #include "openvio.h"
 
@@ -15,7 +15,7 @@
 
 #include "icm20948.h"
 #include "camera.h"
-
+#include "sd_card.h"
 
 extern USBD_HandleTypeDef hUsbDeviceHS;
 extern int frame_count;
@@ -97,15 +97,18 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req,uint8_t *s_data)
 	return s_len;
 }
 
-void StartCameraTask(void const *argument)
+void StartOpenvioTask(void const *argument)
 {
 	int ret;
 
 	openvio_status_init(&vio_status);
 	
-	mt9v034_init();
+    camera_init();
 	icm20948_init();
 	
+	osDelay(500);
+	
+	sdcard_init();
 	//int count = 5;
 	//	while (count--)
 	//	{

@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H743xx,USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;..\App;..\VIO;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Middlewares/Third_Party/FatFs/src</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;..\App;..\VIO;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Middlewares/Third_Party/FatFs/src;..\VIO\CAM</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -382,36 +382,6 @@
           <GroupName>Application/VIO</GroupName>
           <Files>
             <File>
-              <FileName>cambus.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\VIO\cambus.c</FilePath>
-            </File>
-            <File>
-              <FileName>cambus.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\cambus.h</FilePath>
-            </File>
-            <File>
-              <FileName>camera.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\VIO\camera.c</FilePath>
-            </File>
-            <File>
-              <FileName>camera.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\camera.h</FilePath>
-            </File>
-            <File>
-              <FileName>camera_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\VIO\camera_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>camera_task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\camera_task.h</FilePath>
-            </File>
-            <File>
               <FileName>icm20948.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\VIO\icm20948.c</FilePath>
@@ -420,16 +390,6 @@
               <FileName>icm20948.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\VIO\icm20948.h</FilePath>
-            </File>
-            <File>
-              <FileName>mt9v034.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\VIO\mt9v034.c</FilePath>
-            </File>
-            <File>
-              <FileName>mt9v034.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\mt9v034.h</FilePath>
             </File>
             <File>
               <FileName>openvio.c</FileName>
@@ -445,6 +405,76 @@
               <FileName>openvio_def.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\VIO\openvio_def.h</FilePath>
+            </File>
+            <File>
+              <FileName>openvio_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\VIO\openvio_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>openvio_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\openvio_task.h</FilePath>
+            </File>
+            <File>
+              <FileName>sd_card.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\VIO\sd_card.c</FilePath>
+            </File>
+            <File>
+              <FileName>sd_card.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\sd_card.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/CAM</GroupName>
+          <Files>
+            <File>
+              <FileName>cambus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\VIO\CAM\cambus.c</FilePath>
+            </File>
+            <File>
+              <FileName>cambus.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\CAM\cambus.h</FilePath>
+            </File>
+            <File>
+              <FileName>mt9v034.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\VIO\CAM\mt9v034.c</FilePath>
+            </File>
+            <File>
+              <FileName>mt9v034.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\CAM\mt9v034.h</FilePath>
+            </File>
+            <File>
+              <FileName>ov7725.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\VIO\CAM\ov7725.c</FilePath>
+            </File>
+            <File>
+              <FileName>ov7725.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\CAM\ov7725.h</FilePath>
+            </File>
+            <File>
+              <FileName>ov7725_regs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\CAM\ov7725_regs.h</FilePath>
+            </File>
+            <File>
+              <FileName>camera.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\VIO\CAM\camera.c</FilePath>
+            </File>
+            <File>
+              <FileName>camera.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\CAM\camera.h</FilePath>
             </File>
           </Files>
         </Group>
