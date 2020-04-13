@@ -12,6 +12,9 @@
 DMA_BUFFER uint8_t lcd_buffer[240*240*2];
 uint8_t *lcd_buffer8,*lcd_buffer16;
 volatile uint32_t lcd_show_size = 0,send_count = 0;
+
+extern uint8_t fps_value;
+extern uint16_t adc_value;
 extern uint8_t is_wait,fps_count;
 void LCD_Show_Cam(uint8_t *img,uint32_t size)
 {
@@ -26,6 +29,13 @@ void LCD_Show_Cam(uint8_t *img,uint32_t size)
 		lcd_buffer[i*2] = img[i*2];
 		lcd_buffer[i*2+1] = img[i*2+1];
 	}
+	
+	
+	//LCD_ShowIntNum(0,160,adc_value,4,RED,WHITE,uint8_t sizey)
+	
+	
+	LCD_ShowFloatNum1(0,160,6.6*adc_value/4096,3,RED,WHITE,32);
+	LCD_ShowIntNum(0,200,fps_value,2,RED,WHITE,32);
 	
 	LCD_Address_Set(0,0,240-1,240-1);//设置显示范围
     lcd_buffer8 = lcd_buffer;
@@ -61,6 +71,7 @@ void LCD_Fill(uint16_t xsta,uint16_t ysta,uint16_t xend,uint16_t yend,uint16_t c
    cnnt++;
   
 }
+#define LCD_CS_Set() HAL_GPIO_WritePin(GPIOD, TFT_SPI_CS_Pin, GPIO_PIN_SET);
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     if(send_count<lcd_show_size)
@@ -75,6 +86,7 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
             send_count=lcd_show_size;
         }
     }else{
+        LCD_CS_Set();	
 		is_wait = 0;
         fps_count++;
     }

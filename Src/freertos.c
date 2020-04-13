@@ -32,6 +32,8 @@
 #include "openvio.h"
 
 
+uint16_t adc_value;
+uint8_t fps_value;
 extern uint8_t fps_count;
 extern USBD_HandleTypeDef hUsbDeviceHS;
 extern struct OPENVIO_STATUS vio_status;
@@ -217,12 +219,13 @@ void StartDefaultTask(void const * argument)
 //    HAL_Delay(1000);
 //	HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
 	
-	//uint16_t value=Get_Adc_Average(ADC_CHANNEL_16,20);
+	adc_value=Get_Adc_Average(ADC_CHANNEL_16,20);
 	//printf("%d\t%0.2f\t%0.2f\r\n", value,3.3f*(float)value/4096,3.3f*(float)value/4096*2);
 	HAL_Delay(1000);
-	
+	fps_value = fps_count;
 	printf("%d\r\n",fps_count);
 	fps_count=0;
+	
 //	value=0;
 //	for(int i=0;i<10;i++)
 //	{
