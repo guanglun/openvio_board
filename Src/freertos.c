@@ -32,7 +32,7 @@
 #include "openvio.h"
 
 
-
+extern uint8_t fps_count;
 extern USBD_HandleTypeDef hUsbDeviceHS;
 extern struct OPENVIO_STATUS vio_status;
 extern ADC_HandleTypeDef hadc1;
@@ -213,13 +213,16 @@ void StartDefaultTask(void const * argument)
 //    }
 //	HAL_ADC_Stop(&hadc1);
 	
-	HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
-    HAL_Delay(1000);
-	HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
+//	HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
+//    HAL_Delay(1000);
+//	HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
 	
-	uint16_t value=Get_Adc_Average(ADC_CHANNEL_16,20);
-	printf("%d\t%0.2f\t%0.2f\r\n", value,3.3f*(float)value/4096,3.3f*(float)value/4096*2);
+	//uint16_t value=Get_Adc_Average(ADC_CHANNEL_16,20);
+	//printf("%d\t%0.2f\t%0.2f\r\n", value,3.3f*(float)value/4096,3.3f*(float)value/4096*2);
 	HAL_Delay(1000);
+	
+	printf("%d\r\n",fps_count);
+	fps_count=0;
 //	value=0;
 //	for(int i=0;i<10;i++)
 //	{
@@ -232,7 +235,7 @@ void StartDefaultTask(void const * argument)
 
 //    printf(" %d\r\n", state);
 
-    osDelay(100);
+//    osDelay(100);
 
 
     

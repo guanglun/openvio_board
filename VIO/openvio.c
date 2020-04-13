@@ -42,14 +42,14 @@ extern USBD_HandleTypeDef hUsbDeviceHS;
 
 void openvio_status_init(struct OPENVIO_STATUS *status)
 {
-    status->cam_status = 0;
+    status->cam_status = SENSOR_STATUS_START;
     status->imu_status = 0;
     status->usb_lock_status = 0;
 	status->is_imu_send = 0;
 	status->usb_status = USB_DISCONNECT;
 
 	status->cam_name = MT9V034;
-	status->cam_frame_size_num = FRAMESIZE_QVGA;
+	status->cam_frame_size_num = FRAMESIZE_HQVGA;//FRAMESIZE_QVGA;
 
 }
 

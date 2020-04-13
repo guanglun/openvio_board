@@ -90,6 +90,8 @@ void Error_Handler(void);
 #define SD_CD_GPIO_Port GPIOD
 #define IMU_SPI_CS_Pin GPIO_PIN_1
 #define IMU_SPI_CS_GPIO_Port GPIOD
+#define TFT_SPI_CS_Pin GPIO_PIN_4
+#define TFT_SPI_CS_GPIO_Port GPIOD
 #define DCMI_PWDN_Pin GPIO_PIN_7
 #define DCMI_PWDN_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */

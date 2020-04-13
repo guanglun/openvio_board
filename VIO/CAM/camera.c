@@ -7,7 +7,7 @@
 extern DCMI_HandleTypeDef hdcmi;
 extern DMA_HandleTypeDef hdma_dcmi;
 
-DMA_BUFFER uint8_t dcmi_image_buffer[FULL_IMAGE_SIZE] = {0};
+DMA_BUFFER uint8_t dcmi_image_buffer[FULL_IMAGE_SIZE/2] = {0};
 
 int frame_count = 0;
 int line_cnt = 0,count = 0,start=0;
@@ -77,6 +77,7 @@ void dcmi_dma_start(void)
   {
 	  icm20948_transmit();
   }
+  LCD_Show_Cam(dcmi_image_buffer,vio_status.cam_frame_size);
 }
 
 void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi)
