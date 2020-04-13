@@ -127,6 +127,37 @@ void MX_FREERTOS_Init(void) {
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
+DMA_BUFFER uint16_t ADC_ConvertedValue[10];
+uint16_t Get_Adc(uint32_t ch)   
+{
+    ADC_ChannelConfTypeDef ADC1_ChanConf;
+    
+    ADC1_ChanConf.Channel=ch;                                   //ͨ��
+    ADC1_ChanConf.Rank=ADC_REGULAR_RANK_1;                  	//1������
+    ADC1_ChanConf.SamplingTime=ADC_SAMPLETIME_64CYCLES_5;      	//����ʱ��       
+	ADC1_ChanConf.SingleDiff=ADC_SINGLE_ENDED;  				//���߲ɼ�          		
+	ADC1_ChanConf.OffsetNumber=ADC_OFFSET_NONE;             	
+	ADC1_ChanConf.Offset=0;   
+    HAL_ADC_ConfigChannel(&hadc1,&ADC1_ChanConf);        //ͨ������
+
+    HAL_ADC_Start(&hadc1);                               //����ADC
+	
+    HAL_ADC_PollForConversion(&hadc1,10);                //��ѯת��
+	return (uint16_t)HAL_ADC_GetValue(&hadc1);	            //�������һ��ADC1�������ת�����
+}
+
+uint16_t Get_Adc_Average(uint32_t ch,uint8_t times)
+{
+	uint32_t temp_val=0;
+	uint8_t t;
+	for(t=0;t<times;t++)
+	{
+		temp_val+=Get_Adc(ch);
+		HAL_Delay(5);
+	}
+	return temp_val/times;
+} 
+
 /**
   * @brief  Function implementing the defaultTask thread.
   * @param  argument: Not used 
@@ -145,7 +176,7 @@ void StartDefaultTask(void const * argument)
 	
 
 	
-  uint32_t connect_delay = 0;
+    HAL_ADCEx_Calibration_Start(&hadc1,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);
 
   for (;;)
   {
@@ -172,34 +203,51 @@ void StartDefaultTask(void const * argument)
     //			}
     //		}
 
-//    HAL_ADC_Start(&hadc1);
-//    HAL_ADC_PollForConversion(&hadc1, 50);
+    
+//	HAL_ADC_Start(&hadc1);
+//    HAL_ADC_PollForConversion(&hadc1, 200);
 //    if (HAL_IS_BIT_SET(HAL_ADC_GetState(&hadc1), HAL_ADC_STATE_REG_EOC))
 //    {
-//      int AD_Value = HAL_ADC_GetValue(&hadc1);
-//      printf(" %d\r\n", AD_Value);
+//      uint32_t AD_Value = HAL_ADC_GetValue(&hadc1);
+//      printf("%d\t%0.2f\r\n", AD_Value,3.3f*(float)AD_Value/4096*2);
 //    }
-//    HAL_Delay(1000);
-
+//	HAL_ADC_Stop(&hadc1);
+	
+	HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
+    HAL_Delay(1000);
+	HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
+	
+	uint16_t value=Get_Adc_Average(ADC_CHANNEL_16,20);
+	printf("%d\t%0.2f\t%0.2f\r\n", value,3.3f*(float)value/4096,3.3f*(float)value/4096*2);
+	HAL_Delay(1000);
+//	value=0;
+//	for(int i=0;i<10;i++)
+//	{
+//		value+=ADC_ConvertedValue[i];
+//	}
+//	value/=10;
+//	printf("%d\t%0.2f\r\n", value,3.3f*(float)value/4096*2);
+	
 //    GPIO_PinState state = HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin);
 
 //    printf(" %d\r\n", state);
 
-//    osDelay(100);
+    osDelay(100);
 
 
-    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
-    osDelay(1000);
-    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
-    osDelay(1000);
-    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
-    osDelay(1000);
-    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
-    osDelay(1000);
-    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
-    osDelay(1000);
-    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
-    osDelay(1000);
+    
+//    osDelay(1000);
+//	
+//    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
+//    osDelay(1000);
+//    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
+//    osDelay(1000);
+//    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+//    osDelay(1000);
+//    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
+//    osDelay(1000);
+//    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
+//    osDelay(1000);
 
     //    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_RESET);
     //    osDelay(1000);
@@ -215,7 +263,12 @@ void StartDefaultTask(void const * argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)
+{
+  /* ��ȡ���? */
+    ADC_ConvertedValue[0] = HAL_ADC_GetValue(AdcHandle); 
+	printf("%d\t%0.2f\r\n", ADC_ConvertedValue[0],3.3f*(float)ADC_ConvertedValue[0]/4096);
+}
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
