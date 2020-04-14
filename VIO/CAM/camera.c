@@ -77,7 +77,7 @@ void dcmi_dma_start(void)
   {
 	  icm20948_transmit();
   }
-  LCD_Show_Cam(dcmi_image_buffer,vio_status.cam_frame_size);
+  //LCD_Show_Cam(dcmi_image_buffer,vio_status.cam_frame_size);
 }
 
 void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi)

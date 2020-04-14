@@ -108,8 +108,8 @@ void StartOpenvioTask(void const *argument)
 	openvio_status_init(&vio_status);
 	
     camera_init();
-	//icm20948_init();
-	lcd_init();
+	icm20948_init();
+	//lcd_init();
 
 	osDelay(500);
 	
@@ -136,7 +136,7 @@ void StartOpenvioTask(void const *argument)
 	{
 		if(vio_status.cam_status == SENSOR_STATUS_START)
 		{
-			//openvio_usb_send(SENSOR_USB_CAM,"START", 5);
+			openvio_usb_send(SENSOR_USB_CAM,"START", 5);
 			camera_start_send();
 
 			isCamReady = 0;
@@ -158,7 +158,7 @@ void StartOpenvioTask(void const *argument)
 				xTimeLast = xTimeNow;
 				//printf("time:%d\r\n",xTimeNow);
 				
-				//camera_img_send();
+				camera_img_send();
 				isCamReady = 0;
 			}			
 			
