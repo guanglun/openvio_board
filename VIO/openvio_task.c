@@ -40,6 +40,8 @@ static void camera_start_send(void);
 #define REQUEST_IMU_START       0xB0
 #define REQUEST_IMU_STOP        0xB1
 
+
+
 uint8_t camera_ctrl(USBD_SetupReqTypedef *req,uint8_t *s_data)
 {
 	uint8_t s_len = 1;
@@ -137,6 +139,7 @@ void StartOpenvioTask(void const *argument)
 		if(vio_status.cam_status == SENSOR_STATUS_START)
 		{
 			openvio_usb_send(SENSOR_USB_CAM,"START", 5);
+			osDelay(100);
 			camera_start_send();
 
 			isCamReady = 0;
@@ -158,19 +161,15 @@ void StartOpenvioTask(void const *argument)
 				xTimeLast = xTimeNow;
 				//printf("time:%d\r\n",xTimeNow);
 				
-				camera_img_send();
 				isCamReady = 0;
 			}			
-			
 		}
-
 		icm20948_transmit();
-
 		frame_count++;
 	}
 }
 
-#define USB_SEND_MAX_SIZE (63 * 1024)
+#define USB_SEND_MAX_SIZE (1 * 1024)
 
 void camera_start_send(void)
 {
@@ -190,20 +189,23 @@ void camera_start_send(void)
 
 void camera_img_send(void)
 {
-	openvio_usb_send(SENSOR_USB_CAM,"CAM", 3);
-	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
-	for (uint32_t i = 0; i < vio_status.cam_frame_size; i += USB_SEND_MAX_SIZE)
-	{
-		if (i + USB_SEND_MAX_SIZE > vio_status.cam_frame_size)
-		{
-			openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer[i], vio_status.cam_frame_size - i);
-		}
-		else
-		{
-			openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer[i], USB_SEND_MAX_SIZE);
-		}
+	// openvio_usb_send(SENSOR_USB_CAM,"CAM", 3);
+	// osDelay(10);
+	// USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
+	// for (uint32_t i = 0; i < vio_status.cam_frame_size; i += USB_SEND_MAX_SIZE)
+	// {
+	// 	if (i + USB_SEND_MAX_SIZE > vio_status.cam_frame_size)
+	// 	{
+	// 		openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer[i], vio_status.cam_frame_size - i);
+	// 		osDelay(10);
+	// 	}
+	// 	else
+	// 	{
+	// 		openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer[i], USB_SEND_MAX_SIZE);
+	// 		osDelay(10);
+	// 	}
 		
-		icm20948_transmit();
+	// 	icm20948_transmit();
 		
-	}
+	// }
 }

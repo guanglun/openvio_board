@@ -9,7 +9,8 @@
 								color       要填充的颜色
       返回值：  无
 ******************************************************************************/
-DMA_BUFFER uint8_t lcd_buffer[240*240*2];
+//DMA_BUFFER uint8_t lcd_buffer[240*240*2];
+DMA_BUFFER uint8_t lcd_buffer[2];
 uint8_t *lcd_buffer8,*lcd_buffer16;
 volatile uint32_t lcd_show_size = 0,send_count = 0;
 

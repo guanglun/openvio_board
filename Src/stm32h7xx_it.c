@@ -260,7 +260,7 @@ void OTG_HS_IRQHandler(void)
   /* USER CODE END OTG_HS_IRQn 0 */
   HAL_PCD_IRQHandler(&hpcd_USB_OTG_HS);
   /* USER CODE BEGIN OTG_HS_IRQn 1 */
-
+  USER_PCD_IRQHandler(&hpcd_USB_OTG_HS);
   /* USER CODE END OTG_HS_IRQn 1 */
 }
 
