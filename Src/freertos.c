@@ -160,6 +160,9 @@ uint16_t Get_Adc_Average(uint32_t ch,uint8_t times)
 	return temp_val/times;
 } 
 
+QueueHandle_t xQueue;
+
+extern DMA_BUFFER uint8_t dcmi_image_buffer[CAM_PACKAGE_MAX_SIZE * 2];
 /**
   * @brief  Function implementing the defaultTask thread.
   * @param  argument: Not used 
@@ -179,9 +182,17 @@ void StartDefaultTask(void const * argument)
 
 	
     HAL_ADCEx_Calibration_Start(&hadc1,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);
-
+	xQueue = xQueueCreate( 30, sizeof(struct USB_FRAME_STRUCT) );
+	struct USB_FRAME_STRUCT usb_frame_s;
   for (;;)
   {
+    if( xQueueReceive( xQueue, &(usb_frame_s), ( TickType_t ) 0xFFFFFF ) )
+        {
+            while (CAM_Transmit_HS(usb_frame_s.addr,usb_frame_s.len) != 0)
+			{
+				//osDelay(1);
+			}
+        }
 
     //	  	if(hUsbDeviceHS.dev_state != HAL_PCD_STATE_BUSY && vio_status.usb_status == USB_CONNECT)
     //		{
@@ -271,7 +282,10 @@ void StartDefaultTask(void const * argument)
     //    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_RESET);
     //    osDelay(1000);
     //    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_SET);
-        osDelay(1000);
+        //osDelay(1000);
+		
+		
+		
   }
   /* USER CODE END StartDefaultTask */
 }

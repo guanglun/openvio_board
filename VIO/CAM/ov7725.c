@@ -232,7 +232,6 @@ void ov7725_init(void)
     ov7725_dcmi_init();
     ov7725_reset();
     ov7725_config(vio_status.cam_frame_size_num);
-    set_pixformat(PIXFORMAT_GRAYSCALE);
-    //set_pixformat(PIXFORMAT_RGB565);
+    set_pixformat(vio_status.pixformat);
     
 }

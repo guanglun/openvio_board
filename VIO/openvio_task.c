@@ -55,7 +55,8 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req,uint8_t *s_data)
             s_data[1] = vio_status.cam_id;
 			s_data[2] = vio_status.cam_frame_size_num;
 			s_data[3] = vio_status.gs_bpp;
-			s_len = 4;
+            s_data[4] = vio_status.pixformat;
+			s_len = 5;
 			vio_status.cam_status = SENSOR_STATUS_START;
 		}else{
 			s_data[0] = 'F';
@@ -91,10 +92,27 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req,uint8_t *s_data)
 		}
 		break;	
 	case REQUEST_CAMERA_SET_FRAME_SIZE_NUM:
-			mt9v034_config(req->wValue);
-			s_data[0] = 'S';
-			s_data[1] = vio_status.cam_frame_size_num;
-			s_len = 2;
+//			if(vio_status.cam_status == SENSOR_STATUS_WAIT)
+//			{
+				vio_status.cam_status = SENSOR_STATUS_WAIT;
+				if(vio_status.cam_id == OV7725_ID)
+				{
+					ov7725_config(req->wValue);
+				}else if(vio_status.cam_id == MT9V034_ID)
+				{
+					mt9v034_config(req->wValue);
+				}
+				
+				s_data[0] = 'S';
+				s_data[1] = vio_status.cam_id;
+				s_data[2] = vio_status.cam_frame_size_num;
+				s_data[3] = vio_status.gs_bpp;
+				s_data[4] = vio_status.pixformat;
+				s_len = 5;
+//			}else{
+//				s_data[0] = 'F';
+//			}
+			
 		break;	
 		
 	default:

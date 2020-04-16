@@ -6,8 +6,8 @@
 #define DMA_BUFFER \
   __attribute__((section(".RAM_D1")))
 
-#define CAM_PACKAGE_MAX_SIZE (63*1024)
-#define USB_DMA_PACKAGE_SIZE (63*1024)
+#define CAM_PACKAGE_MAX_SIZE (160*1024)
+#define USB_DMA_PACKAGE_SIZE (160*1024)
 
 enum SENSOR_USB{
 	SENSOR_USB_CAM = 0,
@@ -41,11 +41,26 @@ enum USB_STATUS{
     USB_WORKING
 };
 
+typedef enum {
+    PIXFORMAT_INVALID = 0,
+    PIXFORMAT_BINARY,    // 1BPP/BINARY
+    PIXFORMAT_GRAYSCALE, // 1BPP/GRAYSCALE
+    PIXFORMAT_RGB565,    // 2BPP/RGB565
+    PIXFORMAT_YUV422,    // 2BPP/YUV422
+    PIXFORMAT_BAYER,     // 1BPP/RAW
+    PIXFORMAT_JPEG,      // JPEG/COMPRESSED
+} pixformat_t;
+
 struct USB_STRUCT{
     uint32_t target_len;
     uint32_t len;
     uint8_t *addr;
     enum USB_STATUS status;
+};
+
+struct USB_FRAME_STRUCT{
+	uint32_t len;
+	uint8_t *addr;
 };
 
 struct OPENVIO_STATUS{
@@ -56,6 +71,7 @@ struct OPENVIO_STATUS{
     uint8_t usb_lock_status;
 	uint8_t is_imu_send;
 
+    pixformat_t pixformat;
     uint8_t cam_id;
     uint8_t gs_bpp;
     uint8_t cam_frame_size_num;
