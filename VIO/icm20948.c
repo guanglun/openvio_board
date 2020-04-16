@@ -368,7 +368,7 @@ void icm20948_transmit(void)
 		xIMUTimeNow = xTaskGetTickCount();
 		if((xIMUTimeNow-xIMUTimeLast) >= 5 && isIMUReady == 1)
 		{
-			openvio_usb_send(SENSOR_USB_IMU,"IMU", 3);
+			openvio_usb_send(SENSOR_USB_IMU,"ICMIMU", 6);
 			openvio_usb_send(SENSOR_USB_IMU, icm20948_data, 14);
 			
 			xIMUTimeLast = xIMUTimeNow;

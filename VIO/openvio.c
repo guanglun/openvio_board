@@ -4,6 +4,11 @@
 
 #include "mt9v034.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "main.h"
+#include "cmsis_os.h"
+
 extern USBD_HandleTypeDef hUsbDeviceHS;
 
 // typedef enum {
@@ -43,71 +48,76 @@ extern USBD_HandleTypeDef hUsbDeviceHS;
 void openvio_status_init(struct OPENVIO_STATUS *status)
 {
     status->cam_status = SENSOR_STATUS_WAIT;
-    status->imu_status = 0;
+    status->imu_status = SENSOR_STATUS_WAIT;
     status->usb_lock_status = 0;
-	status->is_imu_send = 0;
-	status->usb_status = USB_DISCONNECT;
+    status->is_imu_send = 0;
+    status->usb_status = USB_DISCONNECT;
 
     //status->pixformat = PIXFORMAT_RGB565;//
-	status->pixformat = PIXFORMAT_GRAYSCALE;
-	
-	status->cam_name = 0;
-	status->cam_frame_size_num = FRAMESIZE_QVGA;//FRAMESIZE_VGA;//FRAMESIZE_QVGA;//FRAMESIZE_WVGA2;//FRAMESIZE_HQVGA;//
+    status->pixformat = PIXFORMAT_GRAYSCALE;
 
+    status->cam_name = 0;
+    status->cam_frame_size_num = FRAMESIZE_QVGA; //FRAMESIZE_VGA;//FRAMESIZE_QVGA;//FRAMESIZE_WVGA2;//FRAMESIZE_HQVGA;//
 }
-
 
 void USER_PCD_IRQHandler(PCD_HandleTypeDef *hpcd)
 {
-//    uint32_t send_size = USB_DMA_PACKAGE_SIZE;
-//	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
-//	
-//	if(hcdc->TxState == USBD_OK)
-//	{
-//        if(vio_status.usb_s.status == USB_WORKING)
-//        {
-//            if(vio_status.usb_s.len == vio_status.usb_s.target_len)
-//            {
-//                vio_status.usb_s.status = USB_WAIT;
-//                return;
-//            }else if(vio_status.usb_s.len + USB_DMA_PACKAGE_SIZE > vio_status.usb_s.target_len)
-//            {
-//                send_size = vio_status.usb_s.target_len - vio_status.usb_s.len;
-//            }
+    //    uint32_t send_size = USB_DMA_PACKAGE_SIZE;
+    //	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
+    //
+    //	if(hcdc->TxState == USBD_OK)
+    //	{
+    //        if(vio_status.usb_s.status == USB_WORKING)
+    //        {
+    //            if(vio_status.usb_s.len == vio_status.usb_s.target_len)
+    //            {
+    //                vio_status.usb_s.status = USB_WAIT;
+    //                return;
+    //            }else if(vio_status.usb_s.len + USB_DMA_PACKAGE_SIZE > vio_status.usb_s.target_len)
+    //            {
+    //                send_size = vio_status.usb_s.target_len - vio_status.usb_s.len;
+    //            }
 
-//            CDC_Transmit_HS(vio_status.usb_s.addr + vio_status.usb_s.len,send_size);
-//            vio_status.usb_s.len += send_size;
-//        }
-//			
-//			
-//	}
+    //            CDC_Transmit_HS(vio_status.usb_s.addr + vio_status.usb_s.len,send_size);
+    //            vio_status.usb_s.len += send_size;
+    //        }
+    //
+    //
+    //	}
 }
 
-uint8_t openvio_usb_send(enum SENSOR_USB usb,uint8_t* Buf, uint32_t Len)
+extern QueueHandle_t xQueue;
+uint8_t openvio_usb_send(enum SENSOR_USB usb, uint8_t *Buf, uint32_t Len)
 {
-	int ret = USBD_FAIL,try_cnt = 0;
-	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
-	
-	if(vio_status.usb_s.status == USB_WAIT)
-    {
-        vio_status.usb_s.status = USB_WORKING;
-        vio_status.usb_s.target_len = Len;
-        vio_status.usb_s.len = USB_DMA_PACKAGE_SIZE;
-        vio_status.usb_s.addr = Buf;
+    struct USB_FRAME_STRUCT usb_frame_s;
+    usb_frame_s.addr = (uint8_t *)Buf;
+    usb_frame_s.len = Len;
+    usb_frame_s.sensor = usb;
+    xQueueSend(xQueue, (void *)&usb_frame_s, (TickType_t)0);
+    
+    // int ret = USBD_FAIL,try_cnt = 0;
+    // USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
 
-		if(usb == SENSOR_USB_CAM)
-		{
-            //CDC_Transmit_HS("CAM", 3);
-			CDC_Transmit_HS(vio_status.usb_s.addr, USB_DMA_PACKAGE_SIZE);
-		}else if(usb == SENSOR_USB_IMU)
-		{
-            MPU_Transmit_HS("IMU", 3);
-		}
-		
-		return 0;
+    // if(vio_status.usb_s.status == USB_WAIT)
+    // {
+    //     vio_status.usb_s.status = USB_WORKING;
+    //     vio_status.usb_s.target_len = Len;
+    //     vio_status.usb_s.len = USB_DMA_PACKAGE_SIZE;
+    //     vio_status.usb_s.addr = Buf;
 
-	}
-	return 1;
+    // 	if(usb == SENSOR_USB_CAM)
+    // 	{
+    //         //CDC_Transmit_HS("CAM", 3);
+    // 		CDC_Transmit_HS(vio_status.usb_s.addr, USB_DMA_PACKAGE_SIZE);
+    // 	}else if(usb == SENSOR_USB_IMU)
+    // 	{
+    //         MPU_Transmit_HS("IMU", 3);
+    // 	}
+
+    // 	return 0;
+
+    // }
+    // return 1;
 }
 
 // #define USB_TRY_NUM 65500
@@ -115,7 +125,7 @@ uint8_t openvio_usb_send(enum SENSOR_USB usb,uint8_t* Buf, uint32_t Len)
 // {
 // 	int ret = USBD_FAIL,try_cnt = 0;
 // 	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
-	
+
 // 	do{
 // 		if(usb == SENSOR_USB_CAM)
 // 		{
@@ -128,7 +138,7 @@ uint8_t openvio_usb_send(enum SENSOR_USB usb,uint8_t* Buf, uint32_t Len)
 // 		osDelay(1);
 // 	}
 // 	while(ret == USBD_BUSY);// && try_cnt < USB_TRY_NUM);
-	
+
 // 	if(ret == USBD_FAIL)
 // 	{
 // 		if(usb == SENSOR_USB_CAM)
@@ -141,12 +151,12 @@ uint8_t openvio_usb_send(enum SENSOR_USB usb,uint8_t* Buf, uint32_t Len)
 // 			printf("imu error\r\n");
 // 		}
 // 	}
-	
+
 // 	if(try_cnt >= USB_TRY_NUM)
 // 	{
-		
+
 // 		hcdc->TxState = USBD_OK;
-		
+
 // 		if(usb == SENSOR_USB_CAM)
 // 		{
 // 			vio_status.cam_status = SENSOR_STATUS_WAIT;
@@ -156,84 +166,82 @@ uint8_t openvio_usb_send(enum SENSOR_USB usb,uint8_t* Buf, uint32_t Len)
 // 			vio_status.imu_status = SENSOR_STATUS_WAIT;
 // 			printf("imu  timeout\r\n");
 // 		}
-	
+
 // 	}
 // }
 
-static uint8_t  USBD_CAM_SetTxBuffer(USBD_HandleTypeDef   *pdev,
-                              uint8_t  *pbuff,
-                              uint32_t length)
+static uint8_t USBD_CAM_SetTxBuffer(USBD_HandleTypeDef *pdev,
+                                    uint8_t *pbuff,
+                                    uint32_t length)
 {
-  USBD_CDC_HandleTypeDef   *hcdc = (USBD_CDC_HandleTypeDef *) pdev->pClassData;
+    USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)pdev->pClassData;
 
-  hcdc->TxBuffer = pbuff;
-  hcdc->TxLength = length;
+    hcdc->TxBuffer = pbuff;
+    hcdc->TxLength = length;
 
-  return USBD_OK;
+    return USBD_OK;
 }
 
 static USBD_StatusTypeDef USBD_CAM_LL_Transmit(USBD_HandleTypeDef *pdev, uint8_t ep_addr, uint8_t *pbuf, uint32_t size)
 {
-  HAL_StatusTypeDef hal_status = HAL_OK;
-  USBD_StatusTypeDef usb_status = USBD_OK;
+    HAL_StatusTypeDef hal_status = HAL_OK;
+    USBD_StatusTypeDef usb_status = USBD_OK;
 
-  hal_status = HAL_PCD_EP_Transmit(pdev->pData, ep_addr, pbuf, size);
-  
-  usb_status =  USBD_Get_USB_Status(hal_status); 
-  
-  return usb_status;    
+    hal_status = HAL_PCD_EP_Transmit(pdev->pData, ep_addr, pbuf, size);
+
+    usb_status = USBD_Get_USB_Status(hal_status);
+
+    return usb_status;
 }
 
-static uint8_t  USBD_CAM_TransmitPacket(USBD_HandleTypeDef *pdev)
+static uint8_t USBD_CAM_TransmitPacket(USBD_HandleTypeDef *pdev)
 {
-  USBD_CDC_HandleTypeDef   *hcdc = (USBD_CDC_HandleTypeDef *) pdev->pClassData;
+    USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)pdev->pClassData;
 
-  if (pdev->pClassData != NULL)
-  {
-    if (hcdc->TxState == 0U)
+    if (pdev->pClassData != NULL)
     {
-      /* Tx Transfer in progress */
-      hcdc->TxState = 1U;
+        if (hcdc->TxState == 0U)
+        {
+            /* Tx Transfer in progress */
+            hcdc->TxState = 1U;
 
-      /* Update the packet total length */
-      pdev->ep_in[CDC_IN_EP & 0xFU].total_length = hcdc->TxLength;
+            /* Update the packet total length */
+            pdev->ep_in[CDC_IN_EP & 0xFU].total_length = hcdc->TxLength;
 
-      /* Transmit next packet */
-      USBD_CAM_LL_Transmit(pdev, CDC_IN_EP, hcdc->TxBuffer,
-                       (uint32_t)hcdc->TxLength);
+            /* Transmit next packet */
+            USBD_CAM_LL_Transmit(pdev, CDC_IN_EP, hcdc->TxBuffer,
+                                 (uint32_t)hcdc->TxLength);
 
-      return USBD_OK;
+            return USBD_OK;
+        }
+        else
+        {
+            return USBD_BUSY;
+        }
     }
     else
     {
-      return USBD_BUSY;
+        return USBD_FAIL;
     }
-  }
-  else
-  {
-    return USBD_FAIL;
-  }
 }
 
-uint8_t CAM_Transmit_HS(uint8_t* Buf, uint32_t Len)
+uint8_t CAM_Transmit_HS(uint8_t *Buf, uint32_t Len)
 {
-  uint8_t result = USBD_OK;
-  /* USER CODE BEGIN 12 */
-  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
-  if (hcdc->TxState != 0){
-    return USBD_BUSY;
-  }
-  USBD_CAM_SetTxBuffer(&hUsbDeviceHS, Buf, Len);
-  result = USBD_CAM_TransmitPacket(&hUsbDeviceHS);
-  /* USER CODE END 12 */
-  return result;
+    uint8_t result = USBD_OK;
+    /* USER CODE BEGIN 12 */
+    USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
+    if (hcdc->TxState != 0)
+    {
+        return USBD_BUSY;
+    }
+    USBD_CAM_SetTxBuffer(&hUsbDeviceHS, Buf, Len);
+    result = USBD_CAM_TransmitPacket(&hUsbDeviceHS);
+    /* USER CODE END 12 */
+    return result;
 }
 
 uint8_t get_usb_tx_state(void)
 {
-	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
-	return hcdc->TxState;
+    USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
+    return hcdc->TxState;
 }
-
-	
-

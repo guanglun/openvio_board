@@ -21,7 +21,6 @@
 
 extern USBD_HandleTypeDef hUsbDeviceHS;
 extern int frame_count;
-extern DMA_BUFFER uint8_t dcmi_image_buffer[FULL_IMAGE_SIZE];
 extern int line_cnt;
 
 DMA_BUFFER uint8_t mpu6000_data[14];
@@ -156,74 +155,31 @@ void StartOpenvioTask(void const *argument)
 	{
 		if(vio_status.cam_status == SENSOR_STATUS_START)
 		{
-			openvio_usb_send(SENSOR_USB_CAM,"START", 5);
-			osDelay(100);
-			camera_start_send();
-
+			vio_status.cam_status = SENSOR_STATUS_RUNNING;
 			isCamReady = 0;
 			xTimeLast = xTimeNow;
 			
 		}else if(vio_status.cam_status == SENSOR_STATUS_RUNNING)
 		{
-			if(isCamReady == 0)
-			{
+			// if(isCamReady == 0)
+			// {
 				dcmi_dma_start();
-				isCamReady = 1;
-			}
+			// 	isCamReady = 1;
+			// }
 			
-			xTimeNow = xTaskGetTickCount();
+			// xTimeNow = xTaskGetTickCount();
 
-			//50 20Hz
-			if((xTimeNow-xTimeLast) >= 0 && isCamReady == 1)
-			{
-				xTimeLast = xTimeNow;
-				//printf("time:%d\r\n",xTimeNow);
+			// //50 20Hz
+			// if((xTimeNow-xTimeLast) >= 0 && isCamReady == 1)
+			// {
+			// 	xTimeLast = xTimeNow;
+			// 	//printf("time:%d\r\n",xTimeNow);
 				
-				isCamReady = 0;
-			}			
+			// 	isCamReady = 0;
+			// }			
 		}
 		icm20948_transmit();
 		frame_count++;
 	}
 }
 
-#define USB_SEND_MAX_SIZE (1 * 1024)
-
-void camera_start_send(void)
-{
-//	int ret;
-//	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
-//			uint8_t start_byte[4] = {0x12,0x34,0x56,0x78};
-//			while (hcdc->TxState != 0);
-
-//			do{
-//				ret = CDC_Transmit_HS(start_byte, 4);
-//			}while(ret == USBD_BUSY);
-//			if(ret == USBD_OK)
-			{
-				vio_status.cam_status = SENSOR_STATUS_RUNNING;
-			}	
-}
-
-void camera_img_send(void)
-{
-	// openvio_usb_send(SENSOR_USB_CAM,"CAM", 3);
-	// osDelay(10);
-	// USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
-	// for (uint32_t i = 0; i < vio_status.cam_frame_size; i += USB_SEND_MAX_SIZE)
-	// {
-	// 	if (i + USB_SEND_MAX_SIZE > vio_status.cam_frame_size)
-	// 	{
-	// 		openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer[i], vio_status.cam_frame_size - i);
-	// 		osDelay(10);
-	// 	}
-	// 	else
-	// 	{
-	// 		openvio_usb_send(SENSOR_USB_CAM,&dcmi_image_buffer[i], USB_SEND_MAX_SIZE);
-	// 		osDelay(10);
-	// 	}
-		
-	// 	icm20948_transmit();
-		
-	// }
-}

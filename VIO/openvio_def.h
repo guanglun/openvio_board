@@ -61,6 +61,7 @@ struct USB_STRUCT{
 struct USB_FRAME_STRUCT{
 	uint32_t len;
 	uint8_t *addr;
+    enum SENSOR_USB sensor;
 };
 
 struct OPENVIO_STATUS{
