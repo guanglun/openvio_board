@@ -127,6 +127,7 @@ void StartOpenvioTask(void const *argument)
 	openvio_status_init(&vio_status);
 	
     camera_init();
+	osDelay(500);
 	icm20948_init();
 	//lcd_init();
 

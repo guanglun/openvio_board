@@ -25,7 +25,7 @@
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+/* USER CODE BEGIN Includes */     
 #include "openvio_task.h"
 #include "dcmi.h"
 #include "sd_card.h"
@@ -65,16 +65,16 @@ osThreadId defaultTaskHandle;
 osThreadId openvioTaskHandle;
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void const *argument);
+void StartDefaultTask(void const * argument);
 
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* GetIdleTaskMemory prototype (linked to static allocation support) */
-void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize);
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
 
 /* GetTimerTaskMemory prototype (linked to static allocation support) */
-void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize);
+void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize );
 
 /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
 static StaticTask_t xIdleTaskTCBBuffer;
@@ -107,8 +107,7 @@ void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer, StackT
   * @param  None
   * @retval None
   */
-void MX_FREERTOS_Init(void)
-{
+void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -140,6 +139,7 @@ void MX_FREERTOS_Init(void)
   openvioTaskHandle = osThreadCreate(osThread(openvioTask), NULL);
 
   /* USER CODE END RTOS_THREADS */
+
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -186,7 +186,7 @@ extern uint8_t imu_lock;
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const *argument)
+void StartDefaultTask(void const * argument)
 {
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
@@ -210,14 +210,15 @@ void StartDefaultTask(void const *argument)
     {
       if (usb_frame_s.sensor == SENSOR_USB_CAM)
       {
-        do
-        {
-          CAMTimeNow = xTaskGetTickCount();
-			osDelay(1);
-        } while ( ((CAMTimeNow - IMUTimeNow) >= 2) && (CAMTimeNow >= IMUTimeNow));
+//        do
+//        {
+//          CAMTimeNow = xTaskGetTickCount();
+//			    osDelay(1);
+//        } while ( ((CAMTimeNow - IMUTimeNow) >= 2) && (CAMTimeNow >= IMUTimeNow));
 
         while (CAM_Transmit_HS(usb_frame_s.addr, usb_frame_s.len) != 0)
         {
+			osDelay(1);
         }
       }
       else if (usb_frame_s.sensor == SENSOR_USB_IMU)

@@ -55,7 +55,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void get_time(uint32_t *t1_cnt,uint16_t *t2_cnt);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

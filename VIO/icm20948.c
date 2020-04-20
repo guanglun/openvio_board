@@ -65,11 +65,13 @@ static int icm20948_read_reg(uint8_t reg, uint8_t *buf, uint8_t len)
 
 	if (HAL_SPI_Transmit(&hspi2, &cmd, 1, ICM20948_TIMEOUT_VALUE) != HAL_OK)
 	{
+		printf("HAL_SPI_Transmit Error \r\n");
 		return 1;
 	}
 
 	if (HAL_SPI_Receive(&hspi2, buf, len, ICM20948_TIMEOUT_VALUE) != HAL_OK)
 	{
+		printf("HAL_SPI_Transmit Error \r\n");
 		return 1;
 	}
 
@@ -374,13 +376,17 @@ void icm20948_read(uint8_t *buf)
 
 uint8_t isIMUReady = 0;
 TickType_t xIMUTimeNow = 0,xIMUTimeLast = 0;
-
+uint8_t icm20948_data[20];
 void icm20948_transmit(void)
 {
+	static uint32_t t1;
+	static uint16_t t2;
+	static int16_t accel_data[3], gyro_data[3];
+	
 	if (vio_status.imu_status == SENSOR_STATUS_START)
 	{
 
-		static uint8_t icm20948_data[14];
+		
 		// static short acc[3], gyro[3], temp;
 		// USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
 
@@ -395,7 +401,7 @@ void icm20948_transmit(void)
 		// if(isIMUReady == 0)
 		// {
 			//HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
-			icm20948_read(icm20948_data);
+			icm20948_read(icm20948_data+6);
 		// 	isIMUReady = 1;
 		// }
 		
@@ -410,8 +416,28 @@ void icm20948_transmit(void)
 //                {
 //                    //osDelay(1);
 //                }
+				get_time(&t1,&t2);
+				
+				//printf("%d\r\n",t2);
+				icm20948_data[0] = (uint8_t)(t1>>24);
+				icm20948_data[1] = (uint8_t)(t1>>16);
+				icm20948_data[2] = (uint8_t)(t1>>8);
+				icm20948_data[3] = (uint8_t)(t1>>0);
+				icm20948_data[4] = (uint8_t)(t2>>8);
+				icm20948_data[5] = (uint8_t)(t2>>0);
+				
+	accel_data[0] = (short)((icm20948_data[0+6] << 8) | icm20948_data[1+6]);
+	accel_data[1] = (short)((icm20948_data[2+6] << 8) | icm20948_data[3+6]);
+	accel_data[2] = (short)((icm20948_data[4+6] << 8) | icm20948_data[5+6]);
 
-                while (MPU_Transmit_HS(icm20948_data, 14) != 0)
+	gyro_data[0] = (icm20948_data[6+6] << 8) | icm20948_data[7+6];
+	gyro_data[1] = (icm20948_data[8+6] << 8) | icm20948_data[9+6];
+	gyro_data[2] = (icm20948_data[10+6] << 8) | icm20948_data[11+6];
+	
+	printf("%d\t%d\t%d\t%d\t%d\t%d\r\n", \
+	accel_data[0], accel_data[1], accel_data[2], gyro_data[0], gyro_data[1], gyro_data[2]);
+	
+                while (MPU_Transmit_HS(icm20948_data, 20) != 0)
                 {
                     //osDelay(1);
                 }

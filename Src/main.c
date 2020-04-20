@@ -65,7 +65,7 @@ void SystemClock_Config(void);
 static void MPU_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
-
+uint32_t timer_cnt = 0;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -120,7 +120,9 @@ int main(void)
   MX_MDMA_Init();
   MX_ADC1_Init();
   MX_USART2_UART_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim6);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);//USB2.0 CLK
   printf("hello openvio\r\n");
 
@@ -227,7 +229,11 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void get_time(uint32_t *t1_cnt,uint16_t *t2_cnt)
+{
+	*t2_cnt = htim6.Instance->CNT;
+	*t1_cnt = timer_cnt;
+}
 /* USER CODE END 4 */
 
 /* MPU Configuration */
@@ -274,6 +280,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
+  if (htim->Instance == TIM6) {
+	timer_cnt++;
+    HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
+  }  
   /* USER CODE END Callback 1 */
 }
 

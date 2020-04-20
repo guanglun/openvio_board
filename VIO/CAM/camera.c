@@ -32,7 +32,7 @@ static void vTimerCallback( TimerHandle_t xTimer )
     {
         while (get_usb_tx_state() != 0)
         {
-            //osDelay(1);
+            osDelay(1);
         }
 
         openvio_usb_send(SENSOR_USB_CAM, "CAMERA", 6);
@@ -191,6 +191,7 @@ void dcmi_dma_start(void)
     while(xSemaphoreTake(xSemaphore, 0xFFFF)  != pdTRUE)
 	{
 		 //icm20948_transmit();
+		osDelay(1);
 	}
 	
     HAL_DCMI_Stop(&hdcmi);
