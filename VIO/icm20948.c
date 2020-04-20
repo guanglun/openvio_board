@@ -18,11 +18,23 @@ extern SPI_HandleTypeDef hspi2;
 extern USBD_HandleTypeDef hUsbDeviceHS;
 osThreadId IMUTaskHandle;
 SemaphoreHandle_t xIMUSemaphore;
+TimerHandle_t xTimerIMU; // 定义句柄
+
+uint8_t imu_lock = 0;
 
 #define ICM20948_ENABLE() HAL_GPIO_WritePin(GPIOD, IMU_SPI_CS_Pin, GPIO_PIN_RESET)
 #define ICM20948_DISABLE() HAL_GPIO_WritePin(GPIOD, IMU_SPI_CS_Pin, GPIO_PIN_SET)
 
 #define ICM20948_TIMEOUT_VALUE 0xFF
+TickType_t IMUTimeNow;
+
+// 定时器回调函数格式
+static void vTimerCallback( TimerHandle_t xTimer )
+{
+    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+	icm20948_transmit();
+    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
+}
 
 static int icm20948_read_one_reg(uint8_t reg, uint8_t *buf)
 {
@@ -60,6 +72,8 @@ static int icm20948_read_reg(uint8_t reg, uint8_t *buf, uint8_t len)
 	{
 		return 1;
 	}
+
+	
 
 	ICM20948_DISABLE();
 
@@ -330,6 +344,25 @@ int icm20948_init(void)
 //		}
 
 	ICM_SelectBank(USER_BANK_0);
+
+
+    // 申请定时器， 配置
+    xTimerIMU = xTimerCreate
+                   /*调试用， 系统不用*/
+                   ("IMU Timer",
+                   /*定时溢出周期， 单位是任务节拍数*/
+                   5,   
+                   /*是否自动重载， 此处设置周期性执行*/
+                   pdTRUE,
+                   /*记录定时器溢出次数， 初始化零, 用户自己设置*/
+                  ( void * ) 0,
+                   /*回调函数*/
+                  vTimerCallback);
+
+     if( xTimerIMU != NULL ) {
+        // 启动定时器， 0 表示不阻塞
+        xTimerStart( xTimerIMU, 0 );
+    }	
 	return 0;
 }
 
@@ -359,32 +392,36 @@ void icm20948_transmit(void)
 //		icm20948_read(icm20948_data);
 //		openvio_usb_send(SENSOR_USB_IMU, icm20948_data, 14);
 		
-		if(isIMUReady == 0)
-		{
+		// if(isIMUReady == 0)
+		// {
+			//HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
 			icm20948_read(icm20948_data);
-			isIMUReady = 1;
-		}
+		// 	isIMUReady = 1;
+		// }
 		
-		xIMUTimeNow = xTaskGetTickCount();
-		if((xIMUTimeNow-xIMUTimeLast) >= 5 && isIMUReady == 1)
-		{
+		// xIMUTimeNow = xTaskGetTickCount();
+		// if((xIMUTimeNow-xIMUTimeLast) >= 5 && isIMUReady == 1)
+		// {
 //			openvio_usb_send(SENSOR_USB_IMU,"ICMIMU", 6);
 //			openvio_usb_send(SENSOR_USB_IMU, icm20948_data, 14);
 
-                while (MPU_Transmit_HS("ICMIMU", 6) != 0)
-                {
-                    //osDelay(1);
-                }
+//imu_lock = 1;
+//                while (MPU_Transmit_HS("ICMIMU", 6) != 0)
+//                {
+//                    //osDelay(1);
+//                }
 
                 while (MPU_Transmit_HS(icm20948_data, 14) != 0)
                 {
                     //osDelay(1);
                 }
-								
-			xIMUTimeLast = xIMUTimeNow;
-			isIMUReady = 0;
+				IMUTimeNow = xTaskGetTickCountFromISR();
+//imu_lock = 0;
+			//HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);			
+			// xIMUTimeLast = xIMUTimeNow;
+			// isIMUReady = 0;
 			
-		}
+		// }
 	}
 	// }
 
@@ -413,11 +450,11 @@ void icm20948_transmit(void)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	static BaseType_t xHigherPriorityTaskWoken;
-	if (vio_status.imu_status == SENSOR_STATUS_START)
-	{
-		vio_status.is_imu_send = 1;
-		//		xSemaphoreGiveFromISR( xIMUSemaphore, &xHigherPriorityTaskWoken );
-		//        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-	}
+//	static BaseType_t xHigherPriorityTaskWoken;
+//	if (vio_status.imu_status == SENSOR_STATUS_START)
+//	{
+//		vio_status.is_imu_send = 1;
+//		//		xSemaphoreGiveFromISR( xIMUSemaphore, &xHigherPriorityTaskWoken );
+//		//        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+//	}
 }

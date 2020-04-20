@@ -18,8 +18,66 @@ int frame_count = 0;
 int line_cnt = 0, count = 0, start = 0;
 
 HAL_StatusTypeDef USER_DCMI_Start_DMA(DCMI_HandleTypeDef *hdcmi, uint32_t DCMI_Mode, uint32_t pData, uint32_t Length);
-
+TimerHandle_t xTimerCAM; // 定义句柄
 SemaphoreHandle_t xSemaphore;
+
+
+
+// 定时器回调函数格式
+static void vTimerCallback( TimerHandle_t xTimer )
+{
+    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
+
+    if(vio_status.cam_status == SENSOR_STATUS_RUNNING)
+    {
+        while (get_usb_tx_state() != 0)
+        {
+            //osDelay(1);
+        }
+
+        openvio_usb_send(SENSOR_USB_CAM, "CAMERA", 6);
+
+        __HAL_DCMI_DISABLE_IT(&hdcmi, DCMI_IT_FRAME);
+        USER_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size / 4 * vio_status.gs_bpp);
+//		while(xSemaphoreTake(xSemaphore, 0xFFFF)  != pdTRUE)
+//		{
+//			 //icm20948_transmit();
+//		}
+//		
+//		
+
+//		if (vio_status.cam_frame_size * vio_status.gs_bpp <= CAM_PACKAGE_MAX_SIZE)
+//		{
+//			openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
+//		}		
+    }
+	
+    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
+}
+
+void camera_start(void)
+{
+    // 申请定时器， 配置
+    xTimerCAM = xTimerCreate
+                   /*调试用， 系统不用*/
+                   ("CAM Timer",
+                   /*定时溢出周期， 单位是任务节拍数*/
+                   50,   
+                   /*是否自动重载， 此处设置周期性执行*/
+                   pdTRUE,
+                   /*记录定时器溢出次数， 初始化零, 用户自己设置*/
+                  ( void * ) 0,
+                   /*回调函数*/
+                  vTimerCallback);
+
+     if( xTimerCAM != NULL ) {
+        // 启动定时器， 0 表示不阻塞
+        xTimerStart( xTimerCAM, 0 );
+    }else{
+		printf("xTimerCAM Fail\r\n");
+	}
+}
+
 void camera_init(void)
 {
     uint8_t chip_id, cam_slv_addr;
@@ -46,7 +104,7 @@ void camera_init(void)
         cambus_readb(cam_slv_addr, OV_CHIP_ID, &chip_id);
         break;
     case MT9V034_SLV_ADDR:
-        HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_3); //3 32MHZ,4 24MHZ
+        HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_5); //3 32MHZ,4 24MHZ
         cambus_readb(cam_slv_addr, ON_CHIP_ID, &chip_id);
         break;
     default:
@@ -74,13 +132,19 @@ void camera_init(void)
     default:
         break;
     }
+
+    camera_start();
 }
+
+
 
 //uint8_t str[20], cnt = 0;
 
 extern QueueHandle_t xQueue;
 void USER_DCMI_MemDMAXferCplt(uint32_t data, uint32_t size)
 {
+    
+
     if (vio_status.cam_frame_size * vio_status.gs_bpp > CAM_PACKAGE_MAX_SIZE)
     {
         struct USB_FRAME_STRUCT usb_frame_s;
@@ -90,7 +154,10 @@ void USER_DCMI_MemDMAXferCplt(uint32_t data, uint32_t size)
         
         xQueueSendFromISR(xQueue, (void *)&usb_frame_s, (TickType_t)0);
     }
+    
 }
+
+
 
 void dcmi_dma_start(void)
 {
@@ -106,7 +173,7 @@ void dcmi_dma_start(void)
 
     while (get_usb_tx_state() != 0)
     {
-        //osDelay(1);
+        osDelay(1);
     }
 
     openvio_usb_send(SENSOR_USB_CAM, "CAMERA", 6);
@@ -121,9 +188,9 @@ void dcmi_dma_start(void)
     //		//osDelay(100);
     //    }
 
-    while(xSemaphoreTake(xSemaphore, 0)  != pdTRUE)
+    while(xSemaphoreTake(xSemaphore, 0xFFFF)  != pdTRUE)
 	{
-		 icm20948_transmit();
+		 //icm20948_transmit();
 	}
 	
     HAL_DCMI_Stop(&hdcmi);
@@ -241,6 +308,8 @@ static void USER_DCMI_DMAXferCplt(DMA_HandleTypeDef *hdma)
         //tmp = hdcmi->pBuffPtr;
         //((DMA_Stream_TypeDef *)(hdcmi->DMA_Handle->Instance))->M1AR = (tmp + (4U*hdcmi->XferSize));
         hdcmi->XferCount = hdcmi->XferTransferNumber;
+		
+		HAL_DCMI_Stop(hdcmi);
     }
     else
     {

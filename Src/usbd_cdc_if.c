@@ -302,6 +302,7 @@ uint8_t MPU_Transmit_HS(uint8_t* Buf, uint16_t Len)
   if (hcdc->TxState != 0){
     return USBD_BUSY;
   }
+  HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
   USBD_CDC_SetTxBuffer(&hUsbDeviceHS, Buf, Len);
   result = USBD_MPU_TransmitPacket(&hUsbDeviceHS);
   /* USER CODE END 12 */

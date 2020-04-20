@@ -120,9 +120,7 @@ int main(void)
   MX_MDMA_Init();
   MX_ADC1_Init();
   MX_USART2_UART_Init();
-  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_Base_Start_IT(&htim1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);//USB2.0 CLK
   printf("hello openvio\r\n");
 
@@ -276,9 +274,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-  if (htim->Instance == TIM1) {
-    HAL_GPIO_TogglePin(LED_R_GPIO_Port, LED_R_Pin);
-  }
   /* USER CODE END Callback 1 */
 }
 

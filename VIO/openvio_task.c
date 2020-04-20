@@ -159,11 +159,12 @@ void StartOpenvioTask(void const *argument)
 			isCamReady = 0;
 			xTimeLast = xTimeNow;
 			
-		}else if(vio_status.cam_status == SENSOR_STATUS_RUNNING)
+		}
+		else if(vio_status.cam_status == SENSOR_STATUS_RUNNING)
 		{
 			// if(isCamReady == 0)
 			// {
-				dcmi_dma_start();
+				//dcmi_dma_start();
 			// 	isCamReady = 1;
 			// }
 			
@@ -178,7 +179,8 @@ void StartOpenvioTask(void const *argument)
 			// 	isCamReady = 0;
 			// }			
 		}
-		icm20948_transmit();
+		//icm20948_transmit();
+		osDelay(100);
 		frame_count++;
 	}
 }

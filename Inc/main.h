@@ -84,6 +84,10 @@ void Error_Handler(void);
 #define LED_B_GPIO_Port GPIOE
 #define USB_SWITCH_Pin GPIO_PIN_15
 #define USB_SWITCH_GPIO_Port GPIOE
+#define TEST1_Pin GPIO_PIN_8
+#define TEST1_GPIO_Port GPIOD
+#define TEST2_Pin GPIO_PIN_9
+#define TEST2_GPIO_Port GPIOD
 #define DCMI_RST_Pin GPIO_PIN_10
 #define DCMI_RST_GPIO_Port GPIOA
 #define SD_CD_Pin GPIO_PIN_0
