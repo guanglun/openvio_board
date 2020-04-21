@@ -25,7 +25,7 @@ uint8_t imu_lock = 0;
 #define ICM20948_ENABLE() HAL_GPIO_WritePin(GPIOD, IMU_SPI_CS_Pin, GPIO_PIN_RESET)
 #define ICM20948_DISABLE() HAL_GPIO_WritePin(GPIOD, IMU_SPI_CS_Pin, GPIO_PIN_SET)
 
-#define ICM20948_TIMEOUT_VALUE 0xFF
+#define ICM20948_TIMEOUT_VALUE 0xFFFF
 TickType_t IMUTimeNow;
 
 // 定时器回调函数格式
@@ -347,13 +347,26 @@ int icm20948_init(void)
 
 	ICM_SelectBank(USER_BANK_0);
 
+//	short acc[3], gyro[3];
+//	while(1)
+//	{
+//		
+//	
+//			static float accf[6];
+//	
+//			ICM_SelectBank(USER_BANK_0);
+//			ICM_ReadAccelGyroData(acc, gyro);
+
+//			printf("%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2]);
+//		osDelay(10);
+//	}
 
     // 申请定时器， 配置
     xTimerIMU = xTimerCreate
                    /*调试用， 系统不用*/
                    ("IMU Timer",
                    /*定时溢出周期， 单位是任务节拍数*/
-                   5,   
+                   10,   
                    /*是否自动重载， 此处设置周期性执行*/
                    pdTRUE,
                    /*记录定时器溢出次数， 初始化零, 用户自己设置*/
@@ -371,7 +384,14 @@ int icm20948_init(void)
 void icm20948_read(uint8_t *buf)
 {
 	//ICM_SelectBank(USER_BANK_0);
-	icm20948_read_reg(0x2D, buf, 14);
+	
+	icm20948_read_reg(0x2D, buf, 12);
+	
+	//icm20948_read_reg(0x2D+6, buf+6, 6);
+	// for(int i=0;i<14/7;i++)
+	// {
+	// 	icm20948_read_reg(0x2D+i*7,buf+i*7,7);
+	// }
 }
 
 uint8_t isIMUReady = 0;
@@ -441,7 +461,7 @@ void icm20948_transmit(void)
                 {
                     //osDelay(1);
                 }
-				IMUTimeNow = xTaskGetTickCountFromISR();
+//				IMUTimeNow = xTaskGetTickCountFromISR();
 //imu_lock = 0;
 			//HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);			
 			// xIMUTimeLast = xIMUTimeNow;
@@ -476,6 +496,7 @@ void icm20948_transmit(void)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+	HAL_GPIO_TogglePin(LED_R_GPIO_Port, LED_R_Pin);
 //	static BaseType_t xHigherPriorityTaskWoken;
 //	if (vio_status.imu_status == SENSOR_STATUS_START)
 //	{

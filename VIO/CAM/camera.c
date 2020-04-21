@@ -133,7 +133,7 @@ void camera_init(void)
         break;
     }
 
-    camera_start();
+    //camera_start();
 }
 
 
@@ -310,7 +310,7 @@ static void USER_DCMI_DMAXferCplt(DMA_HandleTypeDef *hdma)
         //((DMA_Stream_TypeDef *)(hdcmi->DMA_Handle->Instance))->M1AR = (tmp + (4U*hdcmi->XferSize));
         hdcmi->XferCount = hdcmi->XferTransferNumber;
 		
-		HAL_DCMI_Stop(hdcmi);
+		//HAL_DCMI_Stop(hdcmi);
     }
     else
     {

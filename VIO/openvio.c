@@ -57,7 +57,7 @@ void openvio_status_init(struct OPENVIO_STATUS *status)
     status->pixformat = PIXFORMAT_GRAYSCALE;
 
     status->cam_name = 0;
-    status->cam_frame_size_num = FRAMESIZE_VGA; //FRAMESIZE_VGA;//FRAMESIZE_QVGA;//FRAMESIZE_WVGA2;//FRAMESIZE_HQVGA;//
+    status->cam_frame_size_num = FRAMESIZE_QVGA; //FRAMESIZE_VGA;//FRAMESIZE_QVGA;//FRAMESIZE_WVGA2;//FRAMESIZE_HQVGA;//
 }
 
 void USER_PCD_IRQHandler(PCD_HandleTypeDef *hpcd)

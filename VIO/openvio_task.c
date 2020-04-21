@@ -165,7 +165,7 @@ void StartOpenvioTask(void const *argument)
 		{
 			// if(isCamReady == 0)
 			// {
-				//dcmi_dma_start();
+				dcmi_dma_start();
 			// 	isCamReady = 1;
 			// }
 			
@@ -181,7 +181,7 @@ void StartOpenvioTask(void const *argument)
 			// }			
 		}
 		//icm20948_transmit();
-		osDelay(100);
+		osDelay(1);
 		frame_count++;
 	}
 }
