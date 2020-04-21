@@ -127,62 +127,24 @@ void StartOpenvioTask(void const *argument)
 	openvio_status_init(&vio_status);
 	
     camera_init();
-	osDelay(500);
 	icm20948_init();
 	//lcd_init();
-
-	osDelay(500);
 	
 	sdcard_init();
-	//int count = 5;
-	//	while (count--)
-	//	{
-	//		osDelay(1000);
-	//		printf("count %d\r\n", count);
-	//	}
-	
-//	while(1)
-//	{
-//		mpu6000_transmit();
-//		osDelay(1000);
-//	}
 
-	//printf("dcmi_dma_start\r\n");
-	uint8_t isCamReady = 0;
-	TickType_t xTimeNow = 0,xTimeLast = 0;
-	
-	
 	while (1)
 	{
 		if(vio_status.cam_status == SENSOR_STATUS_START)
 		{
 			vio_status.cam_status = SENSOR_STATUS_RUNNING;
-			isCamReady = 0;
-			xTimeLast = xTimeNow;
 			
 		}
 		else if(vio_status.cam_status == SENSOR_STATUS_RUNNING)
 		{
-			// if(isCamReady == 0)
-			// {
-				dcmi_dma_start();
-			// 	isCamReady = 1;
-			// }
-			
-			// xTimeNow = xTaskGetTickCount();
-
-			// //50 20Hz
-			// if((xTimeNow-xTimeLast) >= 0 && isCamReady == 1)
-			// {
-			// 	xTimeLast = xTimeNow;
-			// 	//printf("time:%d\r\n",xTimeNow);
-				
-			// 	isCamReady = 0;
-			// }			
+			dcmi_dma_start();		
+		}else{
+			osDelay(100);
 		}
-		//icm20948_transmit();
-		osDelay(1);
-		frame_count++;
 	}
 }
 

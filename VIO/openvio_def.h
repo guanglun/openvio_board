@@ -6,9 +6,6 @@
 #define DMA_BUFFER \
   __attribute__((section(".RAM_D1")))
 
-//#define CAM_PACKAGE_MAX_SIZE (160*1024)
-//#define USB_DMA_PACKAGE_SIZE (160*1024)
-
 #define CAM_PACKAGE_MAX_SIZE (160*1024)
 #define USB_DMA_PACKAGE_SIZE (160*1024)
 

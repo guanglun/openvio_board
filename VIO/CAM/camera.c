@@ -21,8 +21,6 @@ HAL_StatusTypeDef USER_DCMI_Start_DMA(DCMI_HandleTypeDef *hdcmi, uint32_t DCMI_M
 TimerHandle_t xTimerCAM; // 定义句柄
 SemaphoreHandle_t xSemaphore;
 
-
-
 // 定时器回调函数格式
 static void vTimerCallback( TimerHandle_t xTimer )
 {
@@ -104,7 +102,7 @@ void camera_init(void)
         cambus_readb(cam_slv_addr, OV_CHIP_ID, &chip_id);
         break;
     case MT9V034_SLV_ADDR:
-        HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_5); //3 32MHZ,4 24MHZ
+        HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_4); //3 32MHZ,4 24MHZ
         cambus_readb(cam_slv_addr, ON_CHIP_ID, &chip_id);
         break;
     default:
@@ -136,15 +134,9 @@ void camera_init(void)
     //camera_start();
 }
 
-
-
-//uint8_t str[20], cnt = 0;
-
 extern QueueHandle_t xQueue;
 void USER_DCMI_MemDMAXferCplt(uint32_t data, uint32_t size)
 {
-    
-
     if (vio_status.cam_frame_size * vio_status.gs_bpp > CAM_PACKAGE_MAX_SIZE)
     {
         struct USB_FRAME_STRUCT usb_frame_s;
@@ -154,27 +146,12 @@ void USER_DCMI_MemDMAXferCplt(uint32_t data, uint32_t size)
         
         xQueueSendFromISR(xQueue, (void *)&usb_frame_s, (TickType_t)0);
     }
-    
 }
 
 
 
 void dcmi_dma_start(void)
 {
-    // for(int i=0;i<20;i++)
-    //     str[i]='\0';
-
-    // cnt=0;
-
-    //__HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_FRAME);
-    //__HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_LINE);
-
-    //while (CDC_Transmit_HS("CAM", 3) != 0);
-
-    while (get_usb_tx_state() != 0)
-    {
-        osDelay(1);
-    }
 
     openvio_usb_send(SENSOR_USB_CAM, "CAMERA", 6);
 
@@ -188,10 +165,9 @@ void dcmi_dma_start(void)
     //		//osDelay(100);
     //    }
 
-    while(xSemaphoreTake(xSemaphore, 0xFFFF)  != pdTRUE)
+    while(xSemaphoreTake(xSemaphore, 0xFFFFFFFF)  != pdTRUE)
 	{
-		 //icm20948_transmit();
-		osDelay(1);
+		//osDelay(1);
 	}
 	
     HAL_DCMI_Stop(&hdcmi);
@@ -201,10 +177,6 @@ void dcmi_dma_start(void)
         openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
     }
 
-    //	osDelay(4000);
-    //	printf("%s\r\n",str);
-    //	osDelay(4000);
-    //printf("%d\r\n",count_value);
     //LCD_Show_Cam(dcmi_image_buffer,vio_status.cam_frame_size);
 }
 

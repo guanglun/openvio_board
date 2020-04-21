@@ -29,11 +29,11 @@ uint8_t imu_lock = 0;
 TickType_t IMUTimeNow;
 
 // 定时器回调函数格式
-static void vTimerCallback( TimerHandle_t xTimer )
+static void vTimerCallback(TimerHandle_t xTimer)
 {
-    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
 	icm20948_transmit();
-    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
 }
 
 static int icm20948_read_one_reg(uint8_t reg, uint8_t *buf)
@@ -74,8 +74,6 @@ static int icm20948_read_reg(uint8_t reg, uint8_t *buf, uint8_t len)
 		printf("HAL_SPI_Transmit Error \r\n");
 		return 1;
 	}
-
-	
 
 	ICM20948_DISABLE();
 
@@ -280,228 +278,161 @@ int icm20948_init(void)
 	//    osThreadDef(IMUTask, StartIMUTask, osPriorityNormal, 0, 512);
 	//    IMUTaskHandle = osThreadCreate(osThread(IMUTask), NULL);
 
-//		#define COUNT 2
-//		while (1)
-//		{
-//			static int count = 0;
-//			static int acc_tmp[3] = {0,0,0};
-//			static uint8_t icm20948_data[14];
-//			static short acc[3], gyro[3], mag[2],temp;
-//	
-//			static float accf[6];
-//	
-//			ICM_SelectBank(USER_BANK_0);
-//			ICM_ReadAccelGyroData(acc, gyro);
-//	
+	//		#define COUNT 2
+	//		while (1)
+	//		{
+	//			static int count = 0;
+	//			static int acc_tmp[3] = {0,0,0};
+	//			static uint8_t icm20948_data[14];
+	//			static short acc[3], gyro[3], mag[2],temp;
+	//
+	//			static float accf[6];
+	//
+	//			ICM_SelectBank(USER_BANK_0);
+	//			ICM_ReadAccelGyroData(acc, gyro);
+	//
 
-//			//ICM_SelectBank(USER_BANK_2);
-//			//icm20948_read_mag(mag);
+	//			//ICM_SelectBank(USER_BANK_2);
+	//			//icm20948_read_mag(mag);
 
-//			//printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2], mag[0], mag[1], mag[2]);
-//			//printf("%d\t%d\t%d\r\n", acc[0], acc[1], acc[2]);
-//	
-//			float acc_cal = 9.8f*8.0f/65535*2;
-//	
-//			acc_tmp[0]+=acc[0];
-//			acc_tmp[1]+=acc[1];
-//			acc_tmp[2]+=acc[2];
-//			count++;
-//	
-//			#define OX -0.0731
-//			#define OY -0.2291
-//			#define OZ 0.1741
-//			#define RX 1.0013
-//			#define RY 1.0018
-//			#define RZ 1.0144
-//	
-//	
-//			if(count>=COUNT)
-//			{
-//	
-//	
-//				accf[0] = acc_tmp[0]/COUNT*acc_cal;
-//				accf[1] = acc_tmp[1]/COUNT*acc_cal;
-//				accf[2] = acc_tmp[2]/COUNT*acc_cal;
-//				accf[3] = (accf[0]-OX)/RX;
-//				accf[4] = (accf[1]-OY)/RY;
-//				accf[5] = (accf[2]-OZ)/RZ;
+	//			//printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2], mag[0], mag[1], mag[2]);
+	//			//printf("%d\t%d\t%d\r\n", acc[0], acc[1], acc[2]);
+	//
+	//			float acc_cal = 9.8f*8.0f/65535*2;
+	//
+	//			acc_tmp[0]+=acc[0];
+	//			acc_tmp[1]+=acc[1];
+	//			acc_tmp[2]+=acc[2];
+	//			count++;
+	//
+	//			#define OX -0.0731
+	//			#define OY -0.2291
+	//			#define OZ 0.1741
+	//			#define RX 1.0013
+	//			#define RY 1.0018
+	//			#define RZ 1.0144
+	//
+	//
+	//			if(count>=COUNT)
+	//			{
+	//
+	//
+	//				accf[0] = acc_tmp[0]/COUNT*acc_cal;
+	//				accf[1] = acc_tmp[1]/COUNT*acc_cal;
+	//				accf[2] = acc_tmp[2]/COUNT*acc_cal;
+	//				accf[3] = (accf[0]-OX)/RX;
+	//				accf[4] = (accf[1]-OY)/RY;
+	//				accf[5] = (accf[2]-OZ)/RZ;
 
-////				accf[3] =  1.0019*accf[0]-0.0134*accf[1]+0.0212*accf[2];
-////				accf[4] =  0.0569*accf[0]+1.0190*accf[1]+0.0180*accf[2];
-////				accf[5] = -0.0263*accf[0]-0.0086*accf[1]+0.9741*accf[2];
-//	
-//				printf("\t%f\t%f\t%f\t%f\t%f\t%f;\r\n",
-//				accf[0],accf[1],accf[2],accf[3],accf[4],accf[5]);
-//	
-////				printf("\t%f\t%f\t%f;\r\n",
-////				accf[0],accf[1],accf[2]);	
-//	
-//				count = 0;
-//				acc_tmp[0]=0;
-//				acc_tmp[1]=0;
-//				acc_tmp[2]=0;
-//			}
-//	
-//			osDelay(2);
-//		}
+	////				accf[3] =  1.0019*accf[0]-0.0134*accf[1]+0.0212*accf[2];
+	////				accf[4] =  0.0569*accf[0]+1.0190*accf[1]+0.0180*accf[2];
+	////				accf[5] = -0.0263*accf[0]-0.0086*accf[1]+0.9741*accf[2];
+	//
+	//				printf("\t%f\t%f\t%f\t%f\t%f\t%f;\r\n",
+	//				accf[0],accf[1],accf[2],accf[3],accf[4],accf[5]);
+	//
+	////				printf("\t%f\t%f\t%f;\r\n",
+	////				accf[0],accf[1],accf[2]);
+	//
+	//				count = 0;
+	//				acc_tmp[0]=0;
+	//				acc_tmp[1]=0;
+	//				acc_tmp[2]=0;
+	//			}
+	//
+	//			osDelay(2);
+	//		}
 
 	ICM_SelectBank(USER_BANK_0);
 
-//	short acc[3], gyro[3];
-//	while(1)
-//	{
-//		
-//	
-//			static float accf[6];
-//	
-//			ICM_SelectBank(USER_BANK_0);
-//			ICM_ReadAccelGyroData(acc, gyro);
+	//	short acc[3], gyro[3];
+	//	while(1)
+	//	{
+	//
+	//
+	//			static float accf[6];
+	//
+	//			ICM_SelectBank(USER_BANK_0);
+	//			ICM_ReadAccelGyroData(acc, gyro);
 
-//			printf("%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2]);
-//		osDelay(10);
-//	}
+	//			printf("%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2]);
+	//		osDelay(10);
+	//	}
 
-    // 申请定时器， 配置
-    xTimerIMU = xTimerCreate
-                   /*调试用， 系统不用*/
-                   ("IMU Timer",
-                   /*定时溢出周期， 单位是任务节拍数*/
-                   10,   
-                   /*是否自动重载， 此处设置周期性执行*/
-                   pdTRUE,
-                   /*记录定时器溢出次数， 初始化零, 用户自己设置*/
-                  ( void * ) 0,
-                   /*回调函数*/
-                  vTimerCallback);
+	// 申请定时器， 配置
+	xTimerIMU = xTimerCreate
+		/*调试用， 系统不用*/
+		("IMU Timer",
+		 /*定时溢出周期， 单位是任务节拍数*/
+		 5,
+		 /*是否自动重载， 此处设置周期性执行*/
+		 pdTRUE,
+		 /*记录定时器溢出次数， 初始化零, 用户自己设置*/
+		 (void *)0,
+		 /*回调函数*/
+		 vTimerCallback);
 
-     if( xTimerIMU != NULL ) {
-        // 启动定时器， 0 表示不阻塞
-        xTimerStart( xTimerIMU, 0 );
-    }	
+	if (xTimerIMU != NULL)
+	{
+		// 启动定时器， 0 表示不阻塞
+		xTimerStart(xTimerIMU, 0);
+	}
 	return 0;
 }
 
 void icm20948_read(uint8_t *buf)
 {
 	//ICM_SelectBank(USER_BANK_0);
-	
-	icm20948_read_reg(0x2D, buf, 12);
-	
-	//icm20948_read_reg(0x2D+6, buf+6, 6);
-	// for(int i=0;i<14/7;i++)
-	// {
-	// 	icm20948_read_reg(0x2D+i*7,buf+i*7,7);
-	// }
+	icm20948_read_reg(0x2D, buf, 14);
+
 }
 
 uint8_t isIMUReady = 0;
-TickType_t xIMUTimeNow = 0,xIMUTimeLast = 0;
+TickType_t xIMUTimeNow = 0, xIMUTimeLast = 0;
 uint8_t icm20948_data[20];
 void icm20948_transmit(void)
 {
 	static uint32_t t1;
 	static uint16_t t2;
 	static int16_t accel_data[3], gyro_data[3];
-	
+
 	if (vio_status.imu_status == SENSOR_STATUS_START)
 	{
 
-		
-		// static short acc[3], gyro[3], temp;
-		// USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
+		icm20948_read(icm20948_data + 6);
 
-		// if(vio_status.is_imu_send)
-		// {
-		// 	vio_status.is_imu_send = 0;
+		get_time(&t1, &t2);
 
-		// 	//MPU_Transmit_HS(mpu6000_data, 14);
-//		icm20948_read(icm20948_data);
-//		openvio_usb_send(SENSOR_USB_IMU, icm20948_data, 14);
-		
-		// if(isIMUReady == 0)
-		// {
-			//HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
-			icm20948_read(icm20948_data+6);
-		// 	isIMUReady = 1;
-		// }
-		
-		// xIMUTimeNow = xTaskGetTickCount();
-		// if((xIMUTimeNow-xIMUTimeLast) >= 5 && isIMUReady == 1)
-		// {
-//			openvio_usb_send(SENSOR_USB_IMU,"ICMIMU", 6);
-//			openvio_usb_send(SENSOR_USB_IMU, icm20948_data, 14);
+		icm20948_data[0] = (uint8_t)(t1 >> 24);
+		icm20948_data[1] = (uint8_t)(t1 >> 16);
+		icm20948_data[2] = (uint8_t)(t1 >> 8);
+		icm20948_data[3] = (uint8_t)(t1 >> 0);
+		icm20948_data[4] = (uint8_t)(t2 >> 8);
+		icm20948_data[5] = (uint8_t)(t2 >> 0);
 
-//imu_lock = 1;
-//                while (MPU_Transmit_HS("ICMIMU", 6) != 0)
-//                {
-//                    //osDelay(1);
-//                }
-				get_time(&t1,&t2);
-				
-				//printf("%d\r\n",t2);
-				icm20948_data[0] = (uint8_t)(t1>>24);
-				icm20948_data[1] = (uint8_t)(t1>>16);
-				icm20948_data[2] = (uint8_t)(t1>>8);
-				icm20948_data[3] = (uint8_t)(t1>>0);
-				icm20948_data[4] = (uint8_t)(t2>>8);
-				icm20948_data[5] = (uint8_t)(t2>>0);
-				
-	accel_data[0] = (short)((icm20948_data[0+6] << 8) | icm20948_data[1+6]);
-	accel_data[1] = (short)((icm20948_data[2+6] << 8) | icm20948_data[3+6]);
-	accel_data[2] = (short)((icm20948_data[4+6] << 8) | icm20948_data[5+6]);
+		// accel_data[0] = (short)((icm20948_data[0 + 6] << 8) | icm20948_data[1 + 6]);
+		// accel_data[1] = (short)((icm20948_data[2 + 6] << 8) | icm20948_data[3 + 6]);
+		// accel_data[2] = (short)((icm20948_data[4 + 6] << 8) | icm20948_data[5 + 6]);
 
-	gyro_data[0] = (icm20948_data[6+6] << 8) | icm20948_data[7+6];
-	gyro_data[1] = (icm20948_data[8+6] << 8) | icm20948_data[9+6];
-	gyro_data[2] = (icm20948_data[10+6] << 8) | icm20948_data[11+6];
-	
-	printf("%d\t%d\t%d\t%d\t%d\t%d\r\n", \
-	accel_data[0], accel_data[1], accel_data[2], gyro_data[0], gyro_data[1], gyro_data[2]);
-	
-                while (MPU_Transmit_HS(icm20948_data, 20) != 0)
-                {
-                    //osDelay(1);
-                }
-//				IMUTimeNow = xTaskGetTickCountFromISR();
-//imu_lock = 0;
-			//HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);			
-			// xIMUTimeLast = xIMUTimeNow;
-			// isIMUReady = 0;
-			
-		// }
+		// gyro_data[0] = (icm20948_data[6 + 6] << 8) | icm20948_data[7 + 6];
+		// gyro_data[1] = (icm20948_data[8 + 6] << 8) | icm20948_data[9 + 6];
+		// gyro_data[2] = (icm20948_data[10 + 6] << 8) | icm20948_data[11 + 6];
+
+		// printf("%d\t%d\t%d\t%d\t%d\t%d\r\n",
+		// 	   accel_data[0], accel_data[1], accel_data[2], gyro_data[0], gyro_data[1], gyro_data[2]);
+
+		while (MPU_Transmit_HS(icm20948_data, 20) != 0);
 	}
-	// }
-
-	// ICM_ReadAccelGyroData(acc, gyro);
-	// printf("%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2]);
-	// for(int i=0;i<14;i++)
-	// {
-	// 	printf("%02X ",mpu6000_data[i]);
-	// }
-	// printf("\r\n");
-
-	//	acc[0] = (short)((mpu6000_data[0]<<8)|mpu6000_data[1]);
-	//	acc[1] = (short)((mpu6000_data[2]<<8)|mpu6000_data[3]);
-	//	acc[2] = (short)((mpu6000_data[4]<<8)|mpu6000_data[5]);
-	//
-	//	temp = (short)((mpu6000_data[6]<<8)|mpu6000_data[7]);
-	//
-	//	gyro[0] = (short)((mpu6000_data[8]<<8)|mpu6000_data[9]);
-	//	gyro[1] = (short)((mpu6000_data[10]<<8)|mpu6000_data[11]);
-	//	gyro[2] = (short)((mpu6000_data[12]<<8)|mpu6000_data[13]);
-	//
-	//	printf("%d %d %d %d %d %d %d\r\n", 	acc[0],acc[1],acc[2],
-	//										temp,
-	//										gyro[0],gyro[1],gyro[2]);
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	HAL_GPIO_TogglePin(LED_R_GPIO_Port, LED_R_Pin);
-//	static BaseType_t xHigherPriorityTaskWoken;
-//	if (vio_status.imu_status == SENSOR_STATUS_START)
-//	{
-//		vio_status.is_imu_send = 1;
-//		//		xSemaphoreGiveFromISR( xIMUSemaphore, &xHigherPriorityTaskWoken );
-//		//        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-//	}
+	//	static BaseType_t xHigherPriorityTaskWoken;
+	//	if (vio_status.imu_status == SENSOR_STATUS_START)
+	//	{
+	//		vio_status.is_imu_send = 1;
+	//		//		xSemaphoreGiveFromISR( xIMUSemaphore, &xHigherPriorityTaskWoken );
+	//		//        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+	//	}
 }

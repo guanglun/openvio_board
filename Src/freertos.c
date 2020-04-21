@@ -130,12 +130,12 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 2048);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 1024);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-  osThreadDef(openvioTask, StartOpenvioTask, osPriorityNormal, 0, 1024);
+  osThreadDef(openvioTask, StartOpenvioTask, osPriorityNormal, 0, 2048);
   openvioTaskHandle = osThreadCreate(osThread(openvioTask), NULL);
 
   /* USER CODE END RTOS_THREADS */
@@ -148,18 +148,18 @@ uint16_t Get_Adc(uint32_t ch)
 {
   ADC_ChannelConfTypeDef ADC1_ChanConf;
 
-  ADC1_ChanConf.Channel = ch;                             //ͨ��
-  ADC1_ChanConf.Rank = ADC_REGULAR_RANK_1;                //1������
-  ADC1_ChanConf.SamplingTime = ADC_SAMPLETIME_64CYCLES_5; //����ʱ��
-  ADC1_ChanConf.SingleDiff = ADC_SINGLE_ENDED;            //���߲ɼ�
+  ADC1_ChanConf.Channel = ch;                           
+  ADC1_ChanConf.Rank = ADC_REGULAR_RANK_1;               
+  ADC1_ChanConf.SamplingTime = ADC_SAMPLETIME_64CYCLES_5; 
+  ADC1_ChanConf.SingleDiff = ADC_SINGLE_ENDED;           
   ADC1_ChanConf.OffsetNumber = ADC_OFFSET_NONE;
   ADC1_ChanConf.Offset = 0;
-  HAL_ADC_ConfigChannel(&hadc1, &ADC1_ChanConf); //ͨ������
+  HAL_ADC_ConfigChannel(&hadc1, &ADC1_ChanConf); 
 
-  HAL_ADC_Start(&hadc1); //����ADC
+  HAL_ADC_Start(&hadc1);
 
-  HAL_ADC_PollForConversion(&hadc1, 10);     //��ѯת��
-  return (uint16_t)HAL_ADC_GetValue(&hadc1); //�������һ��ADC1�������ת�����
+  HAL_ADC_PollForConversion(&hadc1, 10);
+  return (uint16_t)HAL_ADC_GetValue(&hadc1);
 }
 
 uint16_t Get_Adc_Average(uint32_t ch, uint8_t times)
@@ -199,10 +199,6 @@ void StartDefaultTask(void const * argument)
   {
     printf("Camera xQueueCreate Fail\r\n");
   }
-  else
-  {
-    printf("Camera xQueueCreate Success\r\n");
-  }
 
   for (;;)
   {
@@ -210,15 +206,9 @@ void StartDefaultTask(void const * argument)
     {
       if (usb_frame_s.sensor == SENSOR_USB_CAM)
       {
-//        do
-//        {
-//          CAMTimeNow = xTaskGetTickCount();
-//			    osDelay(1);
-//        } while ( ((CAMTimeNow - IMUTimeNow) >= 2) && (CAMTimeNow >= IMUTimeNow));
-
         while (CAM_Transmit_HS(usb_frame_s.addr, usb_frame_s.len) != 0)
         {
-			osDelay(1);
+          osDelay(1);
         }
       }
       else if (usb_frame_s.sensor == SENSOR_USB_IMU)
