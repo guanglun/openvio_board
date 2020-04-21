@@ -345,20 +345,6 @@ int icm20948_init(void)
 
 	ICM_SelectBank(USER_BANK_0);
 
-	//	short acc[3], gyro[3];
-	//	while(1)
-	//	{
-	//
-	//
-	//			static float accf[6];
-	//
-	//			ICM_SelectBank(USER_BANK_0);
-	//			ICM_ReadAccelGyroData(acc, gyro);
-
-	//			printf("%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2]);
-	//		osDelay(10);
-	//	}
-
 	// 申请定时器， 配置
 	xTimerIMU = xTimerCreate
 		/*调试用， 系统不用*/
@@ -387,18 +373,32 @@ void icm20948_read(uint8_t *buf)
 
 }
 
+#define OX 	-0.772033
+#define OY 	1.824874
+#define OZ 	0.089193
+#define RX 	0.908722
+#define RY 	1.510643
+#define RZ 	1.030456
+
 uint8_t isIMUReady = 0;
 TickType_t xIMUTimeNow = 0, xIMUTimeLast = 0;
 uint8_t icm20948_data[20];
+
+#define CAL_COUNT 100
+int32_t cnnt = 0,cal_gyro[3]={0,0,0};
+
 void icm20948_transmit(void)
 {
 	static uint32_t t1;
 	static uint16_t t2;
 	static int16_t accel_data[3], gyro_data[3];
-
+	static float acc1[3],acc2[3];
+	static float acc_cal = 9.8f*8.0f/65535*2;
+	
 	if (vio_status.imu_status == SENSOR_STATUS_START)
 	{
 
+		
 		icm20948_read(icm20948_data + 6);
 
 		get_time(&t1, &t2);
@@ -410,16 +410,80 @@ void icm20948_transmit(void)
 		icm20948_data[4] = (uint8_t)(t2 >> 8);
 		icm20948_data[5] = (uint8_t)(t2 >> 0);
 
-		// accel_data[0] = (short)((icm20948_data[0 + 6] << 8) | icm20948_data[1 + 6]);
-		// accel_data[1] = (short)((icm20948_data[2 + 6] << 8) | icm20948_data[3 + 6]);
-		// accel_data[2] = (short)((icm20948_data[4 + 6] << 8) | icm20948_data[5 + 6]);
+		accel_data[0] = (short)((icm20948_data[0 + 6] << 8) | icm20948_data[1 + 6]);
+		accel_data[1] = (short)((icm20948_data[2 + 6] << 8) | icm20948_data[3 + 6]);
+		accel_data[2] = (short)((icm20948_data[4 + 6] << 8) | icm20948_data[5 + 6]);
 
-		// gyro_data[0] = (icm20948_data[6 + 6] << 8) | icm20948_data[7 + 6];
-		// gyro_data[1] = (icm20948_data[8 + 6] << 8) | icm20948_data[9 + 6];
-		// gyro_data[2] = (icm20948_data[10 + 6] << 8) | icm20948_data[11 + 6];
+		gyro_data[0] = (icm20948_data[6 + 6] << 8) | icm20948_data[7 + 6];
+		gyro_data[1] = (icm20948_data[8 + 6] << 8) | icm20948_data[9 + 6];
+		gyro_data[2] = (icm20948_data[10 + 6] << 8) | icm20948_data[11 + 6];
 
 		// printf("%d\t%d\t%d\t%d\t%d\t%d\r\n",
 		// 	   accel_data[0], accel_data[1], accel_data[2], gyro_data[0], gyro_data[1], gyro_data[2]);
+		
+		acc1[0] = accel_data[0]*acc_cal;
+		acc1[1] = accel_data[1]*acc_cal;
+		acc1[2] = accel_data[2]*acc_cal;
+		
+		
+		acc2[0] = (acc1[0]-OX)/RX;
+        acc2[1] = (acc1[1]-OY)/RY;
+        acc2[2] = (acc1[2]-OZ)/RZ;
+		
+		accel_data[0] = acc2[0] / acc_cal;
+		accel_data[1] = acc2[1] / acc_cal;
+		accel_data[2] = acc2[2] / acc_cal;
+		
+
+		
+//		printf("%f\t%f\t%f;\r\n", \
+//			acc2[0], acc2[1], acc2[2]);
+
+
+		if(cnnt<CAL_COUNT)
+		{
+			cnnt++;
+			
+			cal_gyro[0] += gyro_data[0];
+			cal_gyro[1] += gyro_data[1];
+			cal_gyro[2] += gyro_data[2];
+			
+			if(cnnt >= CAL_COUNT)
+			{
+				cal_gyro[0] /= CAL_COUNT;
+				cal_gyro[1] /= CAL_COUNT;
+				cal_gyro[2] /= CAL_COUNT;
+			}
+			
+			return;
+		}
+		
+		gyro_data[0] -= cal_gyro[0];
+		gyro_data[1] -= cal_gyro[1];
+		gyro_data[2] -= cal_gyro[2];
+		
+		icm20948_data[6] = (uint8_t)(accel_data[0] >> 8);
+		icm20948_data[7] = (uint8_t)(accel_data[0] >> 0);
+		
+		icm20948_data[8] = (uint8_t)(accel_data[1] >> 8);
+		icm20948_data[9] = (uint8_t)(accel_data[1] >> 0);
+		
+		icm20948_data[10] = (uint8_t)(accel_data[2] >> 8);
+		icm20948_data[11] = (uint8_t)(accel_data[2] >> 0);
+
+		icm20948_data[12] = (uint8_t)(gyro_data[0] >> 8);
+		icm20948_data[13] = (uint8_t)(gyro_data[0] >> 0);
+		
+		icm20948_data[14] = (uint8_t)(gyro_data[1] >> 8);
+		icm20948_data[15] = (uint8_t)(gyro_data[1] >> 0);
+		
+		icm20948_data[16] = (uint8_t)(gyro_data[2] >> 8);
+		icm20948_data[17] = (uint8_t)(gyro_data[2] >> 0);
+
+
+//		printf("%d\t%d\t%d\t%d\t%d\t%d\r\n",
+//		 	   accel_data[0], accel_data[1], accel_data[2], gyro_data[0], gyro_data[1], gyro_data[2]);	
+
 
 		while (MPU_Transmit_HS(icm20948_data, 20) != 0);
 	}
