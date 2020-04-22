@@ -10,6 +10,7 @@
 #include "usbd_def.h"
 #include "usbd_cdc_if.h"
 #include "openvio.h"
+#include "ICM_20948.h"
 
 extern struct OPENVIO_STATUS vio_status;
 
@@ -105,7 +106,7 @@ static int icm20948_write_reg(uint8_t reg, uint8_t value)
 	}
 
 	ICM20948_DISABLE();
-	osDelay(10);
+	//osDelay(1);
 
 	return 0;
 }
@@ -114,21 +115,34 @@ void icm_mag_write(uint8_t reg, uint8_t value)
 {
 	icm20948_write_reg(0x7F, 0x30);
 
-	osDelay(1);
+	//osDelay(1);
 	icm20948_write_reg(0x03, 0x0C); //mode: write
 
-	osDelay(1);
+	//osDelay(1);
 	icm20948_write_reg(0x04, reg); //set reg addr
 
-	osDelay(1);
+	//osDelay(1);
 	icm20948_write_reg(0x06, value); //send value
 
-	osDelay(1);
+	//osDelay(1);
 }
 
+void us_delay(void)
+{
+	uint32_t t1,t1_old;
+	uint16_t t2,t2_old;
+	
+	get_time(&t1_old, &t2_old);
+	
+	do{
+		get_time(&t1, &t2);
+	}while(t2 < (t2_old + 80));
+		
+}
 static uint8_t icm_mag_read(uint8_t reg)
 {
 	uint8_t Data;
+	
 	icm20948_write_reg(0x7F, 0x30);
 	osDelay(1);
 	icm20948_write_reg(0x03, 0x0C | 0x80);
@@ -139,7 +153,28 @@ static uint8_t icm_mag_read(uint8_t reg)
 	osDelay(1);
 	icm20948_write_reg(0x7F, 0x00);
 
+	osDelay(1);
 	icm20948_read_reg(0x3B, &Data, 1);
+	osDelay(1);
+	return Data;
+}
+
+static uint8_t icm_mag_read_buffer(uint8_t reg,uint8_t *buffer)
+{
+	uint8_t Data;
+	
+	icm20948_write_reg(0x7F, 0x30);
+	osDelay(1);
+	icm20948_write_reg(0x03, 0x0C | 0x80);
+	osDelay(1);
+	icm20948_write_reg(0x04, reg); // set reg addr
+	osDelay(1);
+	icm20948_write_reg(0x06, 0xff); //read
+	osDelay(1);
+	icm20948_write_reg(0x7F, 0x00);
+
+	osDelay(1);
+	icm20948_read_reg(0x3B, buffer, 6);
 	osDelay(1);
 	return Data;
 }
@@ -148,16 +183,30 @@ void icm20948_read_mag(int16_t magn[3])
 {
 	uint8_t mag_buffer[10];
 
-	mag_buffer[0] = icm_mag_read(0x01);
+	//icm_mag_read_buffer(0x11,mag_buffer+1);
+	
+	icm20948_write_reg(0x7F, 0x30);
+	osDelay(1);
+	icm20948_write_reg(0x03, 0x0C | 0x80);
+	osDelay(1);
+	icm20948_write_reg(0x04, 0x11); // set reg addr
+	osDelay(1);
+	icm20948_write_reg(0x06, 0xff); //read
+	osDelay(1);
+	icm20948_write_reg(0x7F, 0x00);
+	
+	icm20948_read_reg(0x3B, mag_buffer, 6);
+	
+//	mag_buffer[0] = icm_mag_read(0x01);
 
-	mag_buffer[1] = icm_mag_read(0x11);
-	mag_buffer[2] = icm_mag_read(0x12);
+//	mag_buffer[1] = icm_mag_read(0x11);
+//	mag_buffer[2] = icm_mag_read(0x12);
 	magn[0] = mag_buffer[1] | mag_buffer[2] << 8;
-	mag_buffer[3] = icm_mag_read(0x13);
-	mag_buffer[4] = icm_mag_read(0x14);
+//	mag_buffer[3] = icm_mag_read(0x13);
+//	mag_buffer[4] = icm_mag_read(0x14);
 	magn[1] = mag_buffer[3] | mag_buffer[4] << 8;
-	mag_buffer[5] = icm_mag_read(0x15);
-	mag_buffer[6] = icm_mag_read(0x16);
+//	mag_buffer[5] = icm_mag_read(0x15);
+//	mag_buffer[6] = icm_mag_read(0x16);
 	magn[2] = mag_buffer[5] | mag_buffer[6] << 8;
 
 	icm_mag_write(0x31, 0x01);
@@ -212,7 +261,7 @@ uint8_t icm_who_am_i(void)
 }
 void ICM_SetGyroRateLPF(uint8_t rate, uint8_t lpf)
 {
-	icm20948_write_reg(GYRO_CONFIG_1, (rate | lpf));
+	icm20948_write_reg(GYRO_CONFIG_1, ((rate << 1) | lpf));
 }
 
 int icm20948_init(void)
@@ -235,7 +284,7 @@ int icm20948_init(void)
 
 		ICM_SelectBank(USER_BANK_2);
 		osDelay(20);
-		ICM_SetGyroRateLPF(GYRO_RATE_250, GYRO_LPF_17HZ);
+		ICM_SetGyroRateLPF(GYRO_RATE_2000, GYRO_LPF_17HZ);
 		osDelay(10);
 
 		// Set gyroscope sample rate to 100hz (0x0A) in GYRO_SMPLRT_DIV register (0x00)
@@ -343,6 +392,8 @@ int icm20948_init(void)
 	//			osDelay(2);
 	//		}
 
+	icm_init_new();
+	
 	ICM_SelectBank(USER_BANK_0);
 
 	// 申请定时器， 配置
@@ -373,35 +424,65 @@ void icm20948_read(uint8_t *buf)
 
 }
 
-#define OX 	-0.772033
-#define OY 	1.824874
-#define OZ 	0.089193
-#define RX 	0.908722
-#define RY 	1.510643
-#define RZ 	1.030456
+#define OX 	-0.122902
+#define OY 	-0.048230
+#define OZ 	0.188431
+#define RX 	1.012000
+#define RY 	1.012190
+#define RZ 	1.016193
+
+
+#define MAG_OX 	-26.020547
+#define MAG_OY 	35.461694
+#define MAG_OZ 	-95.002544
+#define MAG_RX 	0.744489
+#define MAG_RY 	0.824312
+#define MAG_RZ 	0.814524
 
 uint8_t isIMUReady = 0;
 TickType_t xIMUTimeNow = 0, xIMUTimeLast = 0;
-uint8_t icm20948_data[20];
+uint8_t icm20948_data[20+9];
 
 #define CAL_COUNT 100
 int32_t cnnt = 0,cal_gyro[3]={0,0,0};
 
+#define M_PI		3.14159265358979323846
+
+//#define CAL_ACC
+//#define PRINTF_ACC
 void icm20948_transmit(void)
 {
 	static uint32_t t1;
 	static uint16_t t2;
-	static int16_t accel_data[3], gyro_data[3];
-	static float acc1[3],acc2[3];
+	static int16_t accel_data[3], gyro_data[3],mag_data_t[3],mag_data[3];
+	static float acc1[3],acc2[3],gyro[3];
 	static float acc_cal = 9.8f*8.0f/65535*2;
 	
+	#ifndef CAL_ACC
 	if (vio_status.imu_status == SENSOR_STATUS_START)
+	#endif
 	{
+		//icm20948_read(icm20948_data + 6);
 
-		
-		icm20948_read(icm20948_data + 6);
+		icm_get_agmt_buff(icm20948_data + 6);
 
 		get_time(&t1, &t2);
+
+		mag_data_t[0] = ((icm20948_data[16 + 6] << 8) | (icm20948_data[15 + 6] & 0xFF)); //Mag data is read little endian
+		mag_data_t[1] = ((icm20948_data[18 + 6] << 8) | (icm20948_data[17 + 6] & 0xFF));
+		mag_data_t[2] = ((icm20948_data[20 + 6] << 8) | (icm20948_data[19 + 6] & 0xFF));
+
+			mag_data[0] = (mag_data_t[0]-MAG_OX)/MAG_RX;
+        	mag_data[1] = (mag_data_t[1]-MAG_OY)/MAG_RY;
+        	mag_data[2] = (mag_data_t[2]-MAG_OZ)/MAG_RZ;
+
+//			mag_data[0] = mag_data_t[0];
+//        	mag_data[1] = mag_data_t[1];
+//        	mag_data[2] = mag_data_t[2];
+		
+		printf("%d\t%d\t%d\r\n",mag_data[0], mag_data[1], mag_data[2]);
+		
+		//return;
 
 		icm20948_data[0] = (uint8_t)(t1 >> 24);
 		icm20948_data[1] = (uint8_t)(t1 >> 16);
@@ -425,6 +506,10 @@ void icm20948_transmit(void)
 		acc1[1] = accel_data[1]*acc_cal;
 		acc1[2] = accel_data[2]*acc_cal;
 		
+		#ifdef CAL_ACC
+		printf("%f\t%f\t%f;\r\n", acc1[0], acc1[1], acc1[2]);		
+		return;
+		#endif
 		
 		acc2[0] = (acc1[0]-OX)/RX;
         acc2[1] = (acc1[1]-OY)/RY;
@@ -462,30 +547,42 @@ void icm20948_transmit(void)
 		gyro_data[1] -= cal_gyro[1];
 		gyro_data[2] -= cal_gyro[2];
 		
+		/*ACC*/
 		icm20948_data[6] = (uint8_t)(accel_data[0] >> 8);
 		icm20948_data[7] = (uint8_t)(accel_data[0] >> 0);
-		
 		icm20948_data[8] = (uint8_t)(accel_data[1] >> 8);
 		icm20948_data[9] = (uint8_t)(accel_data[1] >> 0);
-		
 		icm20948_data[10] = (uint8_t)(accel_data[2] >> 8);
 		icm20948_data[11] = (uint8_t)(accel_data[2] >> 0);
 
+		/*GYRO*/
 		icm20948_data[12] = (uint8_t)(gyro_data[0] >> 8);
 		icm20948_data[13] = (uint8_t)(gyro_data[0] >> 0);
-		
 		icm20948_data[14] = (uint8_t)(gyro_data[1] >> 8);
 		icm20948_data[15] = (uint8_t)(gyro_data[1] >> 0);
-		
 		icm20948_data[16] = (uint8_t)(gyro_data[2] >> 8);
 		icm20948_data[17] = (uint8_t)(gyro_data[2] >> 0);
 
-
+		/*MAG*/
+		icm20948_data[18] = (uint8_t)(mag_data[0] >> 8);
+		icm20948_data[19] = (uint8_t)(mag_data[0] >> 0);
+		icm20948_data[20] = (uint8_t)(mag_data[1] >> 8);
+		icm20948_data[21] = (uint8_t)(mag_data[1] >> 0);
+		icm20948_data[22] = (uint8_t)(mag_data[2] >> 8);
+		icm20948_data[23] = (uint8_t)(mag_data[2] >> 0);	
+		
+		gyro[0] = gyro_data[0] * (500.0 / 65536.0) * (M_PI / 180.0);
+		gyro[1] = gyro_data[1] * (500.0 / 65536.0) * (M_PI / 180.0);
+		gyro[2] = gyro_data[2] * (500.0 / 65536.0) * (M_PI / 180.0);
+	
+		#ifdef PRINTF_ACC
 //		printf("%d\t%d\t%d\t%d\t%d\t%d\r\n",
 //		 	   accel_data[0], accel_data[1], accel_data[2], gyro_data[0], gyro_data[1], gyro_data[2]);	
+//		printf("%f\t%f\t%f\t%f\t%f\t%f\r\n", \
+//			acc2[0], acc2[1], acc2[2],gyro[0],gyro[1],gyro[2]);
+		#endif
 
-
-		while (MPU_Transmit_HS(icm20948_data, 20) != 0);
+		while (MPU_Transmit_HS(icm20948_data, 24) != 0);
 	}
 }
 

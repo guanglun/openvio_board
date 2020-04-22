@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H743xx,USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                                   ../Drivers/STM32H7xx_HAL_Driver/Inc;                                   ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;                                   ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;                                   ../Drivers/CMSIS/Include;                                   ..\App;                                   ..\VIO;                                   ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                                   ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;                                   ../Middlewares/Third_Party/FreeRTOS/Source/include;                                   ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;                                   ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;                                   ../Middlewares/Third_Party/FatFs/src;                                   ..\VIO\CAM</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;..\App;..\VIO;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Middlewares/Third_Party/FatFs/src;..\VIO\CAM;..\VIO\IMU</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -495,6 +495,56 @@
               <FileName>camera.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\VIO\CAM\camera.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/IMU</GroupName>
+          <Files>
+            <File>
+              <FileName>AK09916_ENUMERATIONS.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\IMU\AK09916_ENUMERATIONS.h</FilePath>
+            </File>
+            <File>
+              <FileName>AK09916_REGISTERS.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\IMU\AK09916_REGISTERS.h</FilePath>
+            </File>
+            <File>
+              <FileName>ICM_20948_C.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\VIO\IMU\ICM_20948_C.c</FilePath>
+            </File>
+            <File>
+              <FileName>ICM_20948_C.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\IMU\ICM_20948_C.h</FilePath>
+            </File>
+            <File>
+              <FileName>ICM_20948_ENUMERATIONS.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\IMU\ICM_20948_ENUMERATIONS.h</FilePath>
+            </File>
+            <File>
+              <FileName>ICM_20948_REGISTERS.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\IMU\ICM_20948_REGISTERS.h</FilePath>
+            </File>
+            <File>
+              <FileName>icm20948_img.dmp3a.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\IMU\icm20948_img.dmp3a.h</FilePath>
+            </File>
+            <File>
+              <FileName>ICM_20948.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\VIO\IMU\ICM_20948.c</FilePath>
+            </File>
+            <File>
+              <FileName>ICM_20948.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\VIO\IMU\ICM_20948.h</FilePath>
             </File>
           </Files>
         </Group>

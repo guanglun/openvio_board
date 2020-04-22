@@ -16,6 +16,9 @@
 
 #define CLK_BEST_AVAIL	(0x01)
 #define GYRO_RATE_250	(0x00)
+#define GYRO_RATE_500	(0x01)
+#define GYRO_RATE_1000	(0x02)
+#define GYRO_RATE_2000	(0x03)
 #define GYRO_LPF_17HZ 	(0x29)
 
 int icm20948_init(void);
