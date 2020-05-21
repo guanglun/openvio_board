@@ -66,8 +66,10 @@ struct USB_FRAME_STRUCT{
 
 struct OPENVIO_STATUS{
     struct USB_STRUCT usb_s;
+    
 	enum SENSOR_STATUS cam_status;
 	enum SENSOR_STATUS imu_status;
+    enum SENSOR_STATUS atouch_status;
     enum USB_CONNECT_STATUS usb_status;
     uint8_t usb_lock_status;
 	uint8_t is_imu_send;

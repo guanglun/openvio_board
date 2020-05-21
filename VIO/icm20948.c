@@ -459,7 +459,7 @@ void icm20948_transmit(void)
 	static float acc_cal = 9.8f*8.0f/65535*2;
 	
 	#ifndef CAL_ACC
-	if (vio_status.imu_status == SENSOR_STATUS_START)
+	if (vio_status.imu_status == SENSOR_STATUS_START || vio_status.atouch_status == SENSOR_STATUS_START)
 	#endif
 	{
 		//icm20948_read(icm20948_data + 6);
@@ -582,7 +582,14 @@ void icm20948_transmit(void)
 //			acc2[0], acc2[1], acc2[2],gyro[0],gyro[1],gyro[2]);
 		#endif
 
-		while (MPU_Transmit_HS(icm20948_data, 24) != 0);
+		if(vio_status.atouch_status == SENSOR_STATUS_START)
+		{
+			while (CAM_Transmit_HS(icm20948_data, 24) != 0);
+		}else if (vio_status.imu_status == SENSOR_STATUS_START)
+		{
+			while (MPU_Transmit_HS(icm20948_data, 24) != 0);
+		}
+		
 	}
 }
 

@@ -49,6 +49,8 @@ void openvio_status_init(struct OPENVIO_STATUS *status)
 {
     status->cam_status = SENSOR_STATUS_WAIT;
     status->imu_status = SENSOR_STATUS_WAIT;
+    status->atouch_status = SENSOR_STATUS_WAIT;
+
     status->usb_lock_status = 0;
     status->is_imu_send = 0;
     status->usb_status = USB_DISCONNECT;

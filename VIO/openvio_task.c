@@ -39,7 +39,8 @@ static void camera_start_send(void);
 #define REQUEST_IMU_START       0xB0
 #define REQUEST_IMU_STOP        0xB1
 
-
+#define REQUEST_ATOUCH_START    				0xC0
+#define REQUEST_ATOUCH_STOP     				0xC1
 
 uint8_t camera_ctrl(USBD_SetupReqTypedef *req,uint8_t *s_data)
 {
@@ -48,6 +49,7 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req,uint8_t *s_data)
 	switch (req->bRequest)
 	{
 	case REQUEST_CAMERA_START:
+		vio_status.atouch_status = SENSOR_STATUS_WAIT;
 		if(vio_status.cam_status == SENSOR_STATUS_WAIT)
 		{
 			s_data[0] = 'S';
@@ -113,7 +115,25 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req,uint8_t *s_data)
 //			}
 			
 		break;	
-		
+	case REQUEST_ATOUCH_START:
+		vio_status.cam_status = SENSOR_STATUS_WAIT;
+		if(vio_status.atouch_status == SENSOR_STATUS_WAIT)
+		{	
+			vio_status.atouch_status = SENSOR_STATUS_START;
+			s_data[0] = 'S';
+		}else{
+			s_data[0] = 'F';
+		}
+		break;
+	case REQUEST_ATOUCH_STOP:
+		if(vio_status.atouch_status != SENSOR_STATUS_WAIT)
+		{		
+			vio_status.atouch_status = SENSOR_STATUS_WAIT;
+			s_data[0] = 'S';
+		}else{
+			s_data[0] = 'F';
+		}
+		break;	
 	default:
 		break;
 	}
