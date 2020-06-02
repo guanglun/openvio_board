@@ -13,7 +13,7 @@
 #include "ICM_20948.h"
 
 extern struct OPENVIO_STATUS vio_status;
-
+extern QueueHandle_t xQueue;
 extern SPI_HandleTypeDef hspi2;
 
 extern USBD_HandleTypeDef hUsbDeviceHS;
@@ -32,9 +32,9 @@ TickType_t IMUTimeNow;
 // 定时器回调函数格式
 static void vTimerCallback(TimerHandle_t xTimer)
 {
-	HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
-	icm20948_transmit();
-	HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+	//icm20948_transmit();
+	//HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
 }
 
 static int icm20948_read_one_reg(uint8_t reg, uint8_t *buf)
@@ -322,76 +322,6 @@ int icm20948_init(void)
 		printf("[ICM-20948] [Init Fail]\r\n");
 	}
 
-	/* 创建信号量 */
-	//    xIMUSemaphore = xSemaphoreCreateBinary();
-	//    osThreadDef(IMUTask, StartIMUTask, osPriorityNormal, 0, 512);
-	//    IMUTaskHandle = osThreadCreate(osThread(IMUTask), NULL);
-
-	//		#define COUNT 2
-	//		while (1)
-	//		{
-	//			static int count = 0;
-	//			static int acc_tmp[3] = {0,0,0};
-	//			static uint8_t icm20948_data[14];
-	//			static short acc[3], gyro[3], mag[2],temp;
-	//
-	//			static float accf[6];
-	//
-	//			ICM_SelectBank(USER_BANK_0);
-	//			ICM_ReadAccelGyroData(acc, gyro);
-	//
-
-	//			//ICM_SelectBank(USER_BANK_2);
-	//			//icm20948_read_mag(mag);
-
-	//			//printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\r\n", acc[0], acc[1], acc[2], gyro[0], gyro[1], gyro[2], mag[0], mag[1], mag[2]);
-	//			//printf("%d\t%d\t%d\r\n", acc[0], acc[1], acc[2]);
-	//
-	//			float acc_cal = 9.8f*8.0f/65535*2;
-	//
-	//			acc_tmp[0]+=acc[0];
-	//			acc_tmp[1]+=acc[1];
-	//			acc_tmp[2]+=acc[2];
-	//			count++;
-	//
-	//			#define OX -0.0731
-	//			#define OY -0.2291
-	//			#define OZ 0.1741
-	//			#define RX 1.0013
-	//			#define RY 1.0018
-	//			#define RZ 1.0144
-	//
-	//
-	//			if(count>=COUNT)
-	//			{
-	//
-	//
-	//				accf[0] = acc_tmp[0]/COUNT*acc_cal;
-	//				accf[1] = acc_tmp[1]/COUNT*acc_cal;
-	//				accf[2] = acc_tmp[2]/COUNT*acc_cal;
-	//				accf[3] = (accf[0]-OX)/RX;
-	//				accf[4] = (accf[1]-OY)/RY;
-	//				accf[5] = (accf[2]-OZ)/RZ;
-
-	////				accf[3] =  1.0019*accf[0]-0.0134*accf[1]+0.0212*accf[2];
-	////				accf[4] =  0.0569*accf[0]+1.0190*accf[1]+0.0180*accf[2];
-	////				accf[5] = -0.0263*accf[0]-0.0086*accf[1]+0.9741*accf[2];
-	//
-	//				printf("\t%f\t%f\t%f\t%f\t%f\t%f;\r\n",
-	//				accf[0],accf[1],accf[2],accf[3],accf[4],accf[5]);
-	//
-	////				printf("\t%f\t%f\t%f;\r\n",
-	////				accf[0],accf[1],accf[2]);
-	//
-	//				count = 0;
-	//				acc_tmp[0]=0;
-	//				acc_tmp[1]=0;
-	//				acc_tmp[2]=0;
-	//			}
-	//
-	//			osDelay(2);
-	//		}
-
 	icm_init_new();
 	
 	ICM_SelectBank(USER_BANK_0);
@@ -401,7 +331,7 @@ int icm20948_init(void)
 		/*调试用， 系统不用*/
 		("IMU Timer",
 		 /*定时溢出周期， 单位是任务节拍数*/
-		 50,
+		 10,
 		 /*是否自动重载， 此处设置周期性执行*/
 		 pdTRUE,
 		 /*记录定时器溢出次数， 初始化零, 用户自己设置*/
@@ -461,8 +391,6 @@ void icm20948_transmit(void)
 	static float acc1[3],acc2[3],gyro[3];
 	static float acc_cal = 9.8f*8.0f/65535*2;
 	
-	printf("icm20948_transmit\r\n");
-	
 	#ifndef CAL_ACC
 	if (vio_status.imu_status == SENSOR_STATUS_START)
 	#endif
@@ -471,8 +399,12 @@ void icm20948_transmit(void)
 
 		icm_get_agmt_buff(icm20948_data + 6);
 
+		HAL_GPIO_WritePin(GPIOD, TEST1_Pin, GPIO_PIN_SET);
+		
 		get_time(&t1, &t2);
 
+		HAL_GPIO_WritePin(GPIOD, TEST1_Pin, GPIO_PIN_RESET);
+		
 		mag_data_t[0] = ((icm20948_data[16 + 6] << 8) | (icm20948_data[15 + 6] & 0xFF)); //Mag data is read little endian
 		mag_data_t[1] = ((icm20948_data[18 + 6] << 8) | (icm20948_data[17 + 6] & 0xFF));
 		mag_data_t[2] = ((icm20948_data[20 + 6] << 8) | (icm20948_data[19 + 6] & 0xFF));
@@ -485,7 +417,7 @@ void icm20948_transmit(void)
 //        	mag_data[1] = mag_data_t[1];
 //        	mag_data[2] = mag_data_t[2];
 		
-		printf("%d\t%d\t%d\r\n",mag_data[0], mag_data[1], mag_data[2]);
+		//printf("%d\t%d\t%d\r\n",mag_data[0], mag_data[1], mag_data[2]);
 		
 		//return;
 
@@ -587,9 +519,17 @@ void icm20948_transmit(void)
 //			acc2[0], acc2[1], acc2[2],gyro[0],gyro[1],gyro[2]);
 		#endif
 
-		while (MPU_Transmit_HS(icm20948_data, 24) != 0);
+		//while (MPU_Transmit_HS(icm20948_data, 24) != 0);
+		
+		struct USB_FRAME_STRUCT usb_frame_s;
+        usb_frame_s.addr = (uint8_t *)icm20948_data;
+        usb_frame_s.len = 24;
+        usb_frame_s.sensor = SENSOR_USB_IMU;
+        
+        xQueueSendFromISR(xQueue, (void *)&usb_frame_s, (TickType_t)0);
 	}
 }
+
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {

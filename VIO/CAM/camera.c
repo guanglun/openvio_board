@@ -24,7 +24,10 @@ SemaphoreHandle_t xSemaphore;
 // 定时器回调函数格式
 static void vCAMTimerCallback( TimerHandle_t xTimer )
 {
-	dcmi_dma_start();
+    if(vio_status.cam_status == SENSOR_STATUS_START)
+	{
+	    dcmi_dma_start();
+    }
 }
 
 void camera_start(void)
@@ -128,34 +131,32 @@ void USER_DCMI_MemDMAXferCplt(uint32_t data, uint32_t size)
 
 void dcmi_dma_start(void)
 {
-
-    
 	openvio_usb_send(SENSOR_USB_CAM, "CAMERA", 6);
 	__HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_FRAME);
-	if(vio_status.cam_id == MT9V034_ID)
-	{
-	  
-	  HAL_DCMI_Stop(&hdcmi); 
-	  HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size/4);
-	  __HAL_DCMI_ENABLE(&hdcmi);
-		
-		while(xSemaphoreTake(xSemaphore, 0xFFFFFFFF)  != pdTRUE)
-		{
-			//osDelay(1);
-		}
-		
-		HAL_DCMI_Stop(&hdcmi);
-		
-		//openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
-		
-	    struct USB_FRAME_STRUCT usb_frame_s;
-        usb_frame_s.addr = (uint8_t *)dcmi_image_buffer;
-        usb_frame_s.len = vio_status.cam_frame_size * vio_status.gs_bpp;
-        usb_frame_s.sensor = SENSOR_USB_CAM;
-        
-        xQueueSendFromISR(xQueue, (void *)&usb_frame_s, (TickType_t)0);
+//	if(vio_status.cam_id == MT9V034_ID)
+//	{
+//	  
+//	  HAL_DCMI_Stop(&hdcmi); 
+//	  HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size/4);
+//	  __HAL_DCMI_ENABLE(&hdcmi);
+//		
+//		while(xSemaphoreTake(xSemaphore, 0xFFFFFFFF)  != pdTRUE)
+//		{
+//			//osDelay(1);
+//		}
+//		
+//		HAL_DCMI_Stop(&hdcmi);
+//		
+//		openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
+//		
+//	    // struct USB_FRAME_STRUCT usb_frame_s;
+//        // usb_frame_s.addr = (uint8_t *)dcmi_image_buffer;
+//        // usb_frame_s.len = vio_status.cam_frame_size * vio_status.gs_bpp;
+//        // usb_frame_s.sensor = SENSOR_USB_CAM;
+//        
+//        // xQueueSendFromISR(xQueue, (void *)&usb_frame_s, (TickType_t)0);
 
-	}else
+//	}else
 	{
 		
 		__HAL_DCMI_DISABLE_IT(&hdcmi, DCMI_IT_FRAME);

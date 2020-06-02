@@ -282,7 +282,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 1 */
   if (htim->Instance == TIM6) {
 	timer_cnt++;
-    HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
+    //HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
   }  
   /* USER CODE END Callback 1 */
 }
