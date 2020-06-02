@@ -56,6 +56,7 @@ void DebugMon_Handler(void);
 void EXTI4_IRQHandler(void);
 void DMA1_Stream0_IRQHandler(void);
 void SPI2_IRQHandler(void);
+void TIM8_UP_TIM13_IRQHandler(void);
 void SDMMC1_IRQHandler(void);
 void TIM6_DAC_IRQHandler(void);
 void TIM7_IRQHandler(void);

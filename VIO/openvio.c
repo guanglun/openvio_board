@@ -53,8 +53,9 @@ void openvio_status_init(struct OPENVIO_STATUS *status)
     status->is_imu_send = 0;
     status->usb_status = USB_DISCONNECT;
 
-    //status->pixformat = PIXFORMAT_RGB565;
-    status->pixformat = PIXFORMAT_GRAYSCALE;
+	
+    status->pixformat = PIXFORMAT_RGB565;
+    //status->pixformat = PIXFORMAT_GRAYSCALE;
 
     status->cam_name = 0;
     status->cam_frame_size_num = FRAMESIZE_WVGA2;//FRAMESIZE_VGA; //FRAMESIZE_VGA;//FRAMESIZE_QVGA;//FRAMESIZE_WVGA2;//FRAMESIZE_HQVGA;//

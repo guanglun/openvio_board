@@ -399,11 +399,11 @@ void icm20948_transmit(void)
 
 		icm_get_agmt_buff(icm20948_data + 6);
 
-		HAL_GPIO_WritePin(GPIOD, TEST1_Pin, GPIO_PIN_SET);
+		
 		
 		get_time(&t1, &t2);
 
-		HAL_GPIO_WritePin(GPIOD, TEST1_Pin, GPIO_PIN_RESET);
+		
 		
 		mag_data_t[0] = ((icm20948_data[16 + 6] << 8) | (icm20948_data[15 + 6] & 0xFF)); //Mag data is read little endian
 		mag_data_t[1] = ((icm20948_data[18 + 6] << 8) | (icm20948_data[17 + 6] & 0xFF));

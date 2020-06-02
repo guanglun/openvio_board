@@ -97,6 +97,10 @@ static const uint8_t default_regs[][2] = {
 // End.
 
     {0x00,          0x00},
+	
+	
+	
+	
 };
 
 static int ov7725_reset(void)
