@@ -22,35 +22,9 @@ TimerHandle_t xTimerCAM; // 定义句柄
 SemaphoreHandle_t xSemaphore;
 
 // 定时器回调函数格式
-static void vTimerCallback( TimerHandle_t xTimer )
+static void vCAMTimerCallback( TimerHandle_t xTimer )
 {
-    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
-
-    if(vio_status.cam_status == SENSOR_STATUS_RUNNING)
-    {
-        while (get_usb_tx_state() != 0)
-        {
-            osDelay(1);
-        }
-
-        openvio_usb_send(SENSOR_USB_CAM, "CAMERA", 6);
-
-        __HAL_DCMI_DISABLE_IT(&hdcmi, DCMI_IT_FRAME);
-        USER_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size / 4 * vio_status.gs_bpp);
-//		while(xSemaphoreTake(xSemaphore, 0xFFFF)  != pdTRUE)
-//		{
-//			 //icm20948_transmit();
-//		}
-//		
-//		
-
-//		if (vio_status.cam_frame_size * vio_status.gs_bpp <= CAM_PACKAGE_MAX_SIZE)
-//		{
-//			openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
-//		}		
-    }
-	
-    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
+	dcmi_dma_start();
 }
 
 void camera_start(void)
@@ -61,18 +35,20 @@ void camera_start(void)
                    ("CAM Timer",
                    /*定时溢出周期， 单位是任务节拍数*/
                    50,   
+					//33,
                    /*是否自动重载， 此处设置周期性执行*/
                    pdTRUE,
                    /*记录定时器溢出次数， 初始化零, 用户自己设置*/
                   ( void * ) 0,
                    /*回调函数*/
-                  vTimerCallback);
+                  vCAMTimerCallback);
 
      if( xTimerCAM != NULL ) {
         // 启动定时器， 0 表示不阻塞
         xTimerStart( xTimerCAM, 0 );
+		 printf("[xTimerCAM][SUCCESS]\r\n");
     }else{
-		printf("xTimerCAM Fail\r\n");
+		printf("[xTimerCAM][FAIL]\r\n");
 	}
 }
 
@@ -97,16 +73,16 @@ void camera_init(void)
 
     switch (cam_slv_addr)
     {
-    case OV7725_SLV_ADDR: // Same for OV7690.
-        HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_8);
-        cambus_readb(cam_slv_addr, OV_CHIP_ID, &chip_id);
-        break;
-    case MT9V034_SLV_ADDR:
-        HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_4); //3 32MHZ,4 24MHZ
-        cambus_readb(cam_slv_addr, ON_CHIP_ID, &chip_id);
-        break;
-    default:
-        break;
+		case OV7725_SLV_ADDR: // Same for OV7690.
+			HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_8);
+			cambus_readb(cam_slv_addr, OV_CHIP_ID, &chip_id);
+			break;
+		case MT9V034_SLV_ADDR:
+			HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_4); //3 32MHZ,4 24MHZ
+			cambus_readb(cam_slv_addr, ON_CHIP_ID, &chip_id);
+			break;
+		default:
+			break;
     }
 
     printf("[chip id][%02X]\r\n", chip_id);
@@ -131,7 +107,7 @@ void camera_init(void)
         break;
     }
 
-    //camera_start();
+    camera_start();
 }
 
 extern QueueHandle_t xQueue;
@@ -153,30 +129,57 @@ void USER_DCMI_MemDMAXferCplt(uint32_t data, uint32_t size)
 void dcmi_dma_start(void)
 {
 
-    openvio_usb_send(SENSOR_USB_CAM, "CAMERA", 6);
-
-    __HAL_DCMI_DISABLE_IT(&hdcmi, DCMI_IT_FRAME);
-    USER_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size / 4 * vio_status.gs_bpp);
-    //__HAL_DCMI_ENABLE(&hdcmi);
-
-    //    while ((DCMI->CR & DCMI_CR_CAPTURE) != 0)
-    //    {
-    //        //icm20948_transmit();
-    //		//osDelay(100);
-    //    }
-
-    while(xSemaphoreTake(xSemaphore, 0xFFFFFFFF)  != pdTRUE)
+    
+	openvio_usb_send(SENSOR_USB_CAM, "CAMERA", 6);
+	__HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_FRAME);
+	if(vio_status.cam_id == MT9V034_ID)
 	{
-		//osDelay(1);
+	  
+	  HAL_DCMI_Stop(&hdcmi); 
+	  HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size/4);
+	  __HAL_DCMI_ENABLE(&hdcmi);
+		
+		while(xSemaphoreTake(xSemaphore, 0xFFFFFFFF)  != pdTRUE)
+		{
+			//osDelay(1);
+		}
+		
+		HAL_DCMI_Stop(&hdcmi);
+		
+		//openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
+		
+	    struct USB_FRAME_STRUCT usb_frame_s;
+        usb_frame_s.addr = (uint8_t *)dcmi_image_buffer;
+        usb_frame_s.len = vio_status.cam_frame_size * vio_status.gs_bpp;
+        usb_frame_s.sensor = SENSOR_USB_CAM;
+        
+        xQueueSendFromISR(xQueue, (void *)&usb_frame_s, (TickType_t)0);
+
+	}else
+	{
+		
+		__HAL_DCMI_DISABLE_IT(&hdcmi, DCMI_IT_FRAME);
+		USER_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size / 4 * vio_status.gs_bpp);
+		//__HAL_DCMI_ENABLE(&hdcmi);
+
+		//    while ((DCMI->CR & DCMI_CR_CAPTURE) != 0)
+		//    {
+		//        //icm20948_transmit();
+		//		//osDelay(100);
+		//    }
+
+		while(xSemaphoreTake(xSemaphore, 0xFFFFFFFF)  != pdTRUE)
+		{
+			//osDelay(1);
+		}
+		
+		HAL_DCMI_Stop(&hdcmi);
+
+		if (vio_status.cam_frame_size * vio_status.gs_bpp <= CAM_PACKAGE_MAX_SIZE)
+		{
+			openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
+		}
 	}
-	
-    HAL_DCMI_Stop(&hdcmi);
-
-    if (vio_status.cam_frame_size * vio_status.gs_bpp <= CAM_PACKAGE_MAX_SIZE)
-    {
-        openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
-    }
-
     //LCD_Show_Cam(dcmi_image_buffer,vio_status.cam_frame_size);
 }
 
@@ -188,7 +191,6 @@ void dcmi_dma_start(void)
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
     static BaseType_t xHigherPriorityTaskWoken;
-
     xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken);
 }
 

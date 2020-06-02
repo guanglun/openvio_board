@@ -401,7 +401,7 @@ int icm20948_init(void)
 		/*调试用， 系统不用*/
 		("IMU Timer",
 		 /*定时溢出周期， 单位是任务节拍数*/
-		 5,
+		 50,
 		 /*是否自动重载， 此处设置周期性执行*/
 		 pdTRUE,
 		 /*记录定时器溢出次数， 初始化零, 用户自己设置*/
@@ -413,6 +413,9 @@ int icm20948_init(void)
 	{
 		// 启动定时器， 0 表示不阻塞
 		xTimerStart(xTimerIMU, 0);
+		printf("[xTimerIMU][SUCCESS]\r\n");
+	}else{
+		printf("[xTimerIMU][FAIL]\r\n");
 	}
 	return 0;
 }
@@ -457,6 +460,8 @@ void icm20948_transmit(void)
 	static int16_t accel_data[3], gyro_data[3],mag_data_t[3],mag_data[3];
 	static float acc1[3],acc2[3],gyro[3];
 	static float acc_cal = 9.8f*8.0f/65535*2;
+	
+	printf("icm20948_transmit\r\n");
 	
 	#ifndef CAL_ACC
 	if (vio_status.imu_status == SENSOR_STATUS_START)

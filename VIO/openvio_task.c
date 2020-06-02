@@ -132,19 +132,20 @@ void StartOpenvioTask(void const *argument)
 	
 	sdcard_init();
 
-	while (1)
-	{
-		if(vio_status.cam_status == SENSOR_STATUS_START)
-		{
-			vio_status.cam_status = SENSOR_STATUS_RUNNING;
-			
-		}
-		else if(vio_status.cam_status == SENSOR_STATUS_RUNNING)
-		{
-			dcmi_dma_start();		
-		}else{
-			osDelay(100);
-		}
-	}
+//	while (1)
+//	{
+//		if(vio_status.cam_status == SENSOR_STATUS_START)
+//		{
+//			vio_status.cam_status = SENSOR_STATUS_RUNNING;
+//			
+//		}
+//		else if(vio_status.cam_status == SENSOR_STATUS_RUNNING)
+//		{
+////			dcmi_dma_start();		
+////		}else{
+//			
+//			osDelay(100);
+//		}
+//	}
 }
 
