@@ -103,7 +103,7 @@ void camera_init(void)
         vio_status.cam_frame_size_num = FRAMESIZE_VGA;
         printf("[CAM CHIP][OV7725]\r\n");
         ov7725_init();
-        camera_timer_init(30);
+        camera_timer_init(25);
         break;
     case MT9V034_ID:
         vio_status.pixformat = PIXFORMAT_GRAYSCALE;
