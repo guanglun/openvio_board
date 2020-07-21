@@ -88,6 +88,10 @@ void get_time(uint32_t *t1_cnt,uint16_t *t2_cnt);
 #define TEST1_GPIO_Port GPIOD
 #define TEST2_Pin GPIO_PIN_9
 #define TEST2_GPIO_Port GPIOD
+#define IMU_SDA_Pin GPIO_PIN_10
+#define IMU_SDA_GPIO_Port GPIOD
+#define IMU_SCL_Pin GPIO_PIN_11
+#define IMU_SCL_GPIO_Port GPIOD
 #define DCMI_RST_Pin GPIO_PIN_10
 #define DCMI_RST_GPIO_Port GPIOA
 #define SD_CD_Pin GPIO_PIN_0

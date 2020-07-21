@@ -456,8 +456,6 @@ void icm20948_transmit(void)
 		accel_data[1] = acc2[1] / acc_cal;
 		accel_data[2] = acc2[2] / acc_cal;
 		
-
-		
 //		printf("%f\t%f\t%f;\r\n", \
 //			acc2[0], acc2[1], acc2[2]);
 
