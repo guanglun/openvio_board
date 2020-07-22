@@ -215,7 +215,7 @@ void StartDefaultTask(void const * argument)
       {
         while (MPU_Transmit_HS(usb_frame_s.addr, usb_frame_s.len) != 0)
         {
-          osDelay(1);
+//osDelay(1);
         }
       }
     }
