@@ -376,4 +376,6 @@ void PMU6050_WriteReg(uint8_t reg_add,uint8_t reg_dat);
 void MPU6050_PWR_MGMT_1_INIT(void);
 
 
+void mpu6050_transmit(void);
+
 #endif  /*__MPU6050*/

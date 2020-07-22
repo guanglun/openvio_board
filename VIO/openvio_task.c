@@ -13,6 +13,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 
+#include "mpu6050.h"
 #include "icm20948.h"
 #include "camera.h"
 #include "sd_card.h"
@@ -127,8 +128,10 @@ void StartOpenvioTask(void const *argument)
 	openvio_status_init(&vio_status);
 	
     camera_init();
-	icm20948_init();
+	//icm20948_init();
 	//lcd_init();
+	
+	MPU6050_Init();
 	
 	sdcard_init();
 

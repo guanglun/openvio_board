@@ -249,7 +249,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   }  
   
   if (htim->Instance == TIM13) {
-	icm20948_transmit();
+	  HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_SET);
+
+	  mpu6050_transmit();
+
+	  HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_RESET);
+	  
+	//icm20948_transmit();
     //HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
   }  
   /* USER CODE END Callback 1 */

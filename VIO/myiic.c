@@ -50,7 +50,7 @@ static void i2c_Delay(void)
 		循环次数为200时，SCL频率 = 100KHz  
 	 	循环次数为30时，SCL频率 = 400KHz 
   */
-	for (i = 0; i < 200; i++);
+	for (i = 0; i < 30; i++);
 }
 
 /*
