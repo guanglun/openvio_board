@@ -382,16 +382,6 @@
           <GroupName>Application/VIO</GroupName>
           <Files>
             <File>
-              <FileName>icm20948.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\VIO\icm20948.c</FilePath>
-            </File>
-            <File>
-              <FileName>icm20948.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\icm20948.h</FilePath>
-            </File>
-            <File>
               <FileName>openvio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\VIO\openvio.c</FilePath>

@@ -17,6 +17,9 @@ extern QueueHandle_t xQueue;
 
 uint8_t mpu6050_data[20 + 9];
 
+#define CAL_COUNT 100
+int32_t cnnt = 0, cal_gyro[3] = {0, 0, 0};
+
 void MPU6050ReadData(short *mpudata);
 
 /**
@@ -42,6 +45,13 @@ void MPU6050_ReadData(uint8_t reg_add, unsigned char *Read, uint8_t num)
   Sensor_Read(reg_add, Read, num);
 }
 
+#define OX 0.433201
+#define OY -0.092553
+#define OZ -0.761175
+#define RX 1.002928
+#define RY 1.001974
+#define RZ 1.009245
+
 void mpu6050_transmit(void)
 {
   static uint32_t t1;
@@ -49,7 +59,10 @@ void mpu6050_transmit(void)
 
   static short mpu6050_read_data[6];
 
-  if(vio_status.imu_status == SENSOR_STATUS_START)
+  static float acc1[3], acc2[3], gyro[3];
+  static float acc_cal = 9.8f * 8.0f / 65535 * 2;
+
+  if (vio_status.imu_status == SENSOR_STATUS_START)
   {
 
     get_time(&t1, &t2);
@@ -62,6 +75,28 @@ void mpu6050_transmit(void)
     mpu6050_data[5] = (uint8_t)(t2 >> 0);
 
     MPU6050ReadData(mpu6050_read_data);
+
+    if (cnnt < CAL_COUNT)
+    {
+      cnnt++;
+
+      cal_gyro[0] += mpu6050_read_data[3];
+      cal_gyro[1] += mpu6050_read_data[4];
+      cal_gyro[2] += mpu6050_read_data[5];
+
+      if (cnnt >= CAL_COUNT)
+      {
+        cal_gyro[0] /= CAL_COUNT;
+        cal_gyro[1] /= CAL_COUNT;
+        cal_gyro[2] /= CAL_COUNT;
+      }
+
+      return;
+    }
+
+    mpu6050_read_data[3] -= cal_gyro[0];
+    mpu6050_read_data[4] -= cal_gyro[1];
+    mpu6050_read_data[5] -= cal_gyro[2];
 
     /*ACC*/
     mpu6050_data[6] = (uint8_t)(mpu6050_read_data[0] >> 8);
@@ -87,9 +122,26 @@ void mpu6050_transmit(void)
     // mpu6050_data[22] = (uint8_t)(mag_data[2] >> 8);
     // mpu6050_data[23] = (uint8_t)(mag_data[2] >> 0);
 
-    // printf("%d\t%d\t%d\t%d\t%d\t%d\r\n", \
-    //       mpu6050_read_data[0], mpu6050_read_data[1], mpu6050_read_data[2], \
-    //       mpu6050_read_data[3], mpu6050_read_data[4], mpu6050_read_data[5]);
+    //    printf("%d\t%d\t%d\t%d\t%d\t%d\r\n", \
+//          mpu6050_read_data[0], mpu6050_read_data[1], mpu6050_read_data[2], \
+//          mpu6050_read_data[3], mpu6050_read_data[4], mpu6050_read_data[5]);
+
+    acc1[0] = mpu6050_read_data[0] * acc_cal;
+    acc1[1] = mpu6050_read_data[1] * acc_cal;
+    acc1[2] = mpu6050_read_data[2] * acc_cal;
+
+    acc2[0] = (acc1[0] - OX) / RX;
+    acc2[1] = (acc1[1] - OY) / RY;
+    acc2[2] = (acc1[2] - OZ) / RZ;
+
+//    printf("%f\t%f\t%f;\r\n",
+//           acc2[0], acc2[1], acc2[2]);
+
+    mpu6050_read_data[0] = acc2[0] / acc_cal;
+    mpu6050_read_data[1] = acc2[1] / acc_cal;
+    mpu6050_read_data[2] = acc2[2] / acc_cal;
+
+
 
     struct USB_FRAME_STRUCT usb_frame_s;
     usb_frame_s.addr = (uint8_t *)mpu6050_data;
@@ -97,7 +149,6 @@ void mpu6050_transmit(void)
     usb_frame_s.sensor = SENSOR_USB_IMU;
 
     xQueueSendFromISR(xQueue, (void *)&usb_frame_s, (TickType_t)0);
-
   }
 }
 
@@ -147,29 +198,29 @@ void MPU6050_Init(void)
     printf("[MPU6050] [Init Fail]\r\n");
   }
 
-//  // 申请定时器， 配置
-//  xTimerMPU6050 = xTimerCreate
-//      /*调试用， 系统不用*/
-//      ("IMU Timer",
-//       /*定时溢出周期， 单位是任务节拍数*/
-//       10,
-//       /*是否自动重载， 此处设置周期性执行*/
-//       pdTRUE,
-//       /*记录定时器溢出次数， 初始化零, 用户自己设置*/
-//       (void *)0,
-//       /*回调函数*/
-//       vTimerMPU6050Callback);
+  //  // 申请定时器， 配置
+  //  xTimerMPU6050 = xTimerCreate
+  //      /*调试用， 系统不用*/
+  //      ("IMU Timer",
+  //       /*定时溢出周期， 单位是任务节拍数*/
+  //       10,
+  //       /*是否自动重载， 此处设置周期性执行*/
+  //       pdTRUE,
+  //       /*记录定时器溢出次数， 初始化零, 用户自己设置*/
+  //       (void *)0,
+  //       /*回调函数*/
+  //       vTimerMPU6050Callback);
 
-//  if (xTimerMPU6050 != NULL)
-//  {
-//    // 启动定时器， 0 表示不阻塞
-//    xTimerStart(xTimerMPU6050, 0);
-//    printf("[xTimerIMU][SUCCESS]\r\n");
-//  }
-//  else
-//  {
-//    printf("[xTimerIMU][FAIL]\r\n");
-//  }
+  //  if (xTimerMPU6050 != NULL)
+  //  {
+  //    // 启动定时器， 0 表示不阻塞
+  //    xTimerStart(xTimerMPU6050, 0);
+  //    printf("[xTimerIMU][SUCCESS]\r\n");
+  //  }
+  //  else
+  //  {
+  //    printf("[xTimerIMU][FAIL]\r\n");
+  //  }
 }
 
 /**
