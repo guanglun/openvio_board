@@ -98,6 +98,26 @@ void mpu6050_transmit(void)
     mpu6050_read_data[4] -= cal_gyro[1];
     mpu6050_read_data[5] -= cal_gyro[2];
 
+    //    printf("%d\t%d\t%d\t%d\t%d\t%d\r\n", \
+//          mpu6050_read_data[0], mpu6050_read_data[1], mpu6050_read_data[2], \
+//          mpu6050_read_data[3], mpu6050_read_data[4], mpu6050_read_data[5]);
+
+    acc1[0] = mpu6050_read_data[0] * acc_cal;
+    acc1[1] = mpu6050_read_data[1] * acc_cal;
+    acc1[2] = mpu6050_read_data[2] * acc_cal;
+
+    acc2[0] = (acc1[0] - OX) / RX;
+    acc2[1] = (acc1[1] - OY) / RY;
+    acc2[2] = (acc1[2] - OZ) / RZ;
+
+//    printf("%f\t%f\t%f;\r\n",
+//           acc2[0], acc2[1], acc2[2]);
+
+    mpu6050_read_data[0] = acc2[0] / acc_cal;
+    mpu6050_read_data[1] = acc2[1] / acc_cal;
+    mpu6050_read_data[2] = acc2[2] / acc_cal;
+
+
     /*ACC*/
     mpu6050_data[6] = (uint8_t)(mpu6050_read_data[0] >> 8);
     mpu6050_data[7] = (uint8_t)(mpu6050_read_data[0] >> 0);
@@ -121,28 +141,7 @@ void mpu6050_transmit(void)
     // mpu6050_data[21] = (uint8_t)(mag_data[1] >> 0);
     // mpu6050_data[22] = (uint8_t)(mag_data[2] >> 8);
     // mpu6050_data[23] = (uint8_t)(mag_data[2] >> 0);
-
-    //    printf("%d\t%d\t%d\t%d\t%d\t%d\r\n", \
-//          mpu6050_read_data[0], mpu6050_read_data[1], mpu6050_read_data[2], \
-//          mpu6050_read_data[3], mpu6050_read_data[4], mpu6050_read_data[5]);
-
-    acc1[0] = mpu6050_read_data[0] * acc_cal;
-    acc1[1] = mpu6050_read_data[1] * acc_cal;
-    acc1[2] = mpu6050_read_data[2] * acc_cal;
-
-    acc2[0] = (acc1[0] - OX) / RX;
-    acc2[1] = (acc1[1] - OY) / RY;
-    acc2[2] = (acc1[2] - OZ) / RZ;
-
-//    printf("%f\t%f\t%f;\r\n",
-//           acc2[0], acc2[1], acc2[2]);
-
-    mpu6050_read_data[0] = acc2[0] / acc_cal;
-    mpu6050_read_data[1] = acc2[1] / acc_cal;
-    mpu6050_read_data[2] = acc2[2] / acc_cal;
-
-
-
+	
     struct USB_FRAME_STRUCT usb_frame_s;
     usb_frame_s.addr = (uint8_t *)mpu6050_data;
     usb_frame_s.len = 24;
