@@ -21,7 +21,7 @@ void lcd_spi_init(void)
   hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -54,7 +54,7 @@ void lcd_init(void)
 {
     lcd_spi_init();
 	
-
+	osDelay(120);               //Delay 120ms 
 	LCD_WR_REG(0x11);           //Sleep out 
 	osDelay(120);               //Delay 120ms 
 	LCD_WR_REG(0x36);
@@ -133,12 +133,13 @@ void lcd_init(void)
 
 	LCD_WR_REG(0x29); 
 	
-	
-	
 	//test
 	
-//	LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-//	LCD_ShowString(0,40,"LCD_W:",RED,WHITE,16,0);	
+	LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
+	osDelay(100);
+	LCD_ShowString(0,40,"LCD_W:",RED,WHITE,16,0);	
+	
+	osDelay(1000);
 		//LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
     //     LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
 	// while(1)
@@ -146,9 +147,12 @@ void lcd_init(void)
     //     // while(is_wait);
 	// 	// LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
 	// 	// while(is_wait);
-	LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
+//	LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
 //	while(1)
 //	{
+//		LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
+//		osDelay(1000);
+//		LCD_Fill(0,0,LCD_W,LCD_H,RED);
 //		osDelay(1000);
 //	}
          

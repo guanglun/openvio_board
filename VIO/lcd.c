@@ -9,8 +9,8 @@
 								color       要填充的颜色
       返回值：  无
 ******************************************************************************/
-//DMA_BUFFER uint8_t lcd_buffer[240*240*2];
-DMA_BUFFER uint8_t lcd_buffer[2];
+DMA_BUFFER uint8_t lcd_buffer[240*240*2];
+//DMA_BUFFER uint8_t lcd_buffer[2];
 uint8_t *lcd_buffer8,*lcd_buffer16;
 volatile uint32_t lcd_show_size = 0,send_count = 0;
 
@@ -19,14 +19,25 @@ extern uint16_t adc_value;
 extern uint8_t is_wait,fps_count;
 void LCD_Show_Cam(uint8_t *img,uint32_t size)
 {
+	uint32_t count=0;
 	uint16_t test;
 	if(is_wait == 0)
 	{
 		is_wait = 1;
-	lcd_buffer16 = lcd_buffer;
-   for(int i=0;i<size;i++)
+		lcd_buffer16 = lcd_buffer;
+		
+		
+	// for(int n=0;n<240;n++)
+	// {
+	// 	for(int m=20;m<260;m++)
+	// 	{
+	// 		lcd_buffer[count*2] = img[640*2*n + m*2*2];
+	// 		lcd_buffer[count*2+1] = img[640*2*n + m*2*2+1];
+	// 		count++;
+	// 	}
+	// }		
+   for(int i=0;i<LCD_W*LCD_H;i++)
 	{
-//		*(lcd_buffer16+i) = (uint16_t)((img[i*2])|(img[i*2+1]<<8));
 		lcd_buffer[i*2] = img[i*2];
 		lcd_buffer[i*2+1] = img[i*2+1];
 	}
@@ -35,12 +46,12 @@ void LCD_Show_Cam(uint8_t *img,uint32_t size)
 	//LCD_ShowIntNum(0,160,adc_value,4,RED,WHITE,uint8_t sizey)
 	
 	
-	LCD_ShowFloatNum1(0,160,6.6*adc_value/4096,3,RED,WHITE,32);
-	LCD_ShowIntNum(0,200,fps_value,2,RED,WHITE,32);
+//	LCD_ShowFloatNum1(0,160,6.6*adc_value/4096,3,RED,WHITE,32);
+//	LCD_ShowIntNum(0,200,fps_value,2,RED,WHITE,32);
 	
 	LCD_Address_Set(0,0,240-1,240-1);//设置显示范围
     lcd_buffer8 = lcd_buffer;
-    lcd_show_size = size*2;
+    lcd_show_size = LCD_W*LCD_H*2;
 	send_count = 65535;
     LCD_Writ_Buffer(lcd_buffer8,65535);
 	}
@@ -53,13 +64,15 @@ void LCD_Fill(uint16_t xsta,uint16_t ysta,uint16_t xend,uint16_t yend,uint16_t c
     
 	uint16_t *lcd_buffer16 = (uint16_t *)lcd_buffer;
 	LCD_Address_Set(xsta,ysta,xend-1,yend-1);//设置显示范围
-	// for(i=ysta;i<yend;i++)
-	// {													   	 	
-	// 	for(j=xsta;j<xend;j++)
-	// 	{
-	// 		LCD_WR_DATA(color);
-	// 	}
-	// } 		
+//	for(i=ysta;i<yend;i++)
+//	{													   	 	
+//	for(j=xsta;j<xend;j++)
+//	{
+//		LCD_WR_DATA(color);
+//	}
+//	} 		
+	
+	
 	send_count = 65535;
    for(i=0;i<240*240;i++)
 	{

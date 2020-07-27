@@ -58,6 +58,8 @@ typedef enum {
     FRAMESIZE_XGA,      // 1024x768
     FRAMESIZE_SXGA,     // 1280x1024
     FRAMESIZE_UXGA,     // 1600x1200
+
+    FRAMESIZE_MLCD,     // 240x240
 } framesize_t;
 
 extern const int resolution[][2];

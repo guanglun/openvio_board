@@ -127,9 +127,9 @@ void StartOpenvioTask(void const *argument)
 
 	openvio_status_init(&vio_status);
 	
+	lcd_init();
+	
     camera_init();
-	//icm20948_init();
-	//lcd_init();
 	
 	MPU6050_Init();
 	
