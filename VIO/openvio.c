@@ -63,7 +63,7 @@ void openvio_status_init(struct OPENVIO_STATUS *status)
 
 void USER_PCD_IRQHandler(PCD_HandleTypeDef *hpcd)
 {
-    //    uint32_t send_size = USB_DMA_PACKAGE_SIZE;
+    //  uint32_t send_size = USB_DMA_PACKAGE_SIZE;
     //	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
     //
     //	if(hcdc->TxState == USBD_OK)

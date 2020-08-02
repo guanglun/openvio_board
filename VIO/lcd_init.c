@@ -135,11 +135,11 @@ void lcd_init(void)
 	
 	//test
 	
-	LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-	osDelay(100);
-	LCD_ShowString(0,40,"LCD_W:",RED,WHITE,16,0);	
-	
-	osDelay(1000);
+	LCD_Fill(0,0,LCD_W,LCD_H,RED);
+//	osDelay(100);
+//	LCD_ShowString(0,40,"LCD_W:",RED,WHITE,16,0);	
+//	
+//	osDelay(1000);
 		//LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
     //     LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
 	// while(1)

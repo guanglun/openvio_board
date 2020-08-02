@@ -2,6 +2,7 @@
 #include "lcd_init.h"
 #include "lcdfont.h"
 #include "openvio.h"
+#include "camera.h"
 /******************************************************************************
       函数说明：在指定区域填充颜色
       入口数据：xsta,ysta   起始坐标
@@ -14,46 +15,115 @@ DMA_BUFFER uint8_t lcd_buffer[240*240*2];
 uint8_t *lcd_buffer8,*lcd_buffer16;
 volatile uint32_t lcd_show_size = 0,send_count = 0;
 
+extern const int resolution[][2];
 extern uint8_t fps_value;
 extern uint16_t adc_value;
 extern uint8_t is_wait,fps_count;
 void LCD_Show_Cam(uint8_t *img,uint32_t size)
 {
-	uint32_t count=0;
+	static uint32_t pix_count=0,recv_size_count=0;
+	uint32_t temp=0;
 	uint16_t test;
+	uint8_t step = 0;
+	uint16_t img_x = resolution[vio_status.cam_frame_size_num][0];
+	uint16_t img_y = resolution[vio_status.cam_frame_size_num][1];
+	uint16_t rgb;
+	
+//	if(vio_status.cam_frame_size * vio_status.gs_bpp <= CAM_PACKAGE_MAX_SIZE)
+//	{
+//		return;
+//	}
+	
 	if(is_wait == 0)
 	{
-		is_wait = 1;
+		
 		lcd_buffer16 = lcd_buffer;
 		
+		step = img_x / LCD_W;
+		if((img_x % LCD_W) > 0)
+		{
+			step++;
+		}
 		
-	// for(int n=0;n<240;n++)
-	// {
-	// 	for(int m=20;m<260;m++)
-	// 	{
-	// 		lcd_buffer[count*2] = img[640*2*n + m*2*2];
-	// 		lcd_buffer[count*2+1] = img[640*2*n + m*2*2+1];
-	// 		count++;
-	// 	}
-	// }		
-   for(int i=0;i<LCD_W*LCD_H;i++)
-	{
-		lcd_buffer[i*2] = img[i*2];
-		lcd_buffer[i*2+1] = img[i*2+1];
-	}
-	
-	
-	//LCD_ShowIntNum(0,160,adc_value,4,RED,WHITE,uint8_t sizey)
-	
-	
-//	LCD_ShowFloatNum1(0,160,6.6*adc_value/4096,3,RED,WHITE,32);
-//	LCD_ShowIntNum(0,200,fps_value,2,RED,WHITE,32);
-	
-	LCD_Address_Set(0,0,240-1,240-1);//设置显示范围
-    lcd_buffer8 = lcd_buffer;
-    lcd_show_size = LCD_W*LCD_H*2;
-	send_count = 65535;
-    LCD_Writ_Buffer(lcd_buffer8,65535);
+		do{
+			temp = (pix_count/(img_x/step)*step*img_x+pix_count%(img_x/step)*step);
+			if(temp < recv_size_count + size/vio_status.gs_bpp)
+			{
+				if(vio_status.cam_id == OV7725_ID)
+				{				
+					lcd_buffer[pix_count*2] 	= img[(temp-recv_size_count)*2];
+					lcd_buffer[pix_count*2+1] 	= img[(temp-recv_size_count)*2 +1];
+				}else if(vio_status.cam_id == MT9V034_ID)
+				{				
+					rgb = 	((img[temp-recv_size_count] >> 3)|
+							((img[temp-recv_size_count] & ~3) << 3)|
+							((img[temp-recv_size_count] & ~7) << 8));
+					
+					lcd_buffer[pix_count*2+1] = (uint8_t)(rgb);
+					lcd_buffer[pix_count*2] = (uint8_t)(rgb >> 8);
+				}
+				pix_count++;
+			}
+		}
+		while(temp < recv_size_count + size/vio_status.gs_bpp);
+		
+		recv_size_count += size/vio_status.gs_bpp;
+		
+//		for(int n = 0;n < img_y; n += step)
+//		{
+//			for(int m = 0;m < img_x; m += step)
+//			{
+//				if(vio_status.cam_id == OV7725_ID)
+//				{				
+//					lcd_buffer[pix_count*2] 	= img[m*2 + n*img_x*2];
+//					lcd_buffer[pix_count*2+1] 	= img[m*2 + n*img_x*2 +1];
+//				}else if(vio_status.cam_id == MT9V034_ID)
+//				{
+//					rgb = ((img[m+n*img_x] >> 3)|((img[m+n*img_x] & ~3) << 3)|((img[m+n*img_x] & ~7) << 8));
+//					lcd_buffer[pix_count*2+1] = (uint8_t)(rgb);
+//					lcd_buffer[pix_count*2] = (uint8_t)(rgb >> 8);
+//				}
+//				pix_count++;
+//				
+//			}
+//		}
+		
+//	   for(int i=0;i<LCD_W*LCD_H;i++)
+//		{
+//			lcd_buffer[i*2] = img[i*2];
+//			lcd_buffer[i*2+1] = img[i*2+1];
+//		}
+		
+		//LCD_ShowIntNum(0,160,adc_value,4,RED,WHITE,uint8_t sizey)
+	//	LCD_ShowFloatNum1(0,160,6.6*adc_value/4096,3,RED,WHITE,32);
+	//	LCD_ShowIntNum(0,200,fps_value,2,RED,WHITE,32);
+
+		
+		if(pix_count == img_x/step*img_y/step)
+		{
+			LCD_Address_Set(
+							(LCD_W - img_x/step)/2,
+							(LCD_H - img_y/step)/2,
+							(LCD_W - img_x/step)/2 + img_x/step-1,
+							(LCD_H - img_y/step)/2 + img_y/step-1);//设置显示范围
+			
+			lcd_buffer8 = lcd_buffer;
+			lcd_show_size = img_x/step*img_y/step*2;
+			
+			if(lcd_show_size > 65535)
+			{
+				send_count = 65535;
+				LCD_Writ_Buffer(lcd_buffer8,65535);
+			}else{
+				send_count = lcd_show_size;
+				LCD_Writ_Buffer(lcd_buffer8,lcd_show_size);
+			}
+			
+			pix_count=0;
+			recv_size_count = 0;
+			is_wait = 1;
+		}
+		
 	}
 }
 
@@ -76,7 +146,7 @@ void LCD_Fill(uint16_t xsta,uint16_t ysta,uint16_t xend,uint16_t yend,uint16_t c
 	send_count = 65535;
    for(i=0;i<240*240;i++)
 	{
-		*(lcd_buffer16+i) = color;
+		*(lcd_buffer16+i) = ((color<<8)|(color>>8));
 	}
 	    lcd_buffer8 = lcd_buffer;
 		lcd_show_size = 240*240*2;
