@@ -509,66 +509,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Application/IMU</GroupName>
-          <Files>
-            <File>
-              <FileName>AK09916_ENUMERATIONS.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\IMU\AK09916_ENUMERATIONS.h</FilePath>
-            </File>
-            <File>
-              <FileName>AK09916_REGISTERS.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\IMU\AK09916_REGISTERS.h</FilePath>
-            </File>
-            <File>
-              <FileName>ICM_20948_C.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\VIO\IMU\ICM_20948_C.c</FilePath>
-            </File>
-            <File>
-              <FileName>ICM_20948_C.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\IMU\ICM_20948_C.h</FilePath>
-            </File>
-            <File>
-              <FileName>ICM_20948_ENUMERATIONS.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\IMU\ICM_20948_ENUMERATIONS.h</FilePath>
-            </File>
-            <File>
-              <FileName>ICM_20948_REGISTERS.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\IMU\ICM_20948_REGISTERS.h</FilePath>
-            </File>
-            <File>
-              <FileName>icm20948_img.dmp3a.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\IMU\icm20948_img.dmp3a.h</FilePath>
-            </File>
-            <File>
-              <FileName>ICM_20948.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\VIO\IMU\ICM_20948.c</FilePath>
-            </File>
-            <File>
-              <FileName>ICM_20948.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\VIO\IMU\ICM_20948.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Application/App</GroupName>
-          <Files>
-            <File>
-              <FileName>i2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\App\i2c.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>Application/MDK-ARM</GroupName>
           <Files>
             <File>

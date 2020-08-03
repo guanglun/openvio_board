@@ -58,7 +58,7 @@ EndBSPDependencies */
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc.h"
 #include "usbd_ctlreq.h"
-
+#include "openvio_task.h"
 
 /** @addtogroup STM32_USB_DEVICE_LIBRARY
   * @{
@@ -410,7 +410,7 @@ static uint8_t  USBD_CDC_Setup(USBD_HandleTypeDef *pdev,
   uint8_t ifalt = 0U;
   uint16_t status_info = 0U;
   uint8_t ret = USBD_OK;
-
+  uint8_t s_data[128],s_len;
   switch (req->bmRequest & USB_REQ_TYPE_MASK)
   {
     case USB_REQ_TYPE_CLASS :
@@ -483,7 +483,7 @@ static uint8_t  USBD_CDC_Setup(USBD_HandleTypeDef *pdev,
 	  
 	//zsp device config
     case USB_REQ_TYPE_VENDOR:
-      uint8_t s_data[128],s_len;
+      
       s_len = camera_ctrl(req,s_data);
       USBD_CtlSendData(pdev, s_data, s_len);
     break;
@@ -553,7 +553,7 @@ static uint8_t  USBD_CDC_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
   // {
   //   ((USBD_CDC_ItfTypeDef *)pdev->pUserData)->Receive(hcdc->RxBuffer, &hcdc->RxLength);
 
-  //   return USBD_OK;
+     return USBD_OK;
   // }
   // else
   // {

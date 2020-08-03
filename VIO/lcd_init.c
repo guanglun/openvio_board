@@ -1,6 +1,7 @@
 #include "lcd_init.h"
 #include "spi.h"
 #include "lcd.h"
+#include "cmsis_os.h"
 
 extern SPI_HandleTypeDef hspi2;
 
@@ -49,7 +50,7 @@ void lcd_spi_init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
-uint8_t is_wait = 0,fps_count = 0;
+uint8_t is_spi_wait = 0,fps_count = 0;
 void lcd_init(void)
 {
     lcd_spi_init();
@@ -133,32 +134,9 @@ void lcd_init(void)
 
 	LCD_WR_REG(0x29); 
 	
-	//test
-	
-	LCD_Fill(0,0,LCD_W,LCD_H,RED);
-//	osDelay(100);
-//	LCD_ShowString(0,40,"LCD_W:",RED,WHITE,16,0);	
-//	
-//	osDelay(1000);
-		//LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-    //     LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-	// while(1)
-	// {
-    //     // while(is_wait);
-	// 	// LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-	// 	// while(is_wait);
-//	LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-//	while(1)
-//	{
-//		LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-//		osDelay(1000);
-//		LCD_Fill(0,0,LCD_W,LCD_H,RED);
-//		osDelay(1000);
-//	}
-         
-    //     printf("%d\r\n",fps_count);
-    //     fps_count=0;
-	// }
+	LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
+	osDelay(100);
+	LCD_ShowString(0, 16 * 0, "[OPENVIO][StartUp]", RED, WHITE, 16, 0);
 }
 
 void LCD_Writ_Buffer(uint8_t *buf,uint16_t size)

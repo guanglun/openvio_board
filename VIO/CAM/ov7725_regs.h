@@ -11,14 +11,14 @@
 #ifndef __REG_REGS_H__
 #define __REG_REGS_H__
 
-#define GAIN                    0x00 /* AGC - Gain control gain setting  */
-#define BLUE                    0x01 /* AWB - Blue channel gain setting  */
-#define RED                     0x02 /* AWB - Red channel gain setting   */
-#define GREEN                   0x03 /* AWB - Green channel gain setting */
-#define BAVG                    0x05 /* U/B Average Level  */
-#define GAVG                    0x06 /* Y/Gb Average Level */
-#define RAVG                    0x07 /* V/R Average Level  */
-#define AECH                    0x08 /* Exposure Value - AEC MSBs */
+#define CAM_GAIN                    0x00 /* AGC - Gain control gain setting  */
+#define CAM_BLUE                    0x01 /* AWB - Blue channel gain setting  */
+#define CAM_RED                     0x02 /* AWB - Red channel gain setting   */
+#define CAM_GREEN                   0x03 /* AWB - Green channel gain setting */
+#define CAM_BAVG                    0x05 /* U/B Average Level  */
+#define CAM_GAVG                    0x06 /* Y/Gb Average Level */
+#define CAM_RAVG                    0x07 /* V/R Average Level  */
+#define CAM_AECH                    0x08 /* Exposure Value - AEC MSBs */
 
 #define COM2                    0x09 /* Common Control 2 */
 #define COM2_SOFT_SLEEP         0x10 /* Soft sleep mode  */

@@ -13,5 +13,6 @@
 #define OMV_OV7725_BANDING      (0x7F)
 
 void ov7725_init(void);
+void ov7725_config(framesize_t frame_size_num);
 
 #endif

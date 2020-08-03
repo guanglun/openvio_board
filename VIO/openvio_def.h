@@ -2,7 +2,7 @@
 #define __OPENVIO_DEF_H__
 
 #include "main.h"
-
+#include "camera.h"
 #define DMA_BUFFER \
   __attribute__((section(".RAM_D1")))
 
@@ -75,7 +75,7 @@ struct OPENVIO_STATUS{
     pixformat_t pixformat;
     uint8_t cam_id;
     uint8_t gs_bpp;
-    uint8_t cam_frame_size_num;
+    framesize_t cam_frame_size_num;
     uint32_t cam_frame_size;
     uint8_t cam_name;
 };

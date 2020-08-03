@@ -30,6 +30,8 @@
 #include "dcmi.h"
 #include "sd_card.h"
 #include "openvio.h"
+#include "lcd.h"
+#include "usbd_cdc_if.h"
 
 uint16_t adc_value;
 uint8_t fps_value;
@@ -222,94 +224,13 @@ void StartDefaultTask(void const *argument)
       }
     }
 
-    //	  	if(hUsbDeviceHS.dev_state != HAL_PCD_STATE_BUSY && vio_status.usb_status == USB_CONNECT)
-    //		{
-    //			connect_delay++;
-    //			if(connect_delay >= 100)
-    //			{
-    //				connect_delay = 0;
-    //				printf("[USB DISCONNECT]\r\n");
-    //				vio_status.usb_status = USB_DISCONNECT;
-    //        MX_USB_DEVICE_Init();
-    //			}
-
-    //		}else if(hUsbDeviceHS.dev_state == HAL_PCD_STATE_BUSY && vio_status.usb_status == USB_DISCONNECT)
-    //		{
-    //			connect_delay++;
-    //			if(connect_delay >= 100)
-    //			{
-    //				connect_delay = 0;
-    //				printf("[USB CONNECT]\r\n");
-    //				vio_status.usb_status = USB_CONNECT;
-    //			}
-    //		}
-
-    //	HAL_ADC_Start(&hadc1);
-    //    HAL_ADC_PollForConversion(&hadc1, 200);
-    //    if (HAL_IS_BIT_SET(HAL_ADC_GetState(&hadc1), HAL_ADC_STATE_REG_EOC))
-    //    {
-    //      uint32_t AD_Value = HAL_ADC_GetValue(&hadc1);
-    //      printf("%d\t%0.2f\r\n", AD_Value,3.3f*(float)AD_Value/4096*2);
-    //    }
-    //	HAL_ADC_Stop(&hadc1);
-
-    // 	HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
-    //   HAL_Delay(1000);
-    // 	HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
-    //   HAL_Delay(1000);
-
-    // 	HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
-    //   HAL_Delay(1000);
-    // 	HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
-    //   HAL_Delay(1000);
-
-    // 	HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
-    //   HAL_Delay(1000);
-    // 	HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
-    //   HAL_Delay(1000);
-
     // adc_value = Get_Adc_Average(ADC_CHANNEL_16,20);
     // printf("%d\t%0.2f\t%0.2f\r\n", adc_value,3.3f*(float)adc_value/4096,3.3f*(float)adc_value/4096*2);
     // osDelay(1000);
-    //	fps_value = fps_count;
-    //	printf("%d\r\n",fps_count);
-    //	fps_count=0;
 
-    //	value=0;
-    //	for(int i=0;i<10;i++)
-    //	{
-    //		value+=ADC_ConvertedValue[i];
-    //	}
-    //	value/=10;
-    //	printf("%d\t%0.2f\r\n", value,3.3f*(float)value/4096*2);
+    // GPIO_PinState state = HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin);
+    // printf(" %d\r\n", state);
 
-    //    GPIO_PinState state = HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin);
-
-    //    printf(" %d\r\n", state);
-
-    //    osDelay(100);
-
-    //    osDelay(1000);
-    //
-    //    HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
-    //    osDelay(1000);
-    //    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
-    //    osDelay(1000);
-    //    HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
-    //    osDelay(1000);
-    //    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
-    //    osDelay(1000);
-    //    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
-    //    osDelay(1000);
-
-    //    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_RESET);
-    //    osDelay(1000);
-    //    HAL_GPIO_WritePin(LED_E9_GPIO_Port, LED_E9_Pin, GPIO_PIN_SET);
-    //    osDelay(1000);
-    //    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_RESET);
-    //    osDelay(1000);
-    //    HAL_GPIO_WritePin(LED_E10_GPIO_Port, LED_E10_Pin, GPIO_PIN_SET);
-    //osDelay(1000);
   }
   /* USER CODE END StartDefaultTask */
 }

@@ -3,7 +3,7 @@
 #include "main.h"
 #include "cambus.h"
 #include "openvio.h"
-#include "FreeRTOS.h"
+#include "cmsis_os.h"
 
 #include "dcmi.h"
 
@@ -202,7 +202,7 @@ static int set_pixformat(pixformat_t pixformat)
     return cambus_writeb(OV7725_SLV_ADDR, COM7, reg) | ret;
 }
 
-void ov7725_config(int frame_size_num)
+void ov7725_config(framesize_t frame_size_num)
 {
 	vio_status.cam_frame_size_num = frame_size_num;
 	vio_status.cam_frame_size = resolution[frame_size_num][0]*resolution[frame_size_num][1];

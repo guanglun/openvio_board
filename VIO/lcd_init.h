@@ -10,6 +10,7 @@
 #define LCD_H 240
 
 void lcd_spi_init(void);
+void lcd_init(void);
 void LCD_WR_DATA8(uint8_t dat);
 void LCD_WR_DATA(uint16_t dat);
 void LCD_WR_REG(uint8_t dat);

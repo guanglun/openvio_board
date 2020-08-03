@@ -9,6 +9,8 @@
 #include "main.h"
 #include "cmsis_os.h"
 
+USBD_StatusTypeDef MUSBD_Get_USB_Status(HAL_StatusTypeDef hal_status);
+
 extern USBD_HandleTypeDef hUsbDeviceHS;
 
 // typedef enum {
@@ -95,81 +97,9 @@ uint8_t openvio_usb_send(enum SENSOR_USB usb, uint8_t *Buf, uint32_t Len)
     usb_frame_s.len = Len;
     usb_frame_s.sensor = usb;
     xQueueSend(xQueue, (void *)&usb_frame_s, (TickType_t)0);
-    
-    // int ret = USBD_FAIL,try_cnt = 0;
-    // USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
 
-    // if(vio_status.usb_s.status == USB_WAIT)
-    // {
-    //     vio_status.usb_s.status = USB_WORKING;
-    //     vio_status.usb_s.target_len = Len;
-    //     vio_status.usb_s.len = USB_DMA_PACKAGE_SIZE;
-    //     vio_status.usb_s.addr = Buf;
-
-    // 	if(usb == SENSOR_USB_CAM)
-    // 	{
-    //         //CDC_Transmit_HS("CAM", 3);
-    // 		CDC_Transmit_HS(vio_status.usb_s.addr, USB_DMA_PACKAGE_SIZE);
-    // 	}else if(usb == SENSOR_USB_IMU)
-    // 	{
-    //         MPU_Transmit_HS("IMU", 3);
-    // 	}
-
-    // 	return 0;
-
-    // }
-    // return 1;
+    return 1;
 }
-
-// #define USB_TRY_NUM 65500
-// void openvio_usb_send(enum SENSOR_USB usb,uint8_t* Buf, uint16_t Len)
-// {
-// 	int ret = USBD_FAIL,try_cnt = 0;
-// 	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
-
-// 	do{
-// 		if(usb == SENSOR_USB_CAM)
-// 		{
-// 			ret = CDC_Transmit_HS(Buf,Len);
-// 		}else if(usb == SENSOR_USB_IMU)
-// 		{
-// 			ret = MPU_Transmit_HS(Buf,Len);
-// 		}
-// 		try_cnt++;
-// 		osDelay(1);
-// 	}
-// 	while(ret == USBD_BUSY);// && try_cnt < USB_TRY_NUM);
-
-// 	if(ret == USBD_FAIL)
-// 	{
-// 		if(usb == SENSOR_USB_CAM)
-// 		{
-// 			vio_status.cam_status = SENSOR_STATUS_WAIT;
-// 			printf("cam error\r\n");
-// 		}else if(usb == SENSOR_USB_IMU)
-// 		{
-// 			vio_status.imu_status = SENSOR_STATUS_WAIT;
-// 			printf("imu error\r\n");
-// 		}
-// 	}
-
-// 	if(try_cnt >= USB_TRY_NUM)
-// 	{
-
-// 		hcdc->TxState = USBD_OK;
-
-// 		if(usb == SENSOR_USB_CAM)
-// 		{
-// 			vio_status.cam_status = SENSOR_STATUS_WAIT;
-// 			printf("cam timeout\r\n");
-// 		}else if(usb == SENSOR_USB_IMU)
-// 		{
-// 			vio_status.imu_status = SENSOR_STATUS_WAIT;
-// 			printf("imu  timeout\r\n");
-// 		}
-
-// 	}
-// }
 
 static uint8_t USBD_CAM_SetTxBuffer(USBD_HandleTypeDef *pdev,
                                     uint8_t *pbuff,
@@ -190,7 +120,7 @@ static USBD_StatusTypeDef USBD_CAM_LL_Transmit(USBD_HandleTypeDef *pdev, uint8_t
 
     hal_status = HAL_PCD_EP_Transmit(pdev->pData, ep_addr, pbuf, size);
 
-    usb_status = USBD_Get_USB_Status(hal_status);
+    usb_status = MUSBD_Get_USB_Status(hal_status);
 
     return usb_status;
 }
@@ -246,4 +176,29 @@ uint8_t get_usb_tx_state(void)
 {
     USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
     return hcdc->TxState;
+}
+
+USBD_StatusTypeDef MUSBD_Get_USB_Status(HAL_StatusTypeDef hal_status)
+{
+  USBD_StatusTypeDef usb_status = USBD_OK;
+
+  switch (hal_status)
+  {
+    case HAL_OK :
+      usb_status = USBD_OK;
+    break;
+    case HAL_ERROR :
+      usb_status = USBD_FAIL;
+    break;
+    case HAL_BUSY :
+      usb_status = USBD_BUSY;
+    break;
+    case HAL_TIMEOUT :
+      usb_status = USBD_FAIL;
+    break;
+    default :
+      usb_status = USBD_FAIL;
+    break;
+  }
+  return usb_status;
 }

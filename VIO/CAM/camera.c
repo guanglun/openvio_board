@@ -8,19 +8,21 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
+#include "cambus.h"
+#include "lcd.h"
+#include "lcd_init.h"
 
 extern DCMI_HandleTypeDef hdcmi;
 extern DMA_HandleTypeDef hdma_dcmi;
 
 DMA_BUFFER uint8_t dcmi_image_buffer[CAM_PACKAGE_MAX_SIZE * 2] = {0};
 
-int frame_count = 0;
-int line_cnt = 0, count = 0, start = 0;
 volatile uint8_t is_send_cam_head = 0;
+TimerHandle_t xTimerCAM; 
+SemaphoreHandle_t xSemaphore;
 
 HAL_StatusTypeDef USER_DCMI_Start_DMA(DCMI_HandleTypeDef *hdcmi, uint32_t DCMI_Mode, uint32_t pData, uint32_t Length);
-TimerHandle_t xTimerCAM; // 定义句柄
-SemaphoreHandle_t xSemaphore;
+
 
 // 定时器回调函数格式
 static void vCAMTimerCallback(TimerHandle_t xTimer)
@@ -103,7 +105,11 @@ void camera_init(void)
         vio_status.gs_bpp = 2;
         vio_status.cam_frame_size_num = FRAMESIZE_VGA;//FRAMESIZE_QVGA;//FRAMESIZE_MLCD; //
         printf("[CAM CHIP][OV7725]\r\n");
+		LCD_ShowString(0, 16 * 3, "[CAM CHIP][OV7725]", RED, WHITE, 16, 0);
         ov7725_init();
+	
+		osDelay(1000);
+		LCD_Fill(0,0,LCD_W,LCD_H,WHITE);	
         camera_timer_init(20);
         break;
     case MT9V034_ID:
@@ -112,10 +118,15 @@ void camera_init(void)
         vio_status.gs_bpp = 1;
         vio_status.cam_frame_size_num = FRAMESIZE_WVGA2;
         printf("[CAM CHIP][MT9V034]\r\n");
+		LCD_ShowString(0, 16 * 3, "[CAM CHIP][MT9V034]", RED, WHITE, 16, 0);
         mt9v034_init();
+	
+		osDelay(1000);
+		LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
         camera_timer_init(20);
         break;
     default:
+		LCD_ShowString(0, 16 * 3, "[CAM CHIP][Not Found]", RED, WHITE, 16, 0);
         break;
     }
 }
@@ -141,7 +152,7 @@ void USER_DCMI_MemDMAXferCplt(uint32_t data, uint32_t size)
     }
     else
     {
-        LCD_Show_Cam(data, size);
+        LCD_Show_Cam((uint8_t *)data, size);
         is_send_cam_head = 0;
     }
 }
@@ -169,40 +180,32 @@ void dcmi_dma_start(void)
 
         is_send_cam_head = 1;
     }
-    //{
 
-        HAL_GPIO_WritePin(GPIOD, TEST1_Pin, GPIO_PIN_SET);
-        USER_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size / 4 * vio_status.gs_bpp);
+    HAL_GPIO_WritePin(GPIOD, TEST1_Pin, GPIO_PIN_SET);
+    USER_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size / 4 * vio_status.gs_bpp);
 
-        while (xSemaphoreTake(xSemaphore, 0xFFFFFFFF) != pdTRUE)
+    while (xSemaphoreTake(xSemaphore, 0xFFFFFFFF) != pdTRUE)
+    {
+        //osDelay(1);
+    }
+    HAL_GPIO_WritePin(GPIOD, TEST1_Pin, GPIO_PIN_RESET);
+
+    HAL_DCMI_Stop(&hdcmi);
+
+    if (vio_status.cam_frame_size * vio_status.gs_bpp <= CAM_PACKAGE_MAX_SIZE)
+    {
+
+        if ((vio_status.cam_status == SENSOR_STATUS_START) && (is_send_cam_head == 1))
         {
-            //osDelay(1);
+
+            openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
         }
-        HAL_GPIO_WritePin(GPIOD, TEST1_Pin, GPIO_PIN_RESET);
-
-        HAL_DCMI_Stop(&hdcmi);
-
-        if (vio_status.cam_frame_size * vio_status.gs_bpp <= CAM_PACKAGE_MAX_SIZE)
+        else
         {
-            //openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
-
-            if ((vio_status.cam_status == SENSOR_STATUS_START) && (is_send_cam_head == 1))
-            {
-
-                    openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
-            }
-            else
-            {
-                LCD_Show_Cam(dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
-                is_send_cam_head = 0;
-            }
+            LCD_Show_Cam(dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
+            is_send_cam_head = 0;
         }
-    //}
-
-    //if (vio_status.cam_status != SENSOR_STATUS_START)
-    //{
-        //LCD_Show_Cam(dcmi_image_buffer, vio_status.cam_frame_size,1);
-    //}
+    }
 }
 
 //void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi)

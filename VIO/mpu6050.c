@@ -7,6 +7,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "openvio_def.h"
+#include "lcd.h"
 
 osThreadId MPU6050TaskHandle;
 SemaphoreHandle_t xMPU6050Semaphore;
@@ -45,12 +46,12 @@ void MPU6050_ReadData(uint8_t reg_add, unsigned char *Read, uint8_t num)
   Sensor_Read(reg_add, Read, num);
 }
 
-#define OX 0.433201
-#define OY -0.092553
-#define OZ -0.761175
-#define RX 1.002928
-#define RY 1.001974
-#define RZ 1.009245
+#define OX 0.433201f
+#define OY -0.092553f
+#define OZ -0.761175f
+#define RX 1.002928f
+#define RY 1.001974f
+#define RZ 1.009245f
 
 void mpu6050_transmit(void)
 {
@@ -59,7 +60,7 @@ void mpu6050_transmit(void)
 
   static short mpu6050_read_data[6];
 
-  static float acc1[3], acc2[3], gyro[3];
+  static float acc1[3], acc2[3];
   static float acc_cal = 9.8f * 8.0f / 65535 * 2;
 
   if (vio_status.imu_status == SENSOR_STATUS_START)
@@ -151,10 +152,10 @@ void mpu6050_transmit(void)
   }
 }
 
-static void vTimerMPU6050Callback(TimerHandle_t xTimer)
-{
-  mpu6050_transmit();
-}
+//static void vTimerMPU6050Callback(TimerHandle_t xTimer)
+//{
+//  mpu6050_transmit();
+//}
 
 /**
   * @brief   初始化MPU6050芯片
@@ -163,9 +164,6 @@ static void vTimerMPU6050Callback(TimerHandle_t xTimer)
   */
 void MPU6050_Init(void)
 {
-  static short Acel[3];
-  static short Gyro[3];
-  static float Temp;
 
   IMU_I2C_Init();
 
@@ -181,7 +179,8 @@ void MPU6050_Init(void)
   if (MPU6050ReadID() == 1)
   {
     printf("[MPU6050] [Init Success]\r\n");
-
+	LCD_ShowString(0,16 * 1,"[MPU6050] [Init Success]",RED,WHITE,16,0);	
+	  
     // while (1)
     // {
     //   MPU6050ReadAcc(Acel);
@@ -195,6 +194,7 @@ void MPU6050_Init(void)
   else
   {
     printf("[MPU6050] [Init Fail]\r\n");
+	LCD_ShowString(0,16 * 1,"[MPU6050] [Init Fail]",RED,WHITE,16,0);	
   }
 
   //  // 申请定时器， 配置
@@ -233,12 +233,12 @@ uint8_t MPU6050ReadID(void)
   MPU6050_ReadData(MPU6050_RA_WHO_AM_I, &Re, 1); //读器件地址
   if (Re != 0x68)
   {
-    printf("MPU6050 dectected error!\r\n");
+    printf("[MPU6050][ID ERRORR]\r\n");
     return 0;
   }
   else
   {
-    printf("MPU6050 ID = %d\r\n", Re);
+    //printf("MPU6050 ID = %d\r\n", Re);
     return 1;
   }
 }

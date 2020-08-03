@@ -58,10 +58,10 @@ enum
 #define msleep HAL_Delay
 
 static uint16_t mt9v034_ReadReg16(uint8_t address);
-static uint8_t mt9v034_WriteReg16(uint16_t address, uint16_t Data);
+//static uint8_t mt9v034_WriteReg16(uint16_t address, uint16_t Data);
 static int set_auto_exposure(int enable, int exposure_us);
 static int set_framesize(framesize_t framesize);
-static int set_colorbar(int enable); //是否使能测试条码
+//static int set_colorbar(int enable); //是否使能测试条码
 static int set_hmirror(int enable); //设置水平对称
 static int set_vflip(int enable); //设置竖直对称
 
@@ -123,7 +123,7 @@ int mt9v034_init(void)
 	return err;
 }
 
-void mt9v034_config(int frame_size_num)
+void mt9v034_config(framesize_t frame_size_num)
 {
 	vio_status.cam_frame_size_num = frame_size_num;
 	vio_status.cam_frame_size = resolution[frame_size_num][0]*resolution[frame_size_num][1];
@@ -179,15 +179,16 @@ static int set_auto_exposure(int enable, int exposure_us)
 	return ret;
 }
 
-static int set_colorbar(int enable) //是否使能测试条码
-{
-	uint16_t test;
-	int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_TEST_PATTERN, &test);
-	ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_TEST_PATTERN,
-						 (test & (~(MT9V034_TEST_PATTERN_ENABLE | MT9V034_TEST_PATTERN_GRAY_MASK))) | ((enable != 0) ? (MT9V034_TEST_PATTERN_ENABLE | MT9V034_TEST_PATTERN_GRAY_VERTICAL) : 0));
+//static int set_colorbar(int enable) //是否使能测试条码
+//{
+//	uint16_t test;
+//	int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_TEST_PATTERN, &test);
+//	ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_TEST_PATTERN,
+//						 (test & (~(MT9V034_TEST_PATTERN_ENABLE | MT9V034_TEST_PATTERN_GRAY_MASK))) | ((enable != 0) ? (MT9V034_TEST_PATTERN_ENABLE | MT9V034_TEST_PATTERN_GRAY_VERTICAL) : 0));
 
-	return ret;
-}
+//	return ret;
+//}
+
 static int set_hmirror(int enable) //设置水平对称
 {
 	uint16_t read_mode;
@@ -286,40 +287,39 @@ void mt9v034_set_context()
 static uint16_t mt9v034_ReadReg16(uint8_t address)
 {
 	uint8_t tmp[2];
-	HAL_StatusTypeDef ret;
 #if I2C_GPIO_ENABLE
 	i2c_master_read_mem(mt9v034_DEVICE_WRITE_ADDRESS, address, tmp, 2);
 #else
-	ret = HAL_I2C_Mem_Read(&hi2c1, mt9v034_DEVICE_WRITE_ADDRESS, address, I2C_MEMADD_SIZE_8BIT, tmp, 2, 1000);
+	HAL_I2C_Mem_Read(&hi2c1, mt9v034_DEVICE_WRITE_ADDRESS, address, I2C_MEMADD_SIZE_8BIT, tmp, 2, 1000);
 #endif
 	return tmp[0] << 8 | tmp[1];
 }
 
-/**
-  * @brief  Writes to a specific Camera register
-  */
-static uint8_t mt9v034_WriteReg16(uint16_t address, uint16_t Data)
-{
-	uint8_t tmp[4];
-	int8_t ret;
-	/*
-	tmp[0] = address;
-	tmp[1] = Data >> 8;
-	tmp[2] = Data;
-*/
-	tmp[0] = address;
-	tmp[1] = (uint8_t)(Data >> 8);
-	tmp[2] = 0xf0;
-	tmp[3] = (uint8_t)Data;
-#if I2C_GPIO_ENABLE
-#if 0
-	i2c_master_transmit(mt9v034_DEVICE_WRITE_ADDRESS, tmp, 3);
-#else
-	ret = i2c_master_transmit(mt9v034_DEVICE_WRITE_ADDRESS, &tmp[0], 2);
-	ret = i2c_master_transmit(mt9v034_DEVICE_WRITE_ADDRESS, &tmp[2], 2);
-#endif
-#else
-	ret = HAL_I2C_Master_Transmit(&hi2c1, mt9v034_DEVICE_WRITE_ADDRESS, tmp, 3, 100);
-#endif
-	return ret;
-}
+///**
+//  * @brief  Writes to a specific Camera register
+//  */
+//static uint8_t mt9v034_WriteReg16(uint16_t address, uint16_t Data)
+//{
+//	uint8_t tmp[4];
+//	int8_t ret;
+//	/*
+//	tmp[0] = address;
+//	tmp[1] = Data >> 8;
+//	tmp[2] = Data;
+//*/
+//	tmp[0] = address;
+//	tmp[1] = (uint8_t)(Data >> 8);
+//	tmp[2] = 0xf0;
+//	tmp[3] = (uint8_t)Data;
+//#if I2C_GPIO_ENABLE
+//#if 0
+//	i2c_master_transmit(mt9v034_DEVICE_WRITE_ADDRESS, tmp, 3);
+//#else
+//	ret = i2c_master_transmit(mt9v034_DEVICE_WRITE_ADDRESS, &tmp[0], 2);
+//	ret = i2c_master_transmit(mt9v034_DEVICE_WRITE_ADDRESS, &tmp[2], 2);
+//#endif
+//#else
+//	ret = HAL_I2C_Master_Transmit(&hi2c1, mt9v034_DEVICE_WRITE_ADDRESS, tmp, 3, 100);
+//#endif
+//	return ret;
+//}

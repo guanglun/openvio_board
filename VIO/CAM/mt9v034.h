@@ -205,6 +205,6 @@ uint8_t mt9v034_ReadReg(uint16_t Addr);
 uint8_t mt9v034_WriteReg(uint16_t Addr, uint8_t Data);
 */
 int mt9v034_init(void);
-void mt9v034_config(int frame_size_num);
+void mt9v034_config(framesize_t frame_size_num);
 
 #endif /* MT9V34_H_ */

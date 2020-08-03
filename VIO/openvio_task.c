@@ -4,6 +4,8 @@
 
 #include "cambus.h"
 #include "mt9v034.h"
+#include "ov7725.h"
+
 #include "dcmi.h"
 #include "usbd_def.h"
 #include "usbd_cdc_if.h"
@@ -14,7 +16,6 @@
 #include "cmsis_os.h"
 
 #include "mpu6050.h"
-#include "icm20948.h"
 #include "camera.h"
 #include "sd_card.h"
 
@@ -26,12 +27,7 @@ extern int line_cnt;
 
 DMA_BUFFER uint8_t mpu6000_data[14];
 
-
-
 struct OPENVIO_STATUS vio_status;
-
-static void camera_img_send(void);
-static void camera_start_send(void);
 
 #define REQUEST_CAMERA_START    				0xA0
 #define REQUEST_CAMERA_STOP     				0xA1
@@ -97,10 +93,10 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req,uint8_t *s_data)
 				vio_status.cam_status = SENSOR_STATUS_WAIT;
 				if(vio_status.cam_id == OV7725_ID)
 				{
-					ov7725_config(req->wValue);
+					ov7725_config((framesize_t)req->wValue);
 				}else if(vio_status.cam_id == MT9V034_ID)
 				{
-					mt9v034_config(req->wValue);
+					mt9v034_config((framesize_t)req->wValue);
 				}
 				
 				s_data[0] = 'S';
@@ -123,22 +119,32 @@ uint8_t camera_ctrl(USBD_SetupReqTypedef *req,uint8_t *s_data)
 
 void StartOpenvioTask(void const *argument)
 {
-	int ret;
 
 	openvio_status_init(&vio_status);
 	
 	lcd_init();
-	
-    
 	
 	MPU6050_Init();
 	
 	sdcard_init();
 
 	camera_init();
-	
+
 	while (1)
 	{
+		HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
+		osDelay(1000);
+		HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
+		osDelay(1000);
+
+		HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
+		osDelay(1000);
+		HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+		osDelay(1000);
+
+		HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
+		osDelay(1000);
+		HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
 		osDelay(1000);
 	}
 }
