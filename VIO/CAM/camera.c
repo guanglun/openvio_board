@@ -16,7 +16,7 @@ DMA_BUFFER uint8_t dcmi_image_buffer[CAM_PACKAGE_MAX_SIZE * 2] = {0};
 
 int frame_count = 0;
 int line_cnt = 0, count = 0, start = 0;
-uint8_t is_send_cam_head = 0;
+volatile uint8_t is_send_cam_head = 0;
 
 HAL_StatusTypeDef USER_DCMI_Start_DMA(DCMI_HandleTypeDef *hdcmi, uint32_t DCMI_Mode, uint32_t pData, uint32_t Length);
 TimerHandle_t xTimerCAM; // 定义句柄
@@ -101,7 +101,7 @@ void camera_init(void)
     case OV7725_ID:
         vio_status.cam_id = OV7725_ID;
         vio_status.gs_bpp = 2;
-        vio_status.cam_frame_size_num = FRAMESIZE_VGA;//FRAMESIZE_MLCD; //FRAMESIZE_QVGA;//
+        vio_status.cam_frame_size_num = FRAMESIZE_VGA;//FRAMESIZE_QVGA;//FRAMESIZE_MLCD; //
         printf("[CAM CHIP][OV7725]\r\n");
         ov7725_init();
         camera_timer_init(20);
@@ -169,7 +169,7 @@ void dcmi_dma_start(void)
 
         is_send_cam_head = 1;
     }
-    {
+    //{
 
         HAL_GPIO_WritePin(GPIOD, TEST1_Pin, GPIO_PIN_SET);
         USER_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size / 4 * vio_status.gs_bpp);
@@ -186,26 +186,23 @@ void dcmi_dma_start(void)
         {
             //openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
 
-            if (vio_status.cam_status == SENSOR_STATUS_START && is_send_cam_head == 1)
+            if ((vio_status.cam_status == SENSOR_STATUS_START) && (is_send_cam_head == 1))
             {
-                if (vio_status.cam_frame_size * vio_status.gs_bpp > CAM_PACKAGE_MAX_SIZE)
-                {
 
                     openvio_usb_send(SENSOR_USB_CAM, dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
-                }
             }
             else
             {
-                //LCD_Show_Cam(dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
+                LCD_Show_Cam(dcmi_image_buffer, vio_status.cam_frame_size * vio_status.gs_bpp);
                 is_send_cam_head = 0;
             }
         }
-    }
+    //}
 
     //if (vio_status.cam_status != SENSOR_STATUS_START)
-    {
+    //{
         //LCD_Show_Cam(dcmi_image_buffer, vio_status.cam_frame_size,1);
-    }
+    //}
 }
 
 //void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi)

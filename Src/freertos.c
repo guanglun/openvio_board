@@ -25,7 +25,7 @@
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */     
+/* USER CODE BEGIN Includes */
 #include "openvio_task.h"
 #include "dcmi.h"
 #include "sd_card.h"
@@ -65,16 +65,16 @@ osThreadId defaultTaskHandle;
 osThreadId openvioTaskHandle;
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void const * argument);
+void StartDefaultTask(void const *argument);
 
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* GetIdleTaskMemory prototype (linked to static allocation support) */
-void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
+void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize);
 
 /* GetTimerTaskMemory prototype (linked to static allocation support) */
-void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize );
+void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize);
 
 /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
 static StaticTask_t xIdleTaskTCBBuffer;
@@ -107,7 +107,8 @@ void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer, StackT
   * @param  None
   * @retval None
   */
-void MX_FREERTOS_Init(void) {
+void MX_FREERTOS_Init(void)
+{
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -139,7 +140,6 @@ void MX_FREERTOS_Init(void) {
   openvioTaskHandle = osThreadCreate(osThread(openvioTask), NULL);
 
   /* USER CODE END RTOS_THREADS */
-
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -148,13 +148,13 @@ uint16_t Get_Adc(uint32_t ch)
 {
   ADC_ChannelConfTypeDef ADC1_ChanConf;
 
-  ADC1_ChanConf.Channel = ch;                           
-  ADC1_ChanConf.Rank = ADC_REGULAR_RANK_1;               
-  ADC1_ChanConf.SamplingTime = ADC_SAMPLETIME_64CYCLES_5; 
-  ADC1_ChanConf.SingleDiff = ADC_SINGLE_ENDED;           
+  ADC1_ChanConf.Channel = ch;
+  ADC1_ChanConf.Rank = ADC_REGULAR_RANK_1;
+  ADC1_ChanConf.SamplingTime = ADC_SAMPLETIME_64CYCLES_5;
+  ADC1_ChanConf.SingleDiff = ADC_SINGLE_ENDED;
   ADC1_ChanConf.OffsetNumber = ADC_OFFSET_NONE;
   ADC1_ChanConf.Offset = 0;
-  HAL_ADC_ConfigChannel(&hadc1, &ADC1_ChanConf); 
+  HAL_ADC_ConfigChannel(&hadc1, &ADC1_ChanConf);
 
   HAL_ADC_Start(&hadc1);
 
@@ -186,7 +186,7 @@ extern uint8_t imu_lock;
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const * argument)
+void StartDefaultTask(void const *argument)
 {
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
@@ -210,14 +210,14 @@ void StartDefaultTask(void const * argument)
         {
           osDelay(1);
         }
-		if(usb_frame_s.len > 20)
-			LCD_Show_Cam(usb_frame_s.addr, usb_frame_s.len);
+        if (usb_frame_s.len > 20)
+          LCD_Show_Cam(usb_frame_s.addr, usb_frame_s.len);
       }
       else if (usb_frame_s.sensor == SENSOR_USB_IMU)
       {
         while (MPU_Transmit_HS(usb_frame_s.addr, usb_frame_s.len) != 0)
         {
-//osDelay(1);
+          //osDelay(1);
         }
       }
     }
@@ -266,8 +266,7 @@ void StartDefaultTask(void const * argument)
     // 	HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
     //   HAL_Delay(1000);
     // 	HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
-    //   HAL_Delay(1000);      
-
+    //   HAL_Delay(1000);
 
     // adc_value = Get_Adc_Average(ADC_CHANNEL_16,20);
     // printf("%d\t%0.2f\t%0.2f\r\n", adc_value,3.3f*(float)adc_value/4096,3.3f*(float)adc_value/4096*2);
