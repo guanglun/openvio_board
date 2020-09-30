@@ -11,6 +11,7 @@
 #include "usbd_cdc_if.h"
 #include "openvio.h"
 #include "ICM_20948.h"
+#include "imu.h"
 
 extern struct OPENVIO_STATUS vio_status;
 extern QueueHandle_t xQueue;
@@ -33,7 +34,7 @@ TickType_t IMUTimeNow;
 static void vTimerCallback(TimerHandle_t xTimer)
 {
 	//HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
-	//icm20948_transmit();
+	icm20948_transmit();
 	//HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
 }
 
@@ -331,7 +332,7 @@ int icm20948_init(void)
 		/*调试用， 系统不用*/
 		("IMU Timer",
 		 /*定时溢出周期， 单位是任务节拍数*/
-		 10,
+		 20,
 		 /*是否自动重载， 此处设置周期性执行*/
 		 pdTRUE,
 		 /*记录定时器溢出次数， 初始化零, 用户自己设置*/
@@ -381,6 +382,10 @@ int32_t cnnt = 0,cal_gyro[3]={0,0,0};
 
 #define M_PI		3.14159265358979323846
 
+#define INDEX_0	2
+#define INDEX_1	1
+#define INDEX_2	0
+
 //#define CAL_ACC
 //#define PRINTF_ACC
 void icm20948_transmit(void)
@@ -388,30 +393,41 @@ void icm20948_transmit(void)
 	static uint32_t t1;
 	static uint16_t t2;
 	static int16_t accel_data[3], gyro_data[3],mag_data_t[3],mag_data[3];
+	static int16_t temp_data[3];
+	static int32_t temp_data32[3];
 	static float acc1[3],acc2[3],gyro[3];
 	static float acc_cal = 9.8f*8.0f/65535*2;
 	
+	static uint32_t timer;
+	static uint32_t t1_old;
+    static uint16_t t2_old;
+    static bool is_first = true;
+    static float d_time = 0;
+	T_float_angle angle;
+	
+	static uint32_t counnt = 0;
 	#ifndef CAL_ACC
 	if (vio_status.imu_status == SENSOR_STATUS_START)
 	#endif
 	{
-		//icm20948_read(icm20948_data + 6);
+//		counnt++;
+//		if(counnt%6==0)
+//		{
+//			return;
+//		}
 
 		icm_get_agmt_buff(icm20948_data + 6);
-
-		
 		
 		get_time(&t1, &t2);
 
-		
-		
 		mag_data_t[0] = ((icm20948_data[16 + 6] << 8) | (icm20948_data[15 + 6] & 0xFF)); //Mag data is read little endian
 		mag_data_t[1] = ((icm20948_data[18 + 6] << 8) | (icm20948_data[17 + 6] & 0xFF));
 		mag_data_t[2] = ((icm20948_data[20 + 6] << 8) | (icm20948_data[19 + 6] & 0xFF));
 
-			mag_data[0] = (mag_data_t[0]-MAG_OX)/MAG_RX;
-        	mag_data[1] = (mag_data_t[1]-MAG_OY)/MAG_RY;
-        	mag_data[2] = (mag_data_t[2]-MAG_OZ)/MAG_RZ;
+//			mag_data[INDEX_0] = (mag_data_t[0]-MAG_OX)/MAG_RX;
+//        	mag_data[INDEX_1] = (mag_data_t[1]-MAG_OY)/MAG_RY;
+//        	mag_data[INDEX_2] = -(mag_data_t[2]-MAG_OZ)/MAG_RZ;
+
 
 //			mag_data[0] = mag_data_t[0];
 //        	mag_data[1] = mag_data_t[1];
@@ -452,37 +468,45 @@ void icm20948_transmit(void)
         acc2[1] = (acc1[1]-OY)/RY;
         acc2[2] = (acc1[2]-OZ)/RZ;
 		
-		accel_data[0] = acc2[0] / acc_cal;
-		accel_data[1] = acc2[1] / acc_cal;
-		accel_data[2] = acc2[2] / acc_cal;
+		accel_data[INDEX_0] = acc2[0] / acc_cal;
+		accel_data[INDEX_1] = acc2[1] / acc_cal;
+		accel_data[INDEX_2] = acc2[2] / acc_cal;
 		
 
-		
+		//accel_data[INDEX_0] = - accel_data[INDEX_0];
 //		printf("%f\t%f\t%f;\r\n", \
 //			acc2[0], acc2[1], acc2[2]);
 
 
-		if(cnnt<CAL_COUNT)
-		{
-			cnnt++;
-			
-			cal_gyro[0] += gyro_data[0];
-			cal_gyro[1] += gyro_data[1];
-			cal_gyro[2] += gyro_data[2];
-			
-			if(cnnt >= CAL_COUNT)
-			{
-				cal_gyro[0] /= CAL_COUNT;
-				cal_gyro[1] /= CAL_COUNT;
-				cal_gyro[2] /= CAL_COUNT;
-			}
-			
-			return;
-		}
+//		if(cnnt<CAL_COUNT)
+//		{
+//			cnnt++;
+//			
+//			cal_gyro[0] += gyro_data[0];
+//			cal_gyro[1] += gyro_data[1];
+//			cal_gyro[2] += gyro_data[2];
+//			
+//			if(cnnt >= CAL_COUNT)
+//			{
+//				cal_gyro[0] /= CAL_COUNT;
+//				cal_gyro[1] /= CAL_COUNT;
+//				cal_gyro[2] /= CAL_COUNT;
+//			}
+//			
+//			return;
+//		}
 		
 		gyro_data[0] -= cal_gyro[0];
 		gyro_data[1] -= cal_gyro[1];
 		gyro_data[2] -= cal_gyro[2];
+		
+		temp_data[0] = gyro_data[0];
+		temp_data[1] = gyro_data[1];
+		temp_data[2] = gyro_data[2];
+		
+		gyro_data[INDEX_0] = temp_data[0];
+		gyro_data[INDEX_1] = -temp_data[1];
+		gyro_data[INDEX_2] = -temp_data[2];
 		
 		/*ACC*/
 		icm20948_data[6] = (uint8_t)(accel_data[0] >> 8);
@@ -518,15 +542,65 @@ void icm20948_transmit(void)
 //		printf("%f\t%f\t%f\t%f\t%f\t%f\r\n", \
 //			acc2[0], acc2[1], acc2[2],gyro[0],gyro[1],gyro[2]);
 		#endif
+//		printf("%d\t%d\t%d\t%d\t%d\t%d\r\n",
+//		 	   accel_data[0], accel_data[1], accel_data[2], gyro_data[0], gyro_data[1], gyro_data[2]);
+//		printf("%f\t%f\t%f\t%f\t%f\t%f\r\n", \
+//			acc2[0], acc2[1], acc2[2],gyro[0],gyro[1],gyro[2]);
 
-		//while (MPU_Transmit_HS(icm20948_data, 24) != 0);
+		if(is_first == true)
+		{
+			is_first = false;
+			t1_old = t1;
+			t2_old = t2;
+			return;
+		}else{
+			if(t2 > t2_old)
+			{
+				timer = t2-t2_old;
+			}else{
+				timer = (uint32_t)t2 + 50000 - t2_old;
+			}
+
+			t1_old = t1;
+			t2_old = t2;
+
+			d_time = timer*0.00001;
+			
+					
+			prepareData((T_int16_xyz *)accel_data, (T_int16_xyz *)accel_data);
+			IMUSO3Thread((T_int16_xyz *)gyro_data, (T_int16_xyz *)accel_data,(T_int16_xyz *)mag_data, &angle, d_time);
+			//printf("%f\t%f\t%f\r\n", angle.pit, angle.rol, angle.yaw);
+		}
+
 		
-		struct USB_FRAME_STRUCT usb_frame_s;
-        usb_frame_s.addr = (uint8_t *)icm20948_data;
-        usb_frame_s.len = 24;
-        usb_frame_s.sensor = SENSOR_USB_IMU;
-        
-        xQueueSendFromISR(xQueue, (void *)&usb_frame_s, (TickType_t)0);
+//		if(counnt<300)
+//		{
+//			counnt++;
+//		}else
+		{
+			temp_data32[0] =((int32_t)(angle.pit*100));
+			temp_data32[1] =((int32_t)(angle.rol*100));
+			temp_data32[2] =((int32_t)(angle.yaw*100));
+			
+			//printf("%f\t%f\t%f\r\n", angle.pit, angle.rol, angle.yaw);
+			printf("%d\t%d\t%d\r\n", temp_data32[0], temp_data32[1], temp_data32[2]);
+			
+			//memcpy(icm20948_data,(uint8_t *)temp_data32,12);
+			struct USB_FRAME_STRUCT usb_frame_s;
+			usb_frame_s.addr = (uint8_t *)temp_data32;
+			usb_frame_s.len = 12;
+			usb_frame_s.sensor = SENSOR_USB_IMU;
+			
+			xQueueSendFromISR(xQueue, (void *)&usb_frame_s, (TickType_t)0);
+		}
+
+		
+//		struct USB_FRAME_STRUCT usb_frame_s;
+//        usb_frame_s.addr = (uint8_t *)icm20948_data;
+//        usb_frame_s.len = 24;
+//        usb_frame_s.sensor = SENSOR_USB_IMU;
+//        
+//        xQueueSendFromISR(xQueue, (void *)&usb_frame_s, (TickType_t)0);
 	}
 }
 

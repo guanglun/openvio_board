@@ -126,12 +126,14 @@ void StartOpenvioTask(void const *argument)
 
 	openvio_status_init(&vio_status);
 	
-    camera_init();
+    //camera_init();
 	icm20948_init();
 	//lcd_init();
 	
-	sdcard_init();
-
+	//sdcard_init();
+	
+	vio_status.imu_status = SENSOR_STATUS_START;
+	
 	while (1)
 	{
 		osDelay(1000);
