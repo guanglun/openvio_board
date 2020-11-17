@@ -111,7 +111,7 @@ int mt9v034_init(void)
 	// set_colorbar(0);
 	set_vflip(0);
 	set_hmirror(0);
-	set_auto_exposure(0,8000); //曝光设置
+	set_auto_exposure(0,20000); //曝光设置
 
 	// uint16_t chip_control;
 	// int enable = 0;
@@ -130,7 +130,19 @@ void mt9v034_config(framesize_t frame_size_num)
 	set_framesize(frame_size_num);
 }
 
-
+void mt9v034_exposure(int exposure)
+{
+	//printf("exposure %d\r\n",exposure);
+	if(exposure < 0)
+	{
+		set_auto_exposure(1,-exposure);
+	}
+	else
+	{
+		set_auto_exposure(0,exposure);
+	}
+	
+}
 
 int IM_MIN(int a, int b)
 {
