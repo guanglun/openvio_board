@@ -355,13 +355,16 @@ uint8_t * USBD_HS_LangIDStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
   */
 uint8_t * USBD_HS_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
+  char str[128];
+  sprintf(str,"%02X%02X%02X",*(uint32_t*)(0x1FF0F420),*(uint32_t*)(0x1FF0F420+4),*(uint32_t*)(0x1FF0F420+8));
+  //USBD_PRODUCT_STRING_HS
   if(speed == 0)
   {
-    USBD_GetString((uint8_t *)USBD_PRODUCT_STRING_HS, USBD_StrDesc, length);
+    USBD_GetString((uint8_t *)str, USBD_StrDesc, length);
   }
   else
   {
-    USBD_GetString((uint8_t *)USBD_PRODUCT_STRING_HS, USBD_StrDesc, length);
+    USBD_GetString((uint8_t *)str, USBD_StrDesc, length);
   }
   return USBD_StrDesc;
 }
