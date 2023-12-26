@@ -212,8 +212,8 @@ void StartDefaultTask(void const *argument)
         {
           osDelay(1);
         }
-        if (usb_frame_s.len > 20)
-          LCD_Show_Cam(usb_frame_s.addr, usb_frame_s.len);
+        // if (usb_frame_s.len > 20)
+        //   LCD_Show_Cam(usb_frame_s.addr, usb_frame_s.len);
       }
       else if (usb_frame_s.sensor == SENSOR_USB_IMU)
       {
