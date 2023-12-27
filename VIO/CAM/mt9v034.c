@@ -154,12 +154,12 @@ static void _mt9v_frame(uint16_t height,uint16_t width, uint8_t fps)
     data |= MT9V034_READ_MODE_COL_BIN_2;
   }
   //         水平翻转                     垂直翻转
-  data |= (MT9V034_READ_MODE_ROW_FLIP|MT9V034_READ_MODE_COLUMN_FLIP);         //需要翻转的可以打开注释，或者后面PXP转换时翻转也可以  
+  data |= (MT9V034_READ_MODE_ROW_FLIP|MT9V034_READ_MODE_COL_FLIP);         //需要翻转的可以打开注释，或者后面PXP转换时翻转也可以  
   
   cambus_writew(MT9V034_SLV_ADDR, MT9V034_READ_MODE, data);                          //写寄存器，配置行分频
   cambus_writew(MT9V034_SLV_ADDR, MT9V034_WINDOW_WIDTH,  width);                     //读取图像的列数  改变此处也可改变图像输出大小，不过会丢失视角
   cambus_writew(MT9V034_SLV_ADDR, MT9V034_WINDOW_HEIGHT, height);                    //读取图像的行数  改变此处也可改变图像输出大小，不过会丢失视角
-  cambus_writew(MT9V034_SLV_ADDR, MT9V034_COLUMN_START, MT9V034_COLUMN_START_MIN);   //列开始
+  cambus_writew(MT9V034_SLV_ADDR, MT9V034_COL_START, MT9V034_COL_START_MIN);   //列开始
   cambus_writew(MT9V034_SLV_ADDR, MT9V034_ROW_START, MT9V034_ROW_START_MIN);         //行开始
   cambus_writew(MT9V034_SLV_ADDR, MT9V034_TOTAL_SHUTTER_WIDTH,frameRate);                 //0x0B 曝光时间 越长帧率越小
 }
@@ -257,88 +257,88 @@ int mt9v034_init(void)
   cambus_writew(MT9V034_SLV_ADDR, 0x48, 0x0020);   //ROW_NOISE_CONTROL
   cambus_writew(MT9V034_SLV_ADDR, 0x4C, 0x0002);   //NOISE_CONSTANT
   cambus_writew(MT9V034_SLV_ADDR, 0x60, 0x0000);   //PIXCLK_CONTROL
-//   cambus_writew(MT9V034_SLV_ADDR, 0x67, 0x0000);   //TEST_DATA
-//   cambus_writew(MT9V034_SLV_ADDR, 0x6C, 0x0000);   //TILE_X0_Y0
-//   cambus_writew(MT9V034_SLV_ADDR, 0x70, 0x0000);   //TILE_X1_Y0
-//   cambus_writew(MT9V034_SLV_ADDR, 0x71, 0x002A);   //TILE_X2_Y0
-//   cambus_writew(MT9V034_SLV_ADDR, 0x72, 0x0000);   //TILE_X3_Y0
-//   cambus_writew(MT9V034_SLV_ADDR, 0x7F, 0x0000);   //TILE_X4_Y0
-//   cambus_writew(MT9V034_SLV_ADDR, 0x99, 0x0000);   //TILE_X0_Y1
-//   cambus_writew(MT9V034_SLV_ADDR, 0x9A, 0x0096);   //TILE_X1_Y1
-//   cambus_writew(MT9V034_SLV_ADDR, 0x9B, 0x012C);   //TILE_X2_Y1
-//   cambus_writew(MT9V034_SLV_ADDR, 0x9C, 0x01C2);   //TILE_X3_Y1
-//   cambus_writew(MT9V034_SLV_ADDR, 0x9D, 0x0258);   //TILE_X4_Y1
-//   cambus_writew(MT9V034_SLV_ADDR, 0x9E, 0x02F0);   //TILE_X0_Y2
-//   cambus_writew(MT9V034_SLV_ADDR, 0x9F, 0x0000);   //TILE_X1_Y2
-//   cambus_writew(MT9V034_SLV_ADDR, 0xA0, 0x0060);   //TILE_X2_Y2
-//   cambus_writew(MT9V034_SLV_ADDR, 0xA1, 0x00C0);   //TILE_X3_Y2
-//   cambus_writew(MT9V034_SLV_ADDR, 0xA2, 0x0120);   //TILE_X4_Y2
-//   cambus_writew(MT9V034_SLV_ADDR, 0xA3, 0x0180);   //TILE_X0_Y3
-//   cambus_writew(MT9V034_SLV_ADDR, 0xA4, 0x01E0);   //TILE_X1_Y3
-//   cambus_writew(MT9V034_SLV_ADDR, 0xA5, 0x003A);   //TILE_X2_Y3
-//   cambus_writew(MT9V034_SLV_ADDR, 0xA6, 0x0002);   //TILE_X3_Y3
-//   cambus_writew(MT9V034_SLV_ADDR, 0xA8, 0x0000);   //TILE_X4_Y3
-//   cambus_writew(MT9V034_SLV_ADDR, 0xA9, 0x0002);   //TILE_X0_Y4
-//   cambus_writew(MT9V034_SLV_ADDR, 0xAA, 0x0002);   //TILE_X1_Y4
-//   cambus_writew(MT9V034_SLV_ADDR, 0xAB, 0x0040);   //TILE_X2_Y4
-//   cambus_writew(MT9V034_SLV_ADDR, 0xAC, 0x0001);   //TILE_X3_Y4
-//   cambus_writew(MT9V034_SLV_ADDR, 0xAD, 0x01E0);   //TILE_X4_Y4
-//   cambus_writew(MT9V034_SLV_ADDR, 0xAE, 0x0014);   //X0_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xAF, 0x0000);   //X1_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xB0, 0xABE0);   //X2_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xB1, 0x0002);   //X3_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xB2, 0x0010);   //X4_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xB3, 0x0010);   //X5_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xB4, 0x0000);   //Y0_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xB5, 0x0000);   //Y1_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xB6, 0x0000);   //Y2_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xB7, 0x0000);   //Y3_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xBF, 0x0016);   //Y4_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xC0, 0x000A);   //Y5_SLASH5
-//   cambus_writew(MT9V034_SLV_ADDR, 0xC2, 0x18D0);   //DESIRED_BIN
-//   cambus_writew(MT9V034_SLV_ADDR, 0xC3, 0x007F);   //EXP_SKIP_FRM_H
-//   cambus_writew(MT9V034_SLV_ADDR, 0xC4, 0x007F);   //EXP_LPF
-//   cambus_writew(MT9V034_SLV_ADDR, 0xC5, 0x007F);   //GAIN_SKIP_FRM
-//   cambus_writew(MT9V034_SLV_ADDR, 0xC6, 0x0000);   //GAIN_LPF_H
-//   cambus_writew(MT9V034_SLV_ADDR, 0xC7, 0x4416);   //MAX_GAIN
-//   cambus_writew(MT9V034_SLV_ADDR, 0xC8, 0x4421);   //MIN_COARSE_EXPOSURE
-//   cambus_writew(MT9V034_SLV_ADDR, 0xC9, 0x0001);   //MAX_COARSE_EXPOSURE
-//   cambus_writew(MT9V034_SLV_ADDR, 0xCA, 0x0004);   //BIN_DIFF_THRESHOLD
-//   cambus_writew(MT9V034_SLV_ADDR, 0xCB, 0x01E0);   //AUTO_BLOCK_CONTROL
-//   cambus_writew(MT9V034_SLV_ADDR, 0xCC, 0x02F0);   //PIXEL_COUNT
-//   cambus_writew(MT9V034_SLV_ADDR, 0xCD, 0x005E);   //LVDS_MASTER_CONTROL
-//   cambus_writew(MT9V034_SLV_ADDR, 0xCE, 0x002D);   //LVDS_SHFT_CLK_CONTROL
-//   cambus_writew(MT9V034_SLV_ADDR, 0xCF, 0x01DE);   //LVDS_DATA_CONTROL
-//   cambus_writew(MT9V034_SLV_ADDR, 0xD0, 0x01DF);   //LVDS_DATA_STREAM_LATENCY
-//   cambus_writew(MT9V034_SLV_ADDR, 0xD1, 0x0164);   //LVDS_INTERNAL_SYNC
-//   cambus_writew(MT9V034_SLV_ADDR, 0xD2, 0x0001);   //LVDS_USE_10BIT_PIXELS
-//   cambus_writew(MT9V034_SLV_ADDR, 0xD3, 0x0000);   //STEREO_ERROR_CONTROL
-//   cambus_writew(MT9V034_SLV_ADDR, 0xD4, 0x0000);   //INTERLACE_FIELD_VBLANK
-//   cambus_writew(MT9V034_SLV_ADDR, 0xD5, 0x0104);   //IMAGE_CAPTURE_NUM
-//   cambus_writew(MT9V034_SLV_ADDR, 0xD6, 0x0000);   //ANALOG_CONTROLS
-//   cambus_writew(MT9V034_SLV_ADDR, 0xD7, 0x0000);   //AB_PULSE_WIDTH_REG
-//   cambus_writew(MT9V034_SLV_ADDR, 0xD8, 0x0000);   //TX_PULLUP_PULSE_WIDTH_REG
-//   cambus_writew(MT9V034_SLV_ADDR, 0xD9, 0x0000);   //RST_PULLUP_PULSE_WIDTH_REG
-//   cambus_writew(MT9V034_SLV_ADDR, 0xF0, 0x0000);   //NTSC_FV_CONTROL
-//   cambus_writew(MT9V034_SLV_ADDR, 0xFE, 0xBEEF);   //NTSC_HBLANK
+  // cambus_writew(MT9V034_SLV_ADDR, 0x67, 0x0000);   //TEST_DATA
+  // cambus_writew(MT9V034_SLV_ADDR, 0x6C, 0x0000);   //TILE_X0_Y0
+  // cambus_writew(MT9V034_SLV_ADDR, 0x70, 0x0000);   //TILE_X1_Y0
+  // cambus_writew(MT9V034_SLV_ADDR, 0x71, 0x002A);   //TILE_X2_Y0
+  // cambus_writew(MT9V034_SLV_ADDR, 0x72, 0x0000);   //TILE_X3_Y0
+  // cambus_writew(MT9V034_SLV_ADDR, 0x7F, 0x0000);   //TILE_X4_Y0
+  // cambus_writew(MT9V034_SLV_ADDR, 0x99, 0x0000);   //TILE_X0_Y1
+  // cambus_writew(MT9V034_SLV_ADDR, 0x9A, 0x0096);   //TILE_X1_Y1
+  // cambus_writew(MT9V034_SLV_ADDR, 0x9B, 0x012C);   //TILE_X2_Y1
+  // cambus_writew(MT9V034_SLV_ADDR, 0x9C, 0x01C2);   //TILE_X3_Y1
+  // cambus_writew(MT9V034_SLV_ADDR, 0x9D, 0x0258);   //TILE_X4_Y1
+  // cambus_writew(MT9V034_SLV_ADDR, 0x9E, 0x02F0);   //TILE_X0_Y2
+  // cambus_writew(MT9V034_SLV_ADDR, 0x9F, 0x0000);   //TILE_X1_Y2
+  // cambus_writew(MT9V034_SLV_ADDR, 0xA0, 0x0060);   //TILE_X2_Y2
+  // cambus_writew(MT9V034_SLV_ADDR, 0xA1, 0x00C0);   //TILE_X3_Y2
+  // cambus_writew(MT9V034_SLV_ADDR, 0xA2, 0x0120);   //TILE_X4_Y2
+  // cambus_writew(MT9V034_SLV_ADDR, 0xA3, 0x0180);   //TILE_X0_Y3
+  // cambus_writew(MT9V034_SLV_ADDR, 0xA4, 0x01E0);   //TILE_X1_Y3
+  // cambus_writew(MT9V034_SLV_ADDR, 0xA5, 0x003A);   //TILE_X2_Y3
+  // cambus_writew(MT9V034_SLV_ADDR, 0xA6, 0x0002);   //TILE_X3_Y3
+  // cambus_writew(MT9V034_SLV_ADDR, 0xA8, 0x0000);   //TILE_X4_Y3
+  // cambus_writew(MT9V034_SLV_ADDR, 0xA9, 0x0002);   //TILE_X0_Y4
+  // cambus_writew(MT9V034_SLV_ADDR, 0xAA, 0x0002);   //TILE_X1_Y4
+  // cambus_writew(MT9V034_SLV_ADDR, 0xAB, 0x0040);   //TILE_X2_Y4
+  // cambus_writew(MT9V034_SLV_ADDR, 0xAC, 0x0001);   //TILE_X3_Y4
+  // cambus_writew(MT9V034_SLV_ADDR, 0xAD, 0x01E0);   //TILE_X4_Y4
+  // cambus_writew(MT9V034_SLV_ADDR, 0xAE, 0x0014);   //X0_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xAF, 0x0000);   //X1_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xB0, 0xABE0);   //X2_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xB1, 0x0002);   //X3_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xB2, 0x0010);   //X4_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xB3, 0x0010);   //X5_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xB4, 0x0000);   //Y0_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xB5, 0x0000);   //Y1_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xB6, 0x0000);   //Y2_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xB7, 0x0000);   //Y3_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xBF, 0x0016);   //Y4_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xC0, 0x000A);   //Y5_SLASH5
+  // cambus_writew(MT9V034_SLV_ADDR, 0xC2, 0x18D0);   //DESIRED_BIN
+  // cambus_writew(MT9V034_SLV_ADDR, 0xC3, 0x007F);   //EXP_SKIP_FRM_H
+  // cambus_writew(MT9V034_SLV_ADDR, 0xC4, 0x007F);   //EXP_LPF
+  // cambus_writew(MT9V034_SLV_ADDR, 0xC5, 0x007F);   //GAIN_SKIP_FRM
+  // cambus_writew(MT9V034_SLV_ADDR, 0xC6, 0x0000);   //GAIN_LPF_H
+  // cambus_writew(MT9V034_SLV_ADDR, 0xC7, 0x4416);   //MAX_GAIN
+  // cambus_writew(MT9V034_SLV_ADDR, 0xC8, 0x4421);   //MIN_COARSE_EXPOSURE
+  // cambus_writew(MT9V034_SLV_ADDR, 0xC9, 0x0001);   //MAX_COARSE_EXPOSURE
+  // cambus_writew(MT9V034_SLV_ADDR, 0xCA, 0x0004);   //BIN_DIFF_THRESHOLD
+  // cambus_writew(MT9V034_SLV_ADDR, 0xCB, 0x01E0);   //AUTO_BLOCK_CONTROL
+  // cambus_writew(MT9V034_SLV_ADDR, 0xCC, 0x02F0);   //PIXEL_COUNT
+  // cambus_writew(MT9V034_SLV_ADDR, 0xCD, 0x005E);   //LVDS_MASTER_CONTROL
+  // cambus_writew(MT9V034_SLV_ADDR, 0xCE, 0x002D);   //LVDS_SHFT_CLK_CONTROL
+  // cambus_writew(MT9V034_SLV_ADDR, 0xCF, 0x01DE);   //LVDS_DATA_CONTROL
+  // cambus_writew(MT9V034_SLV_ADDR, 0xD0, 0x01DF);   //LVDS_DATA_STREAM_LATENCY
+  // cambus_writew(MT9V034_SLV_ADDR, 0xD1, 0x0164);   //LVDS_INTERNAL_SYNC
+  // cambus_writew(MT9V034_SLV_ADDR, 0xD2, 0x0001);   //LVDS_USE_10BIT_PIXELS
+  // cambus_writew(MT9V034_SLV_ADDR, 0xD3, 0x0000);   //STEREO_ERROR_CONTROL
+  // cambus_writew(MT9V034_SLV_ADDR, 0xD4, 0x0000);   //INTERLACE_FIELD_VBLANK
+  // cambus_writew(MT9V034_SLV_ADDR, 0xD5, 0x0104);   //IMAGE_CAPTURE_NUM
+  // cambus_writew(MT9V034_SLV_ADDR, 0xD6, 0x0000);   //ANALOG_CONTROLS
+  // cambus_writew(MT9V034_SLV_ADDR, 0xD7, 0x0000);   //AB_PULSE_WIDTH_REG
+  // cambus_writew(MT9V034_SLV_ADDR, 0xD8, 0x0000);   //TX_PULLUP_PULSE_WIDTH_REG
+  // cambus_writew(MT9V034_SLV_ADDR, 0xD9, 0x0000);   //RST_PULLUP_PULSE_WIDTH_REG
+  // cambus_writew(MT9V034_SLV_ADDR, 0xF0, 0x0000);   //NTSC_FV_CONTROL
+  // cambus_writew(MT9V034_SLV_ADDR, 0xFE, 0xBEEF);   //NTSC_HBLANK
   
   _mt9v_frame(480,752,60);
 
-//   cambus_writew(MT9V034_SLV_ADDR, 0x2C, 0x0004);                                            //参考电压设置   1.4v 
-//   cambus_writew(MT9V034_SLV_ADDR, MT9V034_ANALOG_CTRL, MT9V034_ANTI_ECLIPSE_ENABLE);        //反向腐蚀
-//   cambus_writew(MT9V034_SLV_ADDR, MT9V034_MAX_GAIN_REG, 10);                                //0xAB  最大模拟增益     64
-//   cambus_writew(MT9V034_SLV_ADDR, MT9V034_AGC_AEC_PIXEL_COUNT_REG, 0xB0);                   //0xB0  用于AEC/AGC直方图像素数目,最大44000   IMAGEH*IMAGEW  
-//   cambus_writew(MT9V034_SLV_ADDR, MT9V034_ADC_RES_CTRL_REG, 0x0303);                        //0x1C  here is the way to regulate darkness :)    
-//   cambus_writew(MT9V034_SLV_ADDR, 0x13,0x2D2E);                                             //We also recommended using R0x13 = 0x2D2E with this setting for better column FPN.  
-//   cambus_writew(MT9V034_SLV_ADDR, 0x20,0x03c7);                                             //0x01C7对比度差，发白；0x03C7对比度提高 Recommended by design to improve performance in HDR mode and when frame rate is low.
-//   cambus_writew(MT9V034_SLV_ADDR, 0x24,0x0010);                                             //Corrects pixel negative dark offset when global reset in R0x20[9] is enabled.
-//   cambus_writew(MT9V034_SLV_ADDR, 0x2B,0x0003);                                             //Improves column FPN.
-//   cambus_writew(MT9V034_SLV_ADDR, 0x2F,0x0003);                                             //Improves FPN at near-saturation.  
-//   cambus_writew(MT9V034_SLV_ADDR, MT9V034_SHUTTER_WIDTH_CONTROL,0x0164);                    //0x0A Coarse Shutter IMAGEW Control 
-//   cambus_writew(MT9V034_SLV_ADDR, MT9V034_V2_CTRL_REG_A, 0x001A);                           //0x32   0x001A  
-//   cambus_writew(MT9V034_SLV_ADDR, MT9V034_HDR_ENABLE_REG,0x0103);                           //0x0F High Dynamic Range enable,bit is set (R0x0F[1]=1), the sensor uses black level correction values from one green plane, which are applied to all colors.
-//   cambus_writew(MT9V034_SLV_ADDR, MT9V034_AGC_AEC_DESIRED_BIN_REG, 40);                     //0xA5  图像亮度  60  1-64
-//   cambus_writew(MT9V034_SLV_ADDR, MT9V034_ANALOG_GAIN,0x8010);
+  // cambus_writew(MT9V034_SLV_ADDR, 0x2C, 0x0004);                                            //参考电压设置   1.4v 
+  // // cambus_writew(MT9V034_SLV_ADDR, MT9V034_ANALOG_CTRL, MT9V034_ANTI_ECLIPSE_ENABLE);        //反向腐蚀
+  // cambus_writew(MT9V034_SLV_ADDR, MTV_MAX_GAIN_REG, 10);                                //0xAB  最大模拟增益     64
+  // cambus_writew(MT9V034_SLV_ADDR, MTV_AGC_AEC_PIXEL_COUNT_REG, 0xB0);                   //0xB0  用于AEC/AGC直方图像素数目,最大44000   IMAGEH*IMAGEW  
+  // cambus_writew(MT9V034_SLV_ADDR, MTV_ADC_RES_CTRL_REG, 0x0303);                        //0x1C  here is the way to regulate darkness :)    
+  // cambus_writew(MT9V034_SLV_ADDR, 0x13,0x2D2E);                                             //We also recommended using R0x13 = 0x2D2E with this setting for better column FPN.  
+  // cambus_writew(MT9V034_SLV_ADDR, 0x20,0x03c7);                                             //0x01C7对比度差，发白；0x03C7对比度提高 Recommended by design to improve performance in HDR mode and when frame rate is low.
+  // cambus_writew(MT9V034_SLV_ADDR, 0x24,0x0010);                                             //Corrects pixel negative dark offset when global reset in R0x20[9] is enabled.
+  // cambus_writew(MT9V034_SLV_ADDR, 0x2B,0x0003);                                             //Improves column FPN.
+  // cambus_writew(MT9V034_SLV_ADDR, 0x2F,0x0003);                                             //Improves FPN at near-saturation.  
+  // cambus_writew(MT9V034_SLV_ADDR, MT9V034_SHUTTER_WIDTH_CONTROL,0x0164);                    //0x0A Coarse Shutter IMAGEW Control 
+  // cambus_writew(MT9V034_SLV_ADDR, MTV_V2_CTRL_REG_A, 0x001A);                           //0x32   0x001A  
+  // cambus_writew(MT9V034_SLV_ADDR, MTV_HDR_ENABLE_REG,0x0103);                           //0x0F High Dynamic Range enable,bit is set (R0x0F[1]=1), the sensor uses black level correction values from one green plane, which are applied to all colors.
+  // cambus_writew(MT9V034_SLV_ADDR, MTV_AGC_AEC_DESIRED_BIN_REG, 40);                     //0xA5  图像亮度  60  1-64
+  // cambus_writew(MT9V034_SLV_ADDR, MT9V034_ANALOG_GAIN,0x8010);
   
   
   //set_triggered_mode(0);
@@ -346,9 +346,9 @@ int mt9v034_init(void)
     mt9v034_config(vio_status.cam_frame_size_num);
 
     // set_colorbar(0);
-    // set_vflip(0);
-    // set_hmirror(0);
-    // set_auto_exposure(0, 200); //曝光设置
+    set_vflip(0);
+    set_hmirror(0);
+    set_auto_exposure(0, 200); //曝光设置
     
 	//cambus_writew(MT9V034_SLV_ADDR, MT9V034_RESET, 0x03);                                     //0x0c  复位 
 
@@ -412,7 +412,7 @@ static int set_auto_exposure(int enable, int exposure_us)
         int coarse_time = exposure / row_time;
         int fine_time = exposure % row_time;
 
-        ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_TOTAL_SHUTTER_WIDTH, 480);
+        ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_TOTAL_SHUTTER_WIDTH, fine_time);
         ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_FINE_SHUTTER_WIDTH_TOTAL, fine_time);
     }
     else if ((enable != 0) && (exposure_us >= 0))
@@ -505,8 +505,8 @@ static int set_framesize(framesize_t framesize)
     // must be increased.
     //
     // The STM32H7 needs more than 94+(752-640) clocks between rows otherwise it can't keep up with the pixel rate.
-    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_HORIZONTAL_BLANKING,
-                         MT9V034_HORIZONTAL_BLANKING_DEF + (MT9V034_MAX_WIDTH - IM_MIN(width * read_mode_mul, 640)));
+    // ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_HORIZONTAL_BLANKING,
+    //                      MT9V034_HORIZONTAL_BLANKING_DEF + (MT9V034_MAX_WIDTH - IM_MIN(width * read_mode_mul, 640)));
 
     ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_READ_MODE, read_mode);
     ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_PIXEL_COUNT, (width * height) / 8);
