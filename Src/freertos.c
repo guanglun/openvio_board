@@ -204,6 +204,13 @@ void StartDefaultTask(void const *argument)
 
   for (;;)
   {
+
+    while(1)
+    {
+      osDelay(1000);
+      //CAM_Transmit_HS(dcmi_image_buffer, CAM_PACKAGE_MAX_SIZE);
+    }
+
     if (xQueueReceive(xQueue, &(usb_frame_s), (TickType_t)0xFFFFFF))
     {
       if (usb_frame_s.sensor == SENSOR_USB_CAM)
