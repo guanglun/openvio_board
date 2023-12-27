@@ -16,9 +16,9 @@
         <TargetCommonOption>
           <Device>STM32H743VITx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.2.3.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
-          <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x24000000-0x2407FFFF) IROM(0x8000000-0x81FFFFF)            CLOCK(12000000) FPU3(DFPU) CPUTYPE("Cortex-M7") ELITTLE</Cpu>
+          <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x24000000-0x2407FFFF) IROM(0x8000000-0x81FFFFF)             CLOCK(12000000) FPU3(DFPU) CPUTYPE("Cortex-M7") ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
           <FlashDriverDll></FlashDriverDll>
@@ -184,6 +184,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>3</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -337,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H743xx,USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                ../Drivers/STM32H7xx_HAL_Driver/Inc;                ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;                ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;                ../Drivers/CMSIS/Include;                ..\App;                ..\VIO;                ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;                ../Middlewares/Third_Party/FreeRTOS/Source/include;                ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;                ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;                ../Middlewares/Third_Party/FatFs/src;                ..\VIO\CAM;                ..\VIO\IMU</IncludePath>
+              <IncludePath>../Inc;                    ../Drivers/STM32H7xx_HAL_Driver/Inc;                    ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;                    ../Drivers/CMSIS/Device/ST/STM32H7xx/Include;                    ../Drivers/CMSIS/Include;                    ..\App;                    ..\VIO;                    ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                    ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;                    ../Middlewares/Third_Party/FreeRTOS/Source/include;                    ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;                    ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;                    ../Middlewares/Third_Party/FatFs/src;                    ..\VIO\CAM;                    ..\VIO\IMU</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -819,27 +820,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Middlewares/USB_Device_Library</GroupName>
+          <GroupName>Middlewares/FatFs</GroupName>
           <Files>
             <File>
-              <FileName>usbd_core.c</FileName>
+              <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c</FilePath>
+              <FilePath>../Middlewares/Third_Party/FatFs/src/diskio.c</FilePath>
             </File>
             <File>
-              <FileName>usbd_ctlreq.c</FileName>
+              <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c</FilePath>
+              <FilePath>../Middlewares/Third_Party/FatFs/src/ff.c</FilePath>
             </File>
             <File>
-              <FileName>usbd_ioreq.c</FileName>
+              <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c</FilePath>
+              <FilePath>../Middlewares/Third_Party/FatFs/src/ff_gen_drv.c</FilePath>
             </File>
             <File>
-              <FileName>usbd_cdc.c</FileName>
+              <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c</FilePath>
+              <FilePath>../Middlewares/Third_Party/FatFs/src/option/syscall.c</FilePath>
+            </File>
+            <File>
+              <FileName>cc936.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Middlewares/Third_Party/FatFs/src/option/cc936.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -899,32 +905,27 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Middlewares/FatFs</GroupName>
+          <GroupName>Middlewares/USB_Device_Library</GroupName>
           <Files>
             <File>
-              <FileName>diskio.c</FileName>
+              <FileName>usbd_core.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Middlewares/Third_Party/FatFs/src/diskio.c</FilePath>
+              <FilePath>../Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c</FilePath>
             </File>
             <File>
-              <FileName>ff.c</FileName>
+              <FileName>usbd_ctlreq.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Middlewares/Third_Party/FatFs/src/ff.c</FilePath>
+              <FilePath>../Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c</FilePath>
             </File>
             <File>
-              <FileName>ff_gen_drv.c</FileName>
+              <FileName>usbd_ioreq.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Middlewares/Third_Party/FatFs/src/ff_gen_drv.c</FilePath>
+              <FilePath>../Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c</FilePath>
             </File>
             <File>
-              <FileName>syscall.c</FileName>
+              <FileName>usbd_cdc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Middlewares/Third_Party/FatFs/src/option/syscall.c</FilePath>
-            </File>
-            <File>
-              <FileName>cc936.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Middlewares/Third_Party/FatFs/src/option/cc936.c</FilePath>
+              <FilePath>../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c</FilePath>
             </File>
           </Files>
         </Group>

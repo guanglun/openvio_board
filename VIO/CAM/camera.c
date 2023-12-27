@@ -89,7 +89,7 @@ void camera_init(void)
         cambus_readb(cam_slv_addr, OV_CHIP_ID, &chip_id);
         break;
     case MT9V034_SLV_ADDR:
-        HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_3); //3 32MHZ,4 24MHZ
+        HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_4); //3 32MHZ,4 24MHZ
         cambus_readb(cam_slv_addr, ON_CHIP_ID, &chip_id);
         break;
     default:
@@ -121,10 +121,10 @@ void camera_init(void)
 		LCD_ShowString(0, 16 * 3, "[CAM CHIP][MT9V034]", RED, WHITE, 16, 0);
         mt9v034_init();
 	
-        mt9v034_exposure(500);
+        //mt9v034_exposure(200);
 
-		osDelay(1000);
-		LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
+		osDelay(100);
+		//LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
         //camera_timer_init(60);
 
         //__HAL_DCMI_DISABLE_IT(phdcmi, DCMI_IT_LINE | DCMI_IT_VSYNC);
