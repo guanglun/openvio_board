@@ -23,6 +23,7 @@ SemaphoreHandle_t xSemaphore;
 
 HAL_StatusTypeDef USER_DCMI_Start_DMA(DCMI_HandleTypeDef *hdcmi, uint32_t DCMI_Mode, uint32_t pData, uint32_t Length);
 
+uint8_t is_send_head = 0;
 
 // 定时器回调函数格式
 static void vCAMTimerCallback(TimerHandle_t xTimer)
@@ -89,7 +90,7 @@ void camera_init(void)
         cambus_readb(cam_slv_addr, OV_CHIP_ID, &chip_id);
         break;
     case MT9V034_SLV_ADDR:
-        HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_3); //3 32MHZ,4 24MHZ
+        HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_4); //3 32MHZ,4 24MHZ
         cambus_readb(cam_slv_addr, ON_CHIP_ID, &chip_id);
         break;
     default:
@@ -121,12 +122,15 @@ void camera_init(void)
 		LCD_ShowString(0, 16 * 3, "[CAM CHIP][MT9V034]", RED, WHITE, 16, 0);
         mt9v034_init();
 	
-        mt9v034_exposure(500);
+        mt9v034_exposure(5000);
 
-		osDelay(1000);
+		osDelay(100);
 		LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
         //camera_timer_init(60);
-
+        dcmi_image_buffer[752*480/2+0] = 'C';
+        dcmi_image_buffer[752*480/2+1] = 'A';
+        dcmi_image_buffer[752*480/2+2] = 'M';
+        dcmi_image_buffer[752*480/2+3] = 'E';
         //__HAL_DCMI_DISABLE_IT(phdcmi, DCMI_IT_LINE | DCMI_IT_VSYNC);
         USER_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)dcmi_image_buffer, vio_status.cam_frame_size / 4 * vio_status.gs_bpp);
 
@@ -136,13 +140,20 @@ void camera_init(void)
         break;
     }
 }
-
+uint32_t frame_cnt = 0;
 extern QueueHandle_t xQueue;
-void USER_DCMI_MemDMAXferCplt(uint32_t data, uint32_t size)
+void USER_DCMI_MemDMAXferCplt(uint16_t index, uint32_t data, uint32_t size)
 {
     //HAL_GPIO_WritePin(GPIOD, TEST2_Pin, GPIO_PIN_SET);
-    HAL_GPIO_TogglePin(GPIOD, TEST2_Pin);
-    CAM_Transmit_HS((uint8_t *)data, size);
+    //HAL_GPIO_TogglePin(GPIOD, TEST2_Pin);
+    if(index == 255){
+        *(uint32_t *)&dcmi_image_buffer[752*480/2+4] = frame_cnt;
+        frame_cnt++;
+        CAM_Transmit_HS((uint8_t *)data, size+8);
+    }
+    else{
+        CAM_Transmit_HS((uint8_t *)data, size);
+    }
     //HAL_GPIO_WritePin(GPIOD, TEST2_Pin, GPIO_PIN_RESET);
     // if (vio_status.cam_status == SENSOR_STATUS_START && is_send_cam_head == 1)
     // {
@@ -166,7 +177,7 @@ void USER_DCMI_MemDMAXferCplt(uint32_t data, uint32_t size)
     // }
 }
 
-uint8_t cam_head[6 + 6] = "CAMERA";
+uint8_t cam_head[16] = "CAMERA";
 void dcmi_dma_start(void)
 {
     static uint32_t t1;
@@ -222,9 +233,25 @@ void dcmi_dma_start(void)
 
 //}
 
+//void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi)
+//{
+
+//}
+
+void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi)
+{
+    // if(is_send_head == 1)
+    // {
+    //     if(CAM_Transmit_HS((uint8_t *)cam_head, 16) == 0)
+    //         is_send_head = 0;
+    // }
+    // HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
+}
+
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
-
+    is_send_head = 1;
+    
     // HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_SET);
 	// HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_RESET);
     HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
@@ -288,7 +315,7 @@ static void USER_DCMI_DMAXferCplt(DMA_HandleTypeDef *hdma)
         {
             //str[cnt++] = '1';
             tmp = ((DMA_Stream_TypeDef *)(hdcmi->DMA_Handle->Instance))->M0AR;
-            USER_DCMI_MemDMAXferCplt(tmp, hdcmi->XferSize * 4);
+            USER_DCMI_MemDMAXferCplt(hdcmi->XferCount,tmp, hdcmi->XferSize * 4);
             hdcmi->XferCount--;
         }
         /* Update memory 1 address location */
@@ -296,7 +323,7 @@ static void USER_DCMI_DMAXferCplt(DMA_HandleTypeDef *hdma)
         {
             //str[cnt++] = '2';
             tmp = ((DMA_Stream_TypeDef *)(hdcmi->DMA_Handle->Instance))->M1AR;
-            USER_DCMI_MemDMAXferCplt(tmp, hdcmi->XferSize * 4);
+            USER_DCMI_MemDMAXferCplt(hdcmi->XferCount,tmp, hdcmi->XferSize * 4);
             hdcmi->XferCount--;
         }
         else
@@ -310,7 +337,7 @@ static void USER_DCMI_DMAXferCplt(DMA_HandleTypeDef *hdma)
     {
         //str[cnt++] = '4';
         tmp = ((DMA_Stream_TypeDef *)(hdcmi->DMA_Handle->Instance))->M0AR;
-        USER_DCMI_MemDMAXferCplt((uint32_t)tmp, hdcmi->XferSize * 4);
+        USER_DCMI_MemDMAXferCplt(hdcmi->XferCount,(uint32_t)tmp, hdcmi->XferSize * 4);
         //((DMA_Stream_TypeDef *)(hdcmi->DMA_Handle->Instance))->M0AR = hdcmi->pBuffPtr;
     }
     /* Update memory 1 address location */
@@ -319,7 +346,7 @@ static void USER_DCMI_DMAXferCplt(DMA_HandleTypeDef *hdma)
         //str[cnt++] = '5';
         tmp = ((DMA_Stream_TypeDef *)(hdcmi->DMA_Handle->Instance))->M1AR;
 
-        USER_DCMI_MemDMAXferCplt((uint32_t)tmp, hdcmi->XferSize * 4);
+        USER_DCMI_MemDMAXferCplt(255,(uint32_t)tmp, hdcmi->XferSize * 4);
         //tmp = hdcmi->pBuffPtr;
         //((DMA_Stream_TypeDef *)(hdcmi->DMA_Handle->Instance))->M1AR = (tmp + (4U*hdcmi->XferSize));
         hdcmi->XferCount = hdcmi->XferTransferNumber;

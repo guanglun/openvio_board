@@ -165,6 +165,7 @@ uint8_t CAM_Transmit_HS(uint8_t *Buf, uint32_t Len)
     {
         return USBD_BUSY;
     }
+    HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_RESET);
     //HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_SET);
     USBD_CAM_SetTxBuffer(&hUsbDeviceHS, Buf, Len);
     result = USBD_CAM_TransmitPacket(&hUsbDeviceHS);
