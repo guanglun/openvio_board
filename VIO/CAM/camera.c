@@ -121,7 +121,7 @@ void camera_init(void)
 		LCD_ShowString(0, 16 * 3, "[CAM CHIP][MT9V034]", RED, WHITE, 16, 0);
         mt9v034_init();
 	
-        //mt9v034_exposure(200);
+        mt9v034_exposure(500);
 
 		osDelay(100);
 		//LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
