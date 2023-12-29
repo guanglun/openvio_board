@@ -29,7 +29,6 @@
 #include "mdma.h"
 #include "sdmmc.h"
 #include "spi.h"
-#include "tim.h"
 #include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
@@ -112,12 +111,10 @@ int main(void)
   MX_MDMA_Init();
   MX_ADC1_Init();
   MX_USART2_UART_Init();
-  MX_TIM6_Init();
-  MX_TIM13_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_Base_Start_IT(&htim6);
-  HAL_TIM_Base_Start_IT(&htim13);
-  printf("hello openvio\r\n");
+  // HAL_TIM_Base_Start_IT(&htim6);
+  // HAL_TIM_Base_Start_IT(&htim13);
+  //printf("hello openvio\r\n");
 
   /* USER CODE END 2 */
 
@@ -224,9 +221,17 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void get_time(uint32_t *t1_cnt,uint16_t *t2_cnt)
 {
-	*t2_cnt = htim6.Instance->CNT;
-	*t1_cnt = timer_cnt;
+//	*t2_cnt = htim6.Instance->CNT;
+//	*t1_cnt = timer_cnt;
 }
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  //if(huart->Instance == USART2)
+  {
+    HAL_GPIO_TogglePin(TEST2_GPIO_Port, TEST2_Pin);
+  }
+}
+
 /* USER CODE END 4 */
 
  /**

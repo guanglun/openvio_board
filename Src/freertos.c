@@ -199,7 +199,7 @@ void StartDefaultTask(void const * argument)
   xQueue = xQueueCreate(200, sizeof(struct USB_FRAME_STRUCT));
   if (xQueue == NULL)
   {
-    printf("Camera xQueueCreate Fail\r\n");
+    //printf("Camera xQueueCreate Fail\r\n");
   }
 
   for (;;)

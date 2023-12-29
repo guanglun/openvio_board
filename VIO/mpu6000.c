@@ -83,7 +83,7 @@ int mpu6000_init(void)
 	uint8_t recv[6], id;
 
 	mpu6000_read_reg((0 | 0x80), &id, 1);
-	printf("[MPU6000] ID: %02X\r\n", id);
+	//printf("[MPU6000] ID: %02X\r\n", id);
 
 	if (id == 0x68)
 	{
@@ -109,7 +109,7 @@ int mpu6000_init(void)
 	}
 	else
 	{
-		printf("mpu6000 init fail\r\n");
+		//printf("mpu6000 init fail\r\n");
 		return 1;
 	}
 	

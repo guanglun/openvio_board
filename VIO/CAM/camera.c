@@ -56,11 +56,11 @@ void camera_timer_init(int fps)
     {
         // 启动定时器， 0 表示不阻塞
         xTimerStart(xTimerCAM, 0);
-        printf("[xTimerCAM][SUCCESS]\r\n");
+        //printf("[xTimerCAM][SUCCESS]\r\n");
     }
     else
     {
-        printf("[xTimerCAM][FAIL]\r\n");
+        //printf("[xTimerCAM][FAIL]\r\n");
     }
 }
 
@@ -81,7 +81,7 @@ void camera_init(void)
 
     cam_slv_addr = cambus_scan();
 
-    printf("[cam slv addr][%02X]\r\n", cam_slv_addr);
+    //printf("[cam slv addr][%02X]\r\n", cam_slv_addr);
 
     switch (cam_slv_addr)
     {
@@ -97,7 +97,7 @@ void camera_init(void)
         break;
     }
 
-    printf("[chip id][%02X]\r\n", chip_id);
+    //printf("[chip id][%02X]\r\n", chip_id);
 
     switch (chip_id)
     {
@@ -105,7 +105,7 @@ void camera_init(void)
         vio_status.cam_id = OV7725_ID;
         vio_status.gs_bpp = 2;
         vio_status.cam_frame_size_num = FRAMESIZE_VGA;//FRAMESIZE_QVGA;//FRAMESIZE_MLCD; //
-        printf("[CAM CHIP][OV7725]\r\n");
+        //printf("[CAM CHIP][OV7725]\r\n");
 		LCD_ShowString(0, 16 * 3, "[CAM CHIP][OV7725]", RED, WHITE, 16, 0);
         ov7725_init();
 	
@@ -118,7 +118,7 @@ void camera_init(void)
         vio_status.cam_id = MT9V034_ID;
         vio_status.gs_bpp = 1;
         vio_status.cam_frame_size_num = FRAMESIZE_WVGA2;
-        printf("[CAM CHIP][MT9V034]\r\n");
+        //printf("[CAM CHIP][MT9V034]\r\n");
 		LCD_ShowString(0, 16 * 3, "[CAM CHIP][MT9V034]", RED, WHITE, 16, 0);
         mt9v034_init();
 	
@@ -254,7 +254,7 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
     
     // HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_SET);
 	// HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_RESET);
-    HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
+    // HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
     //static BaseType_t xHigherPriorityTaskWoken;
     //xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken);
 }

@@ -99,10 +99,10 @@ int mt9v034_init(void)
 
 	if (chip_version != 0x1324)
 	{
-		printf("[mt9v034 chip version][read err]\r\n");
+		//printf("[mt9v034 chip version][read err]\r\n");
 		return -1;
 	}
-	printf("[mt9v034 chip version][ok]\r\n");
+	//printf("[mt9v034 chip version][ok]\r\n");
 
     mt9v034_dcmi_init();
     

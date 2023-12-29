@@ -178,8 +178,8 @@ void MPU6050_Init(void)
 
   if (MPU6050ReadID() == 1)
   {
-    printf("[MPU6050] [Init Success]\r\n");
-	LCD_ShowString(0,16 * 1,"[MPU6050] [Init Success]",RED,WHITE,16,0);	
+    //printf("[MPU6050] [Init Success]\r\n");
+	//LCD_ShowString(0,16 * 1,"[MPU6050] [Init Success]",RED,WHITE,16,0);	
 	  
     // while (1)
     // {
@@ -193,8 +193,8 @@ void MPU6050_Init(void)
   }
   else
   {
-    printf("[MPU6050] [Init Fail]\r\n");
-	LCD_ShowString(0,16 * 1,"[MPU6050] [Init Fail]",RED,WHITE,16,0);	
+    //printf("[MPU6050] [Init Fail]\r\n");
+	//LCD_ShowString(0,16 * 1,"[MPU6050] [Init Fail]",RED,WHITE,16,0);	
   }
 
   //  // 申请定时器， 配置
@@ -233,7 +233,7 @@ uint8_t MPU6050ReadID(void)
   MPU6050_ReadData(MPU6050_RA_WHO_AM_I, &Re, 1); //读器件地址
   if (Re != 0x68)
   {
-    printf("[MPU6050][ID ERRORR]\r\n");
+    //printf("[MPU6050][ID ERRORR]\r\n");
     return 0;
   }
   else
