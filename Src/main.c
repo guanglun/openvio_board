@@ -226,9 +226,9 @@ void get_time(uint32_t *t1_cnt,uint16_t *t2_cnt)
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  //if(huart->Instance == USART2)
+  if(huart->Instance == USART2)
   {
-    HAL_GPIO_TogglePin(TEST2_GPIO_Port, TEST2_Pin);
+    HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
   }
 }
 

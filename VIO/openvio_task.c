@@ -148,7 +148,7 @@ void StartOpenvioTask(void const *argument)
 
 	//sdcard_init();
 
-	camera_init();
+	//camera_init();
 
 	while (1)
 	{
