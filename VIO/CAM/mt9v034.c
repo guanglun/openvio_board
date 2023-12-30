@@ -87,6 +87,14 @@ void mt9v034_dcmi_init(void)
 
 }
 
+void set_triggered_mode(int enable)
+{
+    uint16_t reg;
+    int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_CHIP_CONTROL, &reg);
+    ret |= cambus_writew(MT9V034_SLV_ADDR, MT9V034_CHIP_CONTROL,
+                         (reg & (~MT9V034_CHIP_CONTROL_MODE_MASK)) | ((enable != 0) ? MT9V034_CHIP_CONTROL_SNAP_MODE : MT9V034_CHIP_CONTROL_MASTER_MODE));
+}
+
 int mt9v034_init(void)
 {
 	uint16_t chip_version = 0;
@@ -111,8 +119,8 @@ int mt9v034_init(void)
 	// set_colorbar(0);
 	set_vflip(0);
 	set_hmirror(0);
-	set_auto_exposure(0,20000); //曝光设置
-
+	set_auto_exposure(0,1000); //曝光设置
+	set_triggered_mode(1);
 	// uint16_t chip_control;
 	// int enable = 0;
 	// int ret = cambus_readw(MT9V034_SLV_ADDR, MT9V034_CHIP_CONTROL, &chip_control);

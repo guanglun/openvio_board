@@ -202,14 +202,24 @@ void DMA1_Stream0_IRQHandler(void)
 void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
-  static int int_count = 0;
+  static uint32_t int_count = 0;
   int_count++;
-    if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_5) != 0x00U)
+  if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_5) != 0x00U)
   {
-    HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_RESET);
-    //if(int_count % 10 == 0)
-      HAL_UART_Receive_IT(&huart2,u2recv,U2RECV_LEN);
-    HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
+    //HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_RESET);
+    //HAL_UART_Receive_DMA(&huart2,u2recv,U2RECV_LEN);
+    HAL_UART_Receive_IT(&huart2,u2recv,U2RECV_LEN);
+    //HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_RESET);
+    if(int_count % 10 == 0)
+    {
+      //HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
+      HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(DCMI_FSYNC_GPIO_Port, DCMI_FSYNC_Pin,GPIO_PIN_SET);
+      
+    }
+    //HAL_UART_Receive_IT(&huart2,u2recv,U2RECV_LEN);
+      
+    //HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
     //HAL_GPIO_TogglePin(TEST2_GPIO_Port, TEST2_Pin);
     __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_5);
   }
@@ -241,7 +251,7 @@ void SPI2_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
-// HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
+
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
@@ -319,6 +329,14 @@ void DCMI_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if(huart->Instance == USART2)
+  {
+    //HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_SET);
 
+    //HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
+  }
+}
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -102,6 +102,8 @@ void get_time(uint32_t *t1_cnt,uint16_t *t2_cnt);
 #define TFT_SPI_CS_GPIO_Port GPIOD
 #define DCMI_PWDN_Pin GPIO_PIN_7
 #define DCMI_PWDN_GPIO_Port GPIOD
+#define DCMI_FSYNC_Pin GPIO_PIN_4
+#define DCMI_FSYNC_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

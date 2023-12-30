@@ -144,11 +144,11 @@ void StartOpenvioTask(void const *argument)
 
 	//lcd_init();
 
-	MPU6050_Init();
+	//MPU6050_Init();
 
 	//sdcard_init();
 
-	//camera_init();
+	camera_init();
 
 	while (1)
 	{

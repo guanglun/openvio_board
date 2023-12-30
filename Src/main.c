@@ -224,13 +224,7 @@ void get_time(uint32_t *t1_cnt,uint16_t *t2_cnt)
 //	*t2_cnt = htim6.Instance->CNT;
 //	*t1_cnt = timer_cnt;
 }
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  if(huart->Instance == USART2)
-  {
-    HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
-  }
-}
+
 
 /* USER CODE END 4 */
 
