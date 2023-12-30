@@ -147,7 +147,7 @@ void USER_DCMI_MemDMAXferCplt(uint16_t index, uint32_t data, uint32_t size)
     if(index == 255){
         *(uint32_t *)&dcmi_image_buffer[752*480/2+4] = frame_cnt;
         frame_cnt++;
-        CAM_Transmit_HS((uint8_t *)data, size+8);
+        CAM_Transmit_HS((uint8_t *)data, size+16);
     }
     else{
         CAM_Transmit_HS((uint8_t *)data, size);

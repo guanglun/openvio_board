@@ -119,7 +119,7 @@ int mt9v034_init(void)
 	// set_colorbar(0);
 	set_vflip(0);
 	set_hmirror(0);
-	set_auto_exposure(0,1000); //曝光设置
+	set_auto_exposure(0,2000); //曝光设置
 	set_triggered_mode(1);
 	// uint16_t chip_control;
 	// int enable = 0;

@@ -23,6 +23,7 @@
 #include "stm32h7xx_it.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "openvio.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -68,8 +69,10 @@ extern UART_HandleTypeDef huart2;
 extern TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN EV */
+extern DMA_BUFFER uint8_t dcmi_image_buffer[CAM_PACKAGE_MAX_SIZE * 2];
 #define U2RECV_LEN 50
 uint8_t u2recv[U2RECV_LEN];
+static uint32_t int_count = 0;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -202,18 +205,20 @@ void DMA1_Stream0_IRQHandler(void)
 void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
-  static uint32_t int_count = 0;
-  int_count++;
+  
+  
   if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_5) != 0x00U)
   {
     //HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_RESET);
     //HAL_UART_Receive_DMA(&huart2,u2recv,U2RECV_LEN);
     HAL_UART_Receive_IT(&huart2,u2recv,U2RECV_LEN);
     //HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_RESET);
+    int_count++;
     if(int_count % 10 == 0)
     {
       //HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
       HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(DCMI_FSYNC_GPIO_Port, DCMI_FSYNC_Pin,GPIO_PIN_SET);
       
     }
@@ -334,7 +339,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   if(huart->Instance == USART2)
   {
     //HAL_GPIO_WritePin(TEST1_GPIO_Port, TEST1_Pin, GPIO_PIN_SET);
-
+    if(int_count % 10 == 0)
+    {
+      memcpy((uint8_t *)&dcmi_image_buffer[752*480/2+8],u2recv+4,8);
+      HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
+    }
     //HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
   }
 }
